@@ -9,6 +9,7 @@ public enum DestinationNamer {
     }
 
     /// 크기까지 같으면 건너뛰고, 이름만 같거나 크기를 모르면 "이름 2.확장자"처럼 비어 있는 다음 번호를 붙입니다.
+    /// 번호 붙은 사본이 같은 크기로 이미 있어도 건너뜁니다. 그러지 않으면 다시 받을 때마다 사본이 하나씩 늘어납니다.
     public static func decide(filename: String, size: UInt64?, in folder: URL) -> Decision {
         let original = folder.appending(path: filename)
         guard let existingSize = sizeOfFile(at: original) else { return .write(original) }
@@ -22,7 +23,10 @@ public enum DestinationNamer {
                 : folder.appending(path: "\(name.deletingPathExtension) \(number).\(name.pathExtension)")
         }
         var number = 2
-        while sizeOfFile(at: numbered(number)) != nil {
+        while let numberedSize = sizeOfFile(at: numbered(number)) {
+            if numberedSize == size {
+                return .skip(numbered(number))
+            }
             number += 1
         }
         return .write(numbered(number))
