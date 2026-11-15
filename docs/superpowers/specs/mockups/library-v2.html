@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>새 스위치 앱 2차 시안</title>
+<style>
+:root { --page: #0e1014; --ptext: #eceef2; --psub: #a1a9b6; --pline: rgba(255,255,255,.08); --pcard: #1b1e24; --callout: #f5a623; --accent: #7a69ff; --new: #ff9f2e; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--page); color: var(--ptext); font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif; padding: 40px 40px 120px; -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 1400px; margin: 0 auto; }
+h1 { font-size: 28px; font-weight: 700; }
+.lead { color: var(--psub); font-size: 15px; line-height: 1.65; margin: 8px 0 26px; }
+.borrow { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 52px; }
+.borrow .bc { background: var(--pcard); border: 1px solid var(--pline); border-radius: 12px; overflow: hidden; }
+.borrow .bc img { width: 100%; height: 100%; object-fit: cover; object-position: left top; display: block; }
+.borrow .bc .t { padding: 16px 18px; }
+.borrow .bc h3 { font-size: 15px; margin-bottom: 8px; }
+.borrow .bc ul { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.borrow .bc li { font-size: 13.5px; color: var(--psub); line-height: 1.5; padding-left: 12px; position: relative; }
+.borrow .bc li::before { content: ""; position: absolute; left: 0; top: 8px; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
+
+.screen { margin-bottom: 70px; }
+.sh { display: flex; align-items: baseline; gap: 12px; margin-bottom: 16px; }
+.sh .badge { background: var(--callout); color: #1a1205; font-weight: 700; font-size: 13px; padding: 4px 10px; border-radius: 8px; transform: translateY(-3px); }
+.sh h2 { font-size: 24px; font-weight: 700; }
+.sh span.d { color: var(--psub); font-size: 15px; }
+
+/* ===== window themes ===== */
+.win { --win: #ffffff; --side: rgba(238,238,242,.92); --side-solid: #eeeef2; --insp: #f7f7f9; --text: #1d1d1f; --sub: #6e6e73; --faint: #9a9aa0; --line: rgba(0,0,0,.08); --line2: rgba(0,0,0,.12);
+  --hover: rgba(0,0,0,.06); --sel: rgba(0,0,0,.09); --cap: rgba(255,255,255,.86); --capb: rgba(0,0,0,.08); --capshadow: 0 1px 3px rgba(0,0,0,.08); --field: rgba(0,0,0,.05); --segon: #ffffff; --segbg: rgba(0,0,0,.06);
+  position: relative; display: grid; grid-template-columns: 236px 1fr 280px; height: 780px; background: var(--win); color: var(--text); border-radius: 14px; border: 1px solid rgba(255,255,255,.18); box-shadow: 0 30px 80px rgba(0,0,0,.5); }
+.win.dark { --win: #1d1e21; --side: rgba(38,39,43,.96); --side-solid: #26272b; --insp: #222326; --text: #ececef; --sub: #a0a0a8; --faint: #6f6f78; --line: rgba(255,255,255,.07); --line2: rgba(255,255,255,.12);
+  --hover: rgba(255,255,255,.05); --sel: rgba(255,255,255,.10); --cap: rgba(52,53,58,.9); --capb: rgba(255,255,255,.08); --capshadow: none; --field: rgba(255,255,255,.06); --segon: #55565d; --segbg: rgba(255,255,255,.07); border-color: rgba(255,255,255,.12); }
+.win > * { min-width: 0; }
+
+/* sidebar: Photos look + Eagle structure */
+.side { background: var(--side); border-right: 1px solid var(--line); border-radius: 14px 0 0 14px; padding: 14px 10px 10px; display: flex; flex-direction: column; position: relative; }
+.lights { display: flex; gap: 8px; margin: 2px 6px 14px; }
+.lights i { width: 12px; height: 12px; border-radius: 50%; display: block; }
+.lights i:nth-child(1) { background: #ff5f57; } .lights i:nth-child(2) { background: #febc2e; } .lights i:nth-child(3) { background: #28c840; }
+.lib { position: relative; display: flex; align-items: center; gap: 9px; padding: 8px; border-radius: 9px; margin-bottom: 8px; }
+.lib .ic { width: 28px; height: 28px; border-radius: 7px; background: linear-gradient(135deg, #8b7cff, #5d4bff); display: grid; place-items: center; color: #fff; flex: none; }
+.lib .n { font-size: 13.5px; font-weight: 700; line-height: 1.2; }
+.lib .s { font-size: 11px; color: var(--sub); display: flex; align-items: center; gap: 4px; margin-top: 2px; }
+.lib .chev { margin-left: auto; color: var(--faint); }
+.okdot { width: 6px; height: 6px; border-radius: 50%; background: #30c76a; display: inline-block; }
+.sec { font-size: 11px; font-weight: 700; color: var(--faint); margin: 12px 8px 4px; display: flex; justify-content: space-between; }
+.it { position: relative; display: flex; align-items: center; gap: 8px; padding: 5px 8px; border-radius: 7px; font-size: 13px; }
+.it svg { color: var(--accent); flex: none; }
+.it .nm { flex: 1; min-width: 0; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.it .c { font-size: 11.5px; color: var(--faint); font-variant-numeric: tabular-nums; }
+.it.on { background: var(--sel); }
+.it.on .c { color: var(--text); }
+.it .nb { background: var(--new); color: #fff; font-size: 10.5px; font-weight: 700; padding: 0 6px; border-radius: 999px; line-height: 16px; }
+.thumb-ic { width: 22px; height: 22px; border-radius: 5px; flex: none; position: relative; }
+.thumb-ic.new::after { content: ""; position: absolute; right: -2px; top: -2px; width: 7px; height: 7px; border-radius: 50%; background: var(--new); box-shadow: 0 0 0 2px var(--side-solid); }
+.filter { margin-top: auto; display: flex; align-items: center; gap: 6px; background: var(--field); border-radius: 8px; padding: 7px 10px; color: var(--faint); font-size: 12.5px; position: relative; }
+
+/* main */
+.main { display: flex; flex-direction: column; min-height: 0; overflow-x: visible; overflow-y: clip; }
+.tb { display: flex; align-items: center; gap: 10px; padding: 12px 14px; position: relative; }
+.cap { display: inline-flex; align-items: center; gap: 2px; background: var(--cap); border: 1px solid var(--capb); border-radius: 999px; box-shadow: var(--capshadow); padding: 3px; color: var(--text); position: relative; }
+.cap .b { width: 30px; height: 26px; display: grid; place-items: center; border-radius: 999px; color: var(--sub); }
+.cap .b.on { color: var(--accent); }
+.title { min-width: 0; margin-left: 4px; }
+.title b { display: block; font-size: 14.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.title small { font-size: 11.5px; color: var(--sub); }
+.sp { flex: 1; }
+.seg { display: flex; background: var(--segbg); border-radius: 999px; padding: 3px; position: relative; }
+.seg span { font-size: 12.5px; padding: 4px 13px; border-radius: 999px; color: var(--sub); font-weight: 500; }
+.seg span.on { background: var(--segon); color: var(--text); box-shadow: var(--capshadow); }
+.seg span.co { padding: 0; color: #1a1205; background: var(--callout); border-radius: 50%; font-weight: 800; font-size: 13px; }
+.zoom { display: inline-flex; align-items: center; gap: 8px; padding: 0 10px; height: 32px; }
+.zoom .track { width: 70px; height: 3px; background: var(--line2); border-radius: 3px; position: relative; }
+.zoom .track::after { content: ""; position: absolute; left: 34px; top: -5px; width: 13px; height: 13px; border-radius: 50%; background: var(--cap); border: 1px solid var(--line2); box-shadow: 0 1px 2px rgba(0,0,0,.2); }
+.zoom span { color: var(--sub); font-size: 15px; line-height: 1; }
+.pbtn { display: inline-flex; align-items: center; gap: 6px; background: var(--accent); color: #fff; font-size: 12.5px; font-weight: 600; padding: 7px 13px; border-radius: 999px; white-space: nowrap; position: relative; }
+
+.content { flex: 1; overflow-x: visible; overflow-y: clip; padding: 4px 14px 14px; position: relative; }
+.play { margin-bottom: 18px; position: relative; }
+.play .ph { display: flex; align-items: baseline; gap: 8px; padding: 6px 2px 8px; position: relative; }
+.play .ph b { font-size: 17px; font-weight: 700; letter-spacing: -.01em; }
+.play .ph small { font-size: 12px; color: var(--sub); }
+.play .ph .tag { font-size: 10.5px; font-weight: 700; color: #fff; background: var(--new); padding: 1px 7px; border-radius: 999px; }
+.play .ph .tag.done { background: transparent; color: var(--faint); border: 1px solid var(--line2); }
+.play .ph .sel { margin-left: auto; font-size: 12px; color: var(--accent); font-weight: 600; }
+.tight { display: grid; gap: 3px; border-radius: 10px; overflow: hidden; }
+.tight.c4 { grid-template-columns: repeat(4, 1fr); }
+.tight.c5 { grid-template-columns: repeat(5, 1fr); }
+.tight.c6 { grid-template-columns: repeat(6, 1fr); }
+.scene { position: relative; aspect-ratio: 16 / 9; background: #888; }
+.scene .vid { position: absolute; left: 6px; bottom: 5px; display: inline-flex; align-items: center; gap: 4px; color: #fff; font-size: 11px; font-weight: 600; text-shadow: 0 1px 3px rgba(0,0,0,.6); }
+.scene .ok { position: absolute; right: 6px; bottom: 6px; width: 18px; height: 18px; border-radius: 50%; background: var(--accent); border: 2px solid #fff; display: grid; place-items: center; box-shadow: 0 1px 3px rgba(0,0,0,.3); }
+.scene.picked::after { content: ""; position: absolute; inset: 0; box-shadow: inset 0 0 0 3px var(--accent); }
+.scene .newdot { position: absolute; left: 6px; top: 6px; width: 8px; height: 8px; border-radius: 50%; background: var(--new); box-shadow: 0 0 0 2px rgba(255,255,255,.9); }
+.monthhead { position: sticky; top: 0; font-size: 22px; font-weight: 800; letter-spacing: -.02em; padding: 4px 2px 10px; }
+.monthhead small { font-size: 13px; font-weight: 600; color: var(--sub); margin-left: 6px; }
+.dayrow { display: flex; align-items: baseline; gap: 8px; margin: 10px 2px 6px; font-size: 12.5px; color: var(--sub); }
+.dayrow b { color: var(--text); font-size: 13px; }
+
+/* inspector: Eagle */
+.insp { background: var(--insp); border-left: 1px solid var(--line); border-radius: 0 14px 14px 0; padding: 16px 14px; display: flex; flex-direction: column; gap: 12px; position: relative; overflow-x: visible; overflow-y: clip; }
+.fieldbox { background: var(--field); border-radius: 8px; padding: 9px 11px; font-size: 13.5px; font-weight: 600; }
+.fieldbox.ph { font-weight: 400; color: var(--faint); font-size: 12.5px; }
+.props h5 { font-size: 11px; color: var(--faint); font-weight: 700; margin-bottom: 8px; }
+.props dl { display: grid; grid-template-columns: 92px 1fr; row-gap: 7px; font-size: 12.5px; }
+.props dt { color: var(--sub); }
+.props dd { color: var(--text); font-variant-numeric: tabular-nums; }
+.props dd .nb { background: var(--new); color: #fff; font-size: 10.5px; font-weight: 700; padding: 0 6px; border-radius: 999px; margin-left: 4px; }
+.hr { height: 1px; background: var(--line); }
+.ibtn { display: flex; align-items: center; justify-content: center; gap: 7px; font-size: 12.5px; font-weight: 600; padding: 8px; border-radius: 8px; background: var(--field); color: var(--text); position: relative; }
+.ibtn.pri { background: var(--accent); color: #fff; }
+.prev { border-radius: 8px; overflow: hidden; }
+.selstack { position: relative; height: 128px; margin: 4px 6px 2px; }
+.selstack .scene { position: absolute; width: 78%; border-radius: 7px; box-shadow: 0 6px 18px rgba(0,0,0,.35); }
+.files { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 11px; color: var(--sub); background: var(--field); border-radius: 8px; padding: 8px 10px; line-height: 1.75; }
+.files i { color: var(--text); font-style: normal; }
+.pop { display: flex; align-items: center; justify-content: space-between; background: var(--field); border-radius: 8px; padding: 6px 10px; font-size: 12px; }
+.pop small { color: var(--faint); font-size: 10.5px; display: block; }
+.statusline { position: absolute; left: 0; right: 0; bottom: 0; }
+
+/* callouts + notes */
+.co { position: absolute; z-index: 9; width: 24px; height: 24px; border-radius: 50%; background: var(--callout); color: #1a1205; font-weight: 800; font-size: 13px; display: grid; place-items: center; box-shadow: 0 0 0 3px var(--page); }
+.notes { display: grid; grid-template-columns: 1.4fr 1fr; gap: 18px; margin-top: 20px; }
+.card { background: var(--pcard); border: 1px solid var(--pline); border-radius: 12px; padding: 16px 18px; }
+.card h3 { font-size: 15px; margin-bottom: 10px; }
+.card ol { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+.card ol li { display: flex; gap: 10px; font-size: 13.5px; line-height: 1.55; color: var(--psub); }
+.card ol li em { flex: none; width: 21px; height: 21px; border-radius: 50%; background: var(--callout); color: #1a1205; font-style: normal; font-weight: 800; font-size: 11.5px; display: grid; place-items: center; margin-top: 1px; }
+.card ol li .from { display: inline-block; font-size: 11px; font-weight: 700; padding: 0 6px; border-radius: 999px; margin-left: 4px; background: rgba(122,105,255,.18); color: #c9c1ff; }
+.card p { font-size: 13.5px; line-height: 1.65; color: var(--psub); }
+.card p + p { margin-top: 8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>2차 시안: Eagle과 Apple 사진을 섞은 보관함</h1>
+  <p class="lead">세 칸 구조와 오른쪽 정보 칸은 Eagle에서, 생김새와 보기 전환은 Apple 사진에서 가져왔습니다. 1차 시안 3의 플레이 묶음과 새 항목 표시는 그대로 이어받았습니다.<br>같은 앱의 라이트 모드와 다크 모드 두 장면입니다. 맥의 화면 모드를 따라 바뀝니다.</p>
+
+  <div class="borrow">
+    <div class="bc"><div class="t"><h3>Eagle에서 가져온 것</h3><ul>
+      <li>왼쪽 위의 보관함 전환 단추. 여기서는 기기 전환(스위치 2, 스위치 1)입니다.</li>
+      <li>위쪽 고정 항목(모든 항목, 새 항목)과 그 아래 개수가 붙은 게임 목록</li>
+      <li>사이드바 맨 아래의 목록 찾기 칸</li>
+      <li>오른쪽 정보 칸: 이름, 속성 표, 내보내기 단추</li>
+      <li>썸네일 크기 막대</li>
+    </ul></div></div>
+    <div class="bc"><div class="t"><h3>Apple 사진에서 가져온 것</h3><ul>
+      <li>밝고 반투명한 사이드바와 작은 사진 아이콘이 붙은 목록</li>
+      <li>둥근 알약 모양 툴바 단추와 가운데 보기 전환(연, 월, 모든 사진). 여기서는 플레이, 날짜, 모두입니다.</li>
+      <li>틈이 거의 없는 사진 격자와 큰 날짜 제목</li>
+      <li>제목 아래 작은 날짜 줄</li>
+    </ul></div></div>
+  </div>
+
+  <!-- ========== 장면 1: 라이트 ========== -->
+  <section class="screen">
+    <div class="sh"><span class="badge">장면 1</span><h2>게임 하나를 연 모습</h2><span class="d">라이트 모드 · 플레이 보기 · 아무것도 고르지 않은 상태</span></div>
+    <div class="win">
+      <aside class="side">
+        <div class="lights"><i></i><i></i><i></i></div>
+        <div class="lib"><span class="co" style="left:-14px;top:-6px">1</span><span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="3"/><circle cx="7" cy="12" r="1.5"/><circle cx="17" cy="12" r="1.5"/></svg></span><div><div class="n">Nintendo Switch 2</div><div class="s"><span class="okdot"></span>연결됨 · 23.0.1</div></div><svg class="chev" width="10" height="14" viewBox="0 0 10 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 5l3-3 3 3M2 9l3 3 3-3"/></svg></div>
+        <div class="it"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg><span class="nm">모든 항목</span><span class="c">3,147</span></div>
+        <div class="it"><span class="co" style="left:-14px;top:-2px">2</span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 9l2-6h8l2 6v4H2z"/><path d="M2 9h4l1 2h2l1-2h4"/></svg><span class="nm">새 항목</span><span class="nb">30</span></div>
+        <div class="it"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="1.5" y="3.5" width="10" height="9" rx="1.5"/><path d="M11.5 7l3-2v6l-3-2"/></svg><span class="nm">영상</span><span class="c">87</span></div>
+        <div class="it"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="6"/><path d="M8 4.5V8l2.5 1.5"/></svg><span class="nm">최근 가져온 항목</span><span class="c">74</span></div>
+        <div class="sec"><span>게임 (10)</span></div>
+        <div class="it on"><span class="co" style="left:-14px;top:-2px">3</span><span class="thumb-ic new" data-g="hyrule" data-i="901"></span><span class="nm">젤다무쌍 봉인전기</span><span class="c">86</span></div>
+        <div class="it"><span class="thumb-ic new" data-g="kirby" data-i="902"></span><span class="nm">커비 에어 라이더</span><span class="c">31</span></div>
+        <div class="it"><span class="thumb-ic" data-g="fe" data-i="903"></span><span class="nm">파이어 엠블렘 만자천홍</span><span class="c">52</span></div>
+        <div class="it"><span class="thumb-ic" data-g="mk" data-i="904"></span><span class="nm">마리오 카트 월드</span><span class="c">29</span></div>
+        <div class="it"><span class="thumb-ic" data-g="dk" data-i="905"></span><span class="nm">동키콩 바난자</span><span class="c">24</span></div>
+        <div class="it"><span class="thumb-ic" data-g="pza" data-i="906"></span><span class="nm">Pokémon LEGENDS Z-A</span><span class="c">15</span></div>
+        <div class="it"><span class="thumb-ic" data-g="totk" data-i="907"></span><span class="nm">젤다의 전설 티어스 오브 더 킹덤 Nintendo Switch 2 Edition</span><span class="c">40</span></div>
+        <div class="it"><span class="thumb-ic" data-g="acnh" data-i="908"></span><span class="nm">모여봐요 동물의 숲</span><span class="c">241</span></div>
+        <div class="it"><span class="thumb-ic" data-g="fe3h" data-i="909"></span><span class="nm">파이어 엠블렘 풍화설월</span><span class="c">2,626</span></div>
+        <div class="filter"><span class="co" style="left:-14px;top:-4px">4</span><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 3h12l-4.5 5.5V13l-3 1.5V8.5z"/></svg>게임 이름으로 찾기</div>
+      </aside>
+      <div class="main">
+        <div class="tb">
+          <span class="cap"><span class="b"><svg width="16" height="14" viewBox="0 0 18 14" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="1" y="1" width="16" height="12" rx="2.5"/><path d="M6 1v12"/></svg></span></span>
+          <div class="title"><b>젤다무쌍 봉인전기</b><small>11월 1일 ~ 14일 · 사진 80 · 영상 6</small></div>
+          <div class="sp"></div>
+          <span class="cap zoom"><span>−</span><span class="track"></span><span>+</span></span>
+          <span class="seg"><span class="co" style="left:-12px;top:-14px">5</span><span class="on">플레이</span><span>날짜</span><span>모두</span></span>
+          <span class="cap"><span class="b"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 4h12M4 8h8M6 12h4"/></svg></span><span class="b on"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="6.2"/><path d="M8 7v4.2M8 4.8v.1"/></svg></span><span class="b"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="7" cy="7" r="5"/><path d="M11 11l3.5 3.5"/></svg></span></span>
+        </div>
+        <div class="content">
+          <div class="play"><span class="co" style="left:-40px;top:6px">6</span>
+            <div class="ph"><b>11월 14일 토요일</b><small>밤 9:12 ~ 11:40 · 사진 14 · 영상 1</small><span class="tag">새로 찍음</span><span class="sel">이 플레이 고르기</span></div>
+            <div class="tight c5">
+              <div class="scene" data-g="hyrule" data-i="101"><span class="newdot"></span></div><div class="scene" data-g="hyrule" data-i="102"><span class="newdot"></span></div><div class="scene" data-g="hyrule" data-i="103"><span class="newdot"></span><span class="vid"><svg width="9" height="9" viewBox="0 0 10 10"><path d="M2 1l7 4-7 4z" fill="#fff"/></svg>0:30</span></div><div class="scene" data-g="hyrule" data-i="104"><span class="newdot"></span></div><div class="scene" data-g="hyrule" data-i="105"><span class="newdot"></span></div>
+              <div class="scene" data-g="hyrule" data-i="106"><span class="newdot"></span></div><div class="scene" data-g="hyrule" data-i="107"><span class="newdot"></span></div><div class="scene" data-g="hyrule" data-i="108"><span class="newdot"></span></div><div class="scene" data-g="hyrule" data-i="109"><span class="newdot"></span></div><div class="scene" data-g="hyrule" data-i="110"><span class="newdot"></span></div>
+            </div>
+          </div>
+          <div class="play">
+            <div class="ph"><b>11월 13일 금요일</b><small>오후 4:05 ~ 6:20 · 사진 9</small><span class="tag">새로 찍음</span><span class="sel">이 플레이 고르기</span></div>
+            <div class="tight c5">
+              <div class="scene" data-g="hyrule" data-i="111"><span class="newdot"></span></div><div class="scene" data-g="hyrule" data-i="112"><span class="newdot"></span></div><div class="scene" data-g="hyrule" data-i="113"><span class="newdot"></span></div><div class="scene" data-g="hyrule" data-i="114"><span class="newdot"></span></div><div class="scene" data-g="hyrule" data-i="115"><span class="newdot"></span></div>
+            </div>
+          </div>
+          <div class="play">
+            <div class="ph"><b>11월 8일 일요일</b><small>오전 10:30 ~ 낮 12:10 · 사진 11</small><span class="tag done">가져옴</span></div>
+            <div class="tight c5">
+              <div class="scene" data-g="hyrule" data-i="121"></div><div class="scene" data-g="hyrule" data-i="122"></div><div class="scene" data-g="hyrule" data-i="123"></div><div class="scene" data-g="hyrule" data-i="124"></div><div class="scene" data-g="hyrule" data-i="125"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <aside class="insp">
+        <span class="co" style="left:-14px;top:70px">7</span>
+        <div class="prev"><div class="scene" data-g="hyrule" data-i="101"></div></div>
+        <div class="fieldbox">젤다무쌍 봉인전기</div>
+        <div class="props"><h5>정보</h5><dl>
+          <dt>항목</dt><dd>86 (사진 80, 영상 6)</dd>
+          <dt>크기</dt><dd>182.4MB</dd>
+          <dt>처음 찍은 날</dt><dd>2026. 11. 1.</dd>
+          <dt>마지막 찍은 날</dt><dd>2026. 11. 14.</dd>
+          <dt>플레이</dt><dd>7번</dd>
+          <dt>지난번 가져옴</dt><dd>11월 8일, 62개</dd>
+          <dt>새 항목</dt><dd>24개<span class="nb">새</span></dd>
+        </dl></div>
+        <div class="hr"></div>
+        <div class="pop"><div><small>가져올 곳</small>사진 › 스위치 › 젤다무쌍 봉인전기</div><svg width="10" height="14" viewBox="0 0 10 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 5l3-3 3 3M2 9l3 3 3-3"/></svg></div>
+        <div class="ibtn pri"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 2v8M4.5 6.5 8 10l3.5-3.5M3 13h10"/></svg>새 항목 24개 가져오기</div>
+        <div class="ibtn">게임 전체 내보내기</div>
+      </aside>
+    </div>
+    <div class="notes">
+      <div class="card"><h3>화면 설명</h3><ol>
+        <li><em>1</em><span>기기 전환 단추입니다. 스위치 2와 스위치 1을 같이 꽂으면 여기서 바꿉니다. 연결 상태와 펌웨어 버전을 늘 보여 줍니다.<span class="from">Eagle</span></span></li>
+        <li><em>2</em><span>고정 항목입니다. 새 항목은 지난번 가져온 뒤 새로 찍은 것만 모읍니다.<span class="from">Eagle</span></span></li>
+        <li><em>3</em><span>게임 목록에는 그 게임의 최근 캡처를 작은 아이콘으로 붙이고, 이름은 두 줄까지 보여 줍니다. 새 항목이 있으면 주황 점이 붙습니다.<span class="from">Apple 사진</span></span></li>
+        <li><em>4</em><span>게임이 많을 때 이름으로 좁혀 찾습니다.<span class="from">Eagle</span></span></li>
+        <li><em>5</em><span>보기 전환입니다. 플레이는 한 번 앉아서 한 플레이 단위, 날짜는 월과 날 단위, 모두는 한 격자입니다.<span class="from">Apple 사진</span></span></li>
+        <li><em>6</em><span>틈이 거의 없는 격자와 큰 날짜 제목입니다. 새로 찍은 캡처는 왼쪽 위에 주황 점이 붙습니다.<span class="from">Apple 사진</span></span></li>
+        <li><em>7</em><span>아무것도 고르지 않으면 오른쪽 칸에 게임 정보와 가져오기 단추가 나옵니다.<span class="from">Eagle</span></span></li>
+      </ol></div>
+      <div class="card"><h3>1차 시안과 달라진 점</h3>
+        <p>사이드바와 툴바가 Apple 사진처럼 가벼워졌습니다. 테두리 상자 대신 반투명 면과 알약 모양 단추를 씁니다.</p>
+        <p>오른쪽 칸이 Eagle처럼 두 가지 일을 합니다. 아무것도 고르지 않으면 게임 정보를 보여 주고, 고르면 내보내기 칸으로 바뀝니다(장면 2).</p>
+        <p>격자의 틈과 둥근 모서리를 줄여 같은 넓이에 캡처가 더 크게 보입니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 장면 2: 다크 ========== -->
+  <section class="screen">
+    <div class="sh"><span class="badge">장면 2</span><h2>여러 장을 고른 모습</h2><span class="d">다크 모드 · 날짜 보기 · 8개를 고른 상태</span></div>
+    <div class="win dark">
+      <aside class="side">
+        <div class="lights"><i></i><i></i><i></i></div>
+        <div class="lib"><span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="3"/><circle cx="7" cy="12" r="1.5"/><circle cx="17" cy="12" r="1.5"/></svg></span><div><div class="n">Nintendo Switch 2</div><div class="s"><span class="okdot"></span>연결됨 · 23.0.1</div></div><svg class="chev" width="10" height="14" viewBox="0 0 10 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 5l3-3 3 3M2 9l3 3 3-3"/></svg></div>
+        <div class="it"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg><span class="nm">모든 항목</span><span class="c">3,147</span></div>
+        <div class="it"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 9l2-6h8l2 6v4H2z"/><path d="M2 9h4l1 2h2l1-2h4"/></svg><span class="nm">새 항목</span><span class="nb">30</span></div>
+        <div class="it"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="1.5" y="3.5" width="10" height="9" rx="1.5"/><path d="M11.5 7l3-2v6l-3-2"/></svg><span class="nm">영상</span><span class="c">87</span></div>
+        <div class="it"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="6"/><path d="M8 4.5V8l2.5 1.5"/></svg><span class="nm">최근 가져온 항목</span><span class="c">74</span></div>
+        <div class="sec"><span>게임 (10)</span></div>
+        <div class="it"><span class="thumb-ic new" data-g="hyrule" data-i="901"></span><span class="nm">젤다무쌍 봉인전기</span><span class="c">86</span></div>
+        <div class="it"><span class="thumb-ic new" data-g="kirby" data-i="902"></span><span class="nm">커비 에어 라이더</span><span class="c">31</span></div>
+        <div class="it on"><span class="thumb-ic" data-g="fe" data-i="903"></span><span class="nm">파이어 엠블렘 만자천홍</span><span class="c">52</span></div>
+        <div class="it"><span class="thumb-ic" data-g="mk" data-i="904"></span><span class="nm">마리오 카트 월드</span><span class="c">29</span></div>
+        <div class="it"><span class="thumb-ic" data-g="dk" data-i="905"></span><span class="nm">동키콩 바난자</span><span class="c">24</span></div>
+        <div class="it"><span class="thumb-ic" data-g="pza" data-i="906"></span><span class="nm">Pokémon LEGENDS Z-A</span><span class="c">15</span></div>
+        <div class="it"><span class="thumb-ic" data-g="totk" data-i="907"></span><span class="nm">젤다의 전설 티어스 오브 더 킹덤 Nintendo Switch 2 Edition</span><span class="c">40</span></div>
+        <div class="it"><span class="thumb-ic" data-g="acnh" data-i="908"></span><span class="nm">모여봐요 동물의 숲</span><span class="c">241</span></div>
+        <div class="it"><span class="thumb-ic" data-g="fe3h" data-i="909"></span><span class="nm">파이어 엠블렘 풍화설월</span><span class="c">2,626</span></div>
+        <div class="filter"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 3h12l-4.5 5.5V13l-3 1.5V8.5z"/></svg>게임 이름으로 찾기</div>
+      </aside>
+      <div class="main">
+        <div class="tb">
+          <span class="cap"><span class="b"><svg width="16" height="14" viewBox="0 0 18 14" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="1" y="1" width="16" height="12" rx="2.5"/><path d="M6 1v12"/></svg></span></span>
+          <div class="title"><b>파이어 엠블렘 만자천홍</b><small>10월 18일 ~ 11월 6일 · 사진 50 · 영상 2</small></div>
+          <div class="sp"></div>
+          <span class="cap zoom"><span>−</span><span class="track"></span><span>+</span></span>
+          <span class="seg"><span>플레이</span><span class="on">날짜</span><span>모두</span></span>
+          <span class="cap"><span class="b"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 4h12M4 8h8M6 12h4"/></svg></span><span class="b on"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="6.2"/><path d="M8 7v4.2M8 4.8v.1"/></svg></span><span class="b"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="7" cy="7" r="5"/><path d="M11 11l3.5 3.5"/></svg></span></span>
+        </div>
+        <div class="content">
+          <div class="monthhead"><span class="co" style="left:-26px;top:2px">1</span>11월<small>2026년 · 사진 12 · 영상 1</small></div>
+          <div class="dayrow"><b>6일 금요일</b>밤 10:02 ~ 11:48</div>
+          <div class="tight c6">
+            <div class="scene picked" data-g="fe" data-i="201"><span class="ok"><svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.6"><path d="M2 6.5 5 9l5-6"/></svg></span></div>
+            <div class="scene picked" data-g="fe" data-i="202"><span class="ok"><svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.6"><path d="M2 6.5 5 9l5-6"/></svg></span></div>
+            <div class="scene" data-g="fe" data-i="203"></div>
+            <div class="scene picked" data-g="fe" data-i="204"><span class="ok"><svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.6"><path d="M2 6.5 5 9l5-6"/></svg></span><span class="vid"><svg width="9" height="9" viewBox="0 0 10 10"><path d="M2 1l7 4-7 4z" fill="#fff"/></svg>0:30</span></div>
+            <div class="scene picked" data-g="fe" data-i="205"><span class="ok"><svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.6"><path d="M2 6.5 5 9l5-6"/></svg></span></div>
+            <div class="scene" data-g="fe" data-i="206"></div>
+            <div class="scene picked" data-g="fe" data-i="207"><span class="ok"><svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.6"><path d="M2 6.5 5 9l5-6"/></svg></span></div>
+            <div class="scene picked" data-g="fe" data-i="208"><span class="ok"><svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.6"><path d="M2 6.5 5 9l5-6"/></svg></span></div>
+            <div class="scene" data-g="fe" data-i="209"></div>
+            <div class="scene picked" data-g="fe" data-i="210"><span class="ok"><svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.6"><path d="M2 6.5 5 9l5-6"/></svg></span></div>
+            <div class="scene" data-g="fe" data-i="211"></div><div class="scene" data-g="fe" data-i="212"></div>
+          </div>
+          <div class="dayrow"><b>2일 월요일</b>오후 2:40 ~ 3:15</div>
+          <div class="tight c6"><div class="scene" data-g="fe" data-i="221"></div></div>
+          <div class="monthhead" style="margin-top:18px">10월<small>2026년 · 사진 38 · 영상 1</small></div>
+          <div class="dayrow"><b>31일 토요일</b>오후 1:20 ~ 5:05</div>
+          <div class="tight c6">
+            <div class="scene" data-g="fe" data-i="231"></div><div class="scene" data-g="fe" data-i="232"></div><div class="scene" data-g="fe" data-i="233"></div><div class="scene" data-g="fe" data-i="234"></div><div class="scene" data-g="fe" data-i="235"></div><div class="scene" data-g="fe" data-i="236"></div>
+            <div class="scene" data-g="fe" data-i="237"></div><div class="scene" data-g="fe" data-i="238"></div><div class="scene" data-g="fe" data-i="239"></div><div class="scene" data-g="fe" data-i="240"></div><div class="scene" data-g="fe" data-i="241"></div><div class="scene" data-g="fe" data-i="242"></div>
+          </div>
+        </div>
+      </div>
+      <aside class="insp">
+        <span class="co" style="left:-14px;top:14px">2</span>
+        <div class="selstack">
+          <div class="scene" data-g="fe" data-i="201" style="left:2%;top:18px;transform:rotate(-5deg)"></div>
+          <div class="scene" data-g="fe" data-i="205" style="left:18%;top:10px;transform:rotate(4deg)"></div>
+          <div class="scene" data-g="fe" data-i="210" style="left:10%;top:22px"></div>
+        </div>
+        <div class="fieldbox">8개 고름</div>
+        <div class="props"><h5>고른 항목</h5><dl>
+          <dt>사진, 영상</dt><dd>사진 7, 영상 1</dd>
+          <dt>크기</dt><dd>14.6MB</dd>
+          <dt>찍은 때</dt><dd>11월 6일 밤 10:02 ~ 11:41</dd>
+        </dl></div>
+        <div class="hr"></div>
+        <div class="pop" style="position:relative"><span class="co" style="left:-26px;top:4px">3</span><div><small>내보낼 곳</small>사진 › 블로그 › 파이어 엠블렘 만자천홍</div><svg width="10" height="14" viewBox="0 0 10 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 5l3-3 3 3M2 9l3 3 3-3"/></svg></div>
+        <div class="pop"><div><small>파일 이름</small>찍은 순서대로 번호 붙이기</div><svg width="10" height="14" viewBox="0 0 10 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 5l3-3 3 3M2 9l3 3 3-3"/></svg></div>
+        <div class="files"><i>001</i>_20261106_2202.jpg<br><i>002</i>_20261106_2207.jpg<br><i>003</i>_20261106_2215.mp4<br>…<br><i>008</i>_20261106_2341.jpg</div>
+        <div class="ibtn pri" style="margin-top:auto"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 2v8M4.5 6.5 8 10l3.5-3.5M3 13h10"/></svg>8개 내보내기</div>
+      </aside>
+    </div>
+    <div class="notes">
+      <div class="card"><h3>화면 설명</h3><ol>
+        <li><em>1</em><span>날짜 보기입니다. 큰 월 제목 아래에 날마다 플레이 시간대를 적습니다. 2,626개짜리 게임도 월 제목을 따라 내려가며 찾습니다.<span class="from">Apple 사진</span></span></li>
+        <li><em>2</em><span>여러 장을 고르면 오른쪽 칸이 내보내기 칸으로 바뀝니다. 고른 캡처를 겹친 묶음으로 보여 주고 개수, 크기, 찍은 때를 적습니다.<span class="from">Eagle</span></span></li>
+        <li><em>3</em><span>내보낼 곳과 파일 이름 규칙을 고르면, 실제로 만들어질 파일 이름을 바로 아래에 미리 보여 줍니다.<span class="from">Photo Mechanic</span></span></li>
+      </ol></div>
+      <div class="card"><h3>남은 결정</h3>
+        <p>기본 보기를 플레이로 둘지 날짜로 둘지는 실제 캡처로 써 보고 정하면 됩니다. 시안에서는 플레이를 기본으로 두었습니다.</p>
+        <p>"가져오기"와 "내보내기"를 하나로 합칠지도 정해야 합니다. 지금은 가져오기를 게임별 보관 폴더로, 내보내기를 고른 것만 원하는 폴더로 나눴습니다.</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+const PAL = {
+  hyrule: { sky: ['#9cc9e4', '#d9ead0'], ground: ['#55804a', '#2f4d2c'], dots: ['#e8c15a', '#7dbb57', '#8a5a34', '#f2e7c9', '#c0503a'] },
+  kirby:  { sky: ['#bfe6ff', '#fbd8ec'], ground: ['#9bd98f', '#5fae66'], dots: ['#ff6fa3', '#ffe066', '#ffffff', '#ff9ec4'] },
+  mk:     { sky: ['#73c8ff', '#cfeeff'], ground: ['#6a707c', '#3d424c'], dots: ['#e5483c', '#ffd34d', '#3aa0ff', '#ffffff'] },
+  fe:     { sky: ['#6a4a8c', '#c98bb0'], ground: ['#3b2b52', '#1f1730'], dots: ['#f0c35a', '#b58cff', '#e6a0c4', '#ffffff'] },
+  fe3h:   { sky: ['#4e5d8a', '#a7b5d6'], ground: ['#3a3328', '#1f1b16'], dots: ['#d9b45a', '#9a2f2f', '#2f5d9a', '#e9e2cf'] },
+  totk:   { sky: ['#3f6b62', '#9fc4b4'], ground: ['#2c3f39', '#17221f'], dots: ['#5ff2c4', '#c9b37a', '#2aa889', '#e8f7f0'] },
+  pza:    { sky: ['#23345e', '#4b5f95'], ground: ['#1b2238', '#10141f'], dots: ['#12d6a3', '#ff4f7b', '#ffd166', '#9ad7ff'] },
+  dk:     { sky: ['#f7b65a', '#ffe0a3'], ground: ['#7a4c27', '#4a2c15'], dots: ['#c2452d', '#f08c4a', '#ffd34d', '#5a3a1e'] },
+  acnh:   { sky: ['#a8e0ff', '#e3f6ff'], ground: ['#8ed36f', '#4fa556'], dots: ['#ffcf5c', '#6fc3e8', '#ff8fa3', '#ffffff'] },
+};
+function hash(s) { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
+function rng(seed) { let s = seed || 1; return () => { s ^= s << 13; s >>>= 0; s ^= s >> 17; s ^= s << 5; s >>>= 0; return (s % 10000) / 10000; }; }
+function paint(el) {
+  const p = PAL[el.dataset.g]; if (!p) return;
+  const r = rng(hash(el.dataset.g + ':' + (el.dataset.i || '0')));
+  const w = el.clientWidth || 200;
+  const hz = 38 + r() * 26;
+  const layers = [];
+  layers.push(`radial-gradient(circle ${Math.round(w * (0.10 + r() * 0.08))}px at ${Math.round(10 + r() * 80)}% ${Math.round(10 + r() * 14)}%, rgba(255,255,255,.55), rgba(255,255,255,0))`);
+  const n = 3 + Math.floor(r() * 4);
+  for (let k = 0; k < n; k++) {
+    const c = p.dots[Math.floor(r() * p.dots.length)];
+    const rad = Math.max(2, Math.round(w * (0.018 + r() * 0.05)));
+    const x = Math.round(5 + r() * 90), y = Math.round(hz - 6 + r() * (96 - hz));
+    layers.push(`radial-gradient(circle ${rad}px at ${x}% ${y}%, ${c} 96%, transparent 100%)`);
+  }
+  if (r() > .45) layers.push(`linear-gradient(${Math.round(r() * 30 - 15)}deg, transparent ${Math.round(40 + r() * 20)}%, rgba(255,255,255,.08) 0, transparent ${Math.round(70 + r() * 20)}%)`);
+  layers.push(`linear-gradient(180deg, ${p.sky[0]} 0%, ${p.sky[1]} ${hz}%, ${p.ground[0]} ${hz}%, ${p.ground[1]} 100%)`);
+  el.style.background = layers.join(',');
+}
+function paintAll() { document.querySelectorAll('[data-g]').forEach(paint); }
+window.addEventListener('load', paintAll);
+window.addEventListener('resize', paintAll);
+</script>
+</body>
+</html>
