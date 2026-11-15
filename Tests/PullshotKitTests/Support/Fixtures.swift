@@ -96,3 +96,8 @@ func captureFixture(
         gameFolder: game
     )
 }
+
+/// 임시 폴더 아래 새 경로입니다. 만들지는 않습니다.
+func temporaryFolderFixture() -> URL {
+    FileManager.default.temporaryDirectory.appending(path: "pullshot-\(UUID())")
+}
