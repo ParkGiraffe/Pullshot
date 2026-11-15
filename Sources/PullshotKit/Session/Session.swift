@@ -7,10 +7,13 @@ public final class Session {
     static let dataReadTimeout: TimeInterval = 30
     static let readLength = 512 * 1024
     static let maxStrayEvents = 16
+    /// 0바이트 읽기는 바로 돌아와 시간 초과가 나지 않으므로, 연달아 이만큼 오면 응답이 없는 것으로 봅니다.
+    static let maxEmptyReads = 64
 
     let transport: Transport
     let trace: ((String) -> Void)?
     var buffer = PacketBuffer()
+    private var consecutiveEmptyReads = 0
     /// 세션 없는 GetDeviceInfo와 OpenSession은 0을 쓰고, 세션 안의 첫 명령은 1부터 셉니다.
     var nextTransactionID: UInt32 = 0
     public internal(set) var isOpen = false
@@ -48,16 +51,12 @@ public final class Session {
     }
 
     /// 명령 하나를 주고받고, OK가 아니면 그 응답을 오류로 던집니다.
-    func transact(
-        _ operation: PTP.Operation,
-        _ parameters: [UInt32] = [],
-        transactionID: UInt32? = nil
-    ) throws -> (data: Data, response: Container) {
-        let exchanged = try exchange(operation, parameters, transactionID: transactionID)
-        guard exchanged.response.code == PTP.Response.ok.rawValue else {
-            throw SessionError.response(PTP.Response(rawValue: exchanged.response.code), operation: operation)
+    func transact(_ operation: PTP.Operation, _ parameters: [UInt32] = []) throws -> (data: Data, response: Container) {
+        let reply = try exchange(operation, parameters)
+        guard reply.response.code == PTP.Response.ok.rawValue else {
+            throw SessionError.response(PTP.Response(rawValue: reply.response.code), operation: operation)
         }
-        return exchanged
+        return reply
     }
 
     /// 응답 코드를 따지지 않고 명령, 데이터, 응답을 주고받습니다. 열기처럼 OK가 아닌 응답도 다뤄야 할 때 씁니다.
@@ -67,7 +66,7 @@ public final class Session {
         transactionID: UInt32? = nil
     ) throws -> (data: Data, response: Container) {
         let id = transactionID ?? takeTransactionID()
-        return try guarded {
+        return try invalidatingOnFailure {
             try send(.command(operation, transactionID: id, parameters: parameters))
             var data = Data()
             var strayEvents = 0
@@ -90,8 +89,8 @@ public final class Session {
         }
     }
 
-    /// 어긋날 수 있는 일을 감쌉니다. 어떤 실패든 기기와의 순서가 어긋났을 수 있어 세션을 버립니다.
-    func guarded<T>(_ body: () throws -> T) throws -> T {
+    /// 기기와 주고받는 일을 감쌉니다. 어떤 실패든 기기와의 순서가 어긋났을 수 있어 세션을 버립니다.
+    func invalidatingOnFailure<T>(_ body: () throws -> T) throws -> T {
         guard isValid else { throw SessionError.invalidated }
         do {
             return try body()
@@ -122,9 +121,16 @@ public final class Session {
                     : "← \(Self.hex(container.code)) tid \(container.transactionID)")
                 return container
             }
-            // 0바이트 읽기(ZLP)는 버퍼에 아무것도 더하지 않으므로 다음 읽기로 넘어갑니다.
-            try buffer.append(transport.read(maxLength: Self.readLength, timeout: timeout))
+            try fill(timeout: timeout)
         }
+    }
+
+    /// 한 번 읽어 버퍼에 더합니다. 0바이트 읽기(ZLP)는 아무것도 더하지 않고 다음 읽기로 넘어가게 합니다.
+    func fill(timeout: TimeInterval) throws {
+        let chunk = try transport.read(maxLength: Self.readLength, timeout: timeout)
+        consecutiveEmptyReads = chunk.isEmpty ? consecutiveEmptyReads + 1 : 0
+        guard consecutiveEmptyReads <= Self.maxEmptyReads else { throw TransportError.timedOut }
+        buffer.append(chunk)
     }
 
     func requireTransaction(_ expected: UInt32, _ actual: UInt32) throws {

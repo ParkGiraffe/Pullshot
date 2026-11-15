@@ -55,6 +55,15 @@ struct ByteCodingTests {
         }
     }
 
+    @Suite("깨진 문자열")
+    struct BrokenStrings {
+        @Test func `짝 없는 UTF-16 대리 문자는 badString으로 던진다`() {
+            var reader = ByteReader(Data([0x02, 0x00, 0xD8, 0x00, 0x00]))
+
+            #expect(throws: PTPDecodingError.badString) { try reader.string() }
+        }
+    }
+
     @Suite("배열")
     struct Arrays {
         @Test func `32비트 개수 뒤에 원소를 잇는다`() throws {

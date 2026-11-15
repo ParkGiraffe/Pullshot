@@ -56,4 +56,34 @@ struct PacketBufferTests {
             #expect(try buffer.nextContainer()?.code == 0x2001)
         }
     }
+
+    @Suite("메모리")
+    struct Memory {
+        @Test func `흘려 보낸 바이트를 붙잡아 두지 않는다`() {
+            let chunk = Data(count: 512 * 1024)
+            let total = 256 * 1024 * 1024
+            var header = ByteWriter()
+            header.u32(UInt32(ContainerHeader.size + total))
+            header.u16(PTP.ContainerKind.data.rawValue)
+            header.u16(PTP.Operation.getObject.rawValue)
+            header.u32(1)
+            var buffer = PacketBuffer()
+            buffer.append(header.data)
+            _ = buffer.removeFirst(upTo: ContainerHeader.size)
+            let peakBefore = Self.peakResidentBytes()
+            for _ in 0 ..< total / chunk.count {
+                buffer.append(chunk)
+                _ = buffer.removeFirst(upTo: chunk.count)
+            }
+
+            #expect(Self.peakResidentBytes() - peakBefore < 64 * 1024 * 1024)
+        }
+
+        /// 이 프로세스가 지금까지 가장 많이 쓴 실제 메모리입니다(macOS는 바이트 단위).
+        static func peakResidentBytes() -> Int {
+            var usage = rusage()
+            getrusage(RUSAGE_SELF, &usage)
+            return usage.ru_maxrss
+        }
+    }
 }

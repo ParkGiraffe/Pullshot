@@ -7,10 +7,6 @@ public struct PacketBuffer {
 
     public init() {}
 
-    public var count: Int {
-        bytes.count
-    }
-
     public var isEmpty: Bool {
         bytes.isEmpty
     }
@@ -28,7 +24,8 @@ public struct PacketBuffer {
     /// 앞에서 최대 `count`바이트를 덜어 냅니다. 큰 데이터를 파일로 흘려 쓸 때 씁니다.
     public mutating func removeFirst(upTo count: Int) -> Data {
         let taken = Data(bytes.prefix(count))
-        bytes.removeFirst(taken.count)
+        // removeFirst는 시작 위치만 옮기고 앞쪽 메모리를 놓지 않아, 큰 영상을 받으면 받은 만큼 메모리가 늘어납니다.
+        bytes.removeSubrange(bytes.startIndex ..< bytes.startIndex + taken.count)
         return taken
     }
 

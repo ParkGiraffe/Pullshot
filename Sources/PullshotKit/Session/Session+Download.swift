@@ -20,6 +20,8 @@ public extension Session {
         guard !fileManager.fileExists(atPath: destination.path(percentEncoded: false)) else {
             throw SessionError.destinationExists(name)
         }
+        // 보내기 전에 취소됐으면 데이터 단계를 버릴 일이 없으므로 세션을 그대로 둡니다.
+        guard !isCancelled() else { throw SessionError.cancelled }
         let partial = destination.deletingLastPathComponent().appending(path: ".\(name).pullshot-partial")
         try Data().write(to: partial)
         var isSaved = false
@@ -30,13 +32,13 @@ public extension Session {
         }
 
         let file = try FileHandle(forWritingTo: partial)
-        let received = try receiveObject(handle, into: file, progress: progress, isCancelled: isCancelled)
+        let reply = try receiveObject(handle, into: file, progress: progress, isCancelled: isCancelled)
         try file.close()
-        guard received.response.code == PTP.Response.ok.rawValue else {
-            throw SessionError.response(PTP.Response(rawValue: received.response.code), operation: .getObject)
+        guard reply.response.code == PTP.Response.ok.rawValue else {
+            throw SessionError.response(PTP.Response(rawValue: reply.response.code), operation: .getObject)
         }
-        if let expectedSize, received.bytes != expectedSize {
-            throw SessionError.sizeMismatch(expected: expectedSize, actual: received.bytes)
+        if let expectedSize, reply.bytes != expectedSize {
+            throw SessionError.sizeMismatch(expected: expectedSize, actual: reply.bytes)
         }
         do {
             try fileManager.moveItem(at: partial, to: destination)
@@ -54,7 +56,7 @@ public extension Session {
         isCancelled: () -> Bool
     ) throws -> (bytes: UInt64, response: Container) {
         let id = takeTransactionID()
-        return try guarded {
+        return try invalidatingOnFailure {
             try send(.command(.getObject, transactionID: id, parameters: [handle]))
             let header = try awaitHeader()
             try requireTransaction(id, header.transactionID)
@@ -67,7 +69,7 @@ public extension Session {
             var written: UInt64 = 0
             while remaining > 0 {
                 guard !buffer.isEmpty else {
-                    try buffer.append(transport.read(maxLength: Self.readLength, timeout: Self.dataReadTimeout))
+                    try fill(timeout: Self.dataReadTimeout)
                     continue
                 }
                 guard !isCancelled() else { throw SessionError.cancelled }
@@ -89,7 +91,7 @@ public extension Session {
         var strayEvents = 0
         while true {
             guard let header = try buffer.peekHeader() else {
-                try buffer.append(transport.read(maxLength: Self.readLength, timeout: Self.dataReadTimeout))
+                try fill(timeout: Self.dataReadTimeout)
                 continue
             }
             guard header.kind == .event else { return header }

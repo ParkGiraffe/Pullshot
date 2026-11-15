@@ -16,6 +16,7 @@ final class ScriptedTransport: Transport {
     private(set) var ptpResets = 0
     private(set) var usbResets = 0
     var ptpResetError: TransportError?
+    var usbResetError: TransportError?
 
     init(_ steps: [Step]) {
         self.steps = steps
@@ -60,6 +61,9 @@ final class ScriptedTransport: Transport {
 
     func resetUSBDevice() throws {
         usbResets += 1
+        if let usbResetError {
+            throw usbResetError
+        }
     }
 
     func close() {}

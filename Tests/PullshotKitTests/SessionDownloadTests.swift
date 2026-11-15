@@ -115,4 +115,46 @@ struct SessionDownloadTests {
             }
         }
     }
+
+    @Suite("드문 순서")
+    struct Unusual {
+        @Test func `이미 취소된 상태면 명령을 보내지 않고 세션도 유지한다`() throws {
+            let folder = try emptyFolder()
+            let transport = ScriptedTransport([])
+            let session = Session.openedForTesting(transport: transport)
+
+            #expect(throws: SessionError.cancelled) {
+                try session.download(1, expectedSize: 1, to: folder.appending(path: "a.jpg"), isCancelled: { true })
+            }
+            #expect(transport.written.isEmpty)
+            #expect(session.isValid)
+            #expect(try contents(of: folder).isEmpty)
+        }
+
+        @Test func `데이터 없이 바로 온 오류 응답은 던지되 세션은 유지한다`() throws {
+            let folder = try emptyFolder()
+            let session = Session.openedForTesting(transport: ScriptedTransport([
+                .expectWrite(nil), .read(responseFixture(0x2009, tid: 1)),
+            ]))
+
+            #expect(throws: SessionError.response(.invalidObjectHandle, operation: .getObject)) {
+                try session.download(1, expectedSize: 1, to: folder.appending(path: "a.jpg"))
+            }
+            #expect(session.isValid)
+            #expect(try contents(of: folder).isEmpty)
+        }
+
+        @Test func `데이터 머리 앞에 온 이벤트는 건너뛰고 받는다`() throws {
+            let folder = try emptyFolder()
+            let target = folder.appending(path: "e.jpg")
+            let event = Container(kind: .event, code: 0x4002, transactionID: 0, payload: Data()).encoded()
+            try Session.openedForTesting(transport: ScriptedTransport([
+                .expectWrite(nil), .read(event),
+                .read(dataContainerFixture(.getObject, tid: 1, Data([1, 2, 3]))),
+                .read(responseFixture(0x2001, tid: 1)),
+            ])).download(1, expectedSize: 3, to: target)
+
+            #expect(try Data(contentsOf: target) == Data([1, 2, 3]))
+        }
+    }
 }
