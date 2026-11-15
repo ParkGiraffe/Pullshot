@@ -8,7 +8,6 @@ public struct Game: Equatable, Sendable, Identifiable {
     public var name: String
     /// 최근 것이 먼저입니다.
     public var captures: [Capture]
-    public var plays: [Play]
 
     public var id: String {
         name
@@ -17,10 +16,7 @@ public struct Game: Equatable, Sendable, Identifiable {
     /// 최근 캡처 순이고, 찍은 시각을 모르는 캡처만 있는 게임이 그다음, 기타가 맨 끝입니다.
     public static func games(in captures: [Capture]) -> [Self] {
         Dictionary(grouping: captures, by: \.gameName)
-            .map { name, captures in
-                let newestFirst = captures.sorted(by: Capture.newestFirst)
-                return Self(name: name, captures: newestFirst, plays: Play.split(newestFirst))
-            }
+            .map { name, captures in Self(name: name, captures: captures.sorted(by: Capture.newestFirst)) }
             .sorted { lhs, rhs in
                 guard (lhs.name == otherName) == (rhs.name == otherName) else { return rhs.name == otherName }
                 return Capture.newestFirst(lhs.captures[0], rhs.captures[0])

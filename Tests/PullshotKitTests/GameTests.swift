@@ -17,11 +17,10 @@ struct GameTests {
             #expect(games.map(\.name) == ["젤다무쌍 봉인전기", "Mario Kart World", "Pokémon UNITE", "기타"])
         }
 
-        @Test func `게임의 캡처는 최근 것이 먼저이고 플레이도 함께 나눈다`() {
+        @Test func `게임의 캡처는 최근 것이 먼저다`() {
             let game = Game.games(in: [captureFixture("a.jpg", at: "2026-11-13 16:05:00"), captureFixture("b.jpg")])[0]
 
             #expect(game.captures.map(\.filename) == ["b.jpg", "a.jpg"])
-            #expect(game.plays.count == 2)
         }
     }
 

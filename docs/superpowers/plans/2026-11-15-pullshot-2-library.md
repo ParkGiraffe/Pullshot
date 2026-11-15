@@ -10,6 +10,8 @@
 
 **Spec:** `docs/superpowers/specs/2026-11-15-pullshot-design.md`의 6.2, 6.3, 6.4, 7절입니다. 실기기 사실은 `docs/hardware-notes.md`입니다.
 
+**나중 결정(2026-11-15):** Task 8에서 실제 캡처로 플레이 목록을 본 뒤, 사용자가 플레이별 보기는 필요 없다고 해 Task 1의 `Play`와 CLI `--plays`를 뺐습니다. 3단계 앱의 기본 보기는 최신순입니다.
+
 **이 계획의 범위:** 세 계획 중 두 번째입니다. 연결 감시(꽂고 빼기 알림, 두 대 전환), 썸네일 캐시, 날짜 보기의 월과 날 묶기, Quick Look, 현지화, 파일 로그, 내보낼 기준 폴더 기억하기는 3단계(SwiftUI 앱)에서 합니다. 강제 종료 뒤 마지막 트랜잭션 ID로 남은 세션을 닫는 실험(hardware-notes)은 이 계획에 넣지 않습니다. 앱은 정상 종료 때 세션을 닫으므로 급하지 않습니다. 1단계 브랜치가 main에 머지된 뒤 main에서 `library` 브랜치를 땁니다. 머지 전이면 `ptp-core-cli` 끝에서 땁니다.
 
 ## Global Constraints

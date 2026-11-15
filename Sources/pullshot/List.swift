@@ -11,9 +11,6 @@ struct List: ParsableCommand {
     @Flag(name: .customLong("new"), help: "옮긴 적 없는 새 항목만 보여 줍니다.")
     var isNewOnly = false
 
-    @Flag(name: .customLong("plays"), help: "게임 안을 플레이로 나눠 보여 줍니다.")
-    var showsPlays = false
-
     @OptionGroup var connection: ConnectionOptions
     @OptionGroup var ledgerOptions: LedgerOptions
 
@@ -31,7 +28,7 @@ struct List: ParsableCommand {
             let selection = CaptureSelection(names: [], game: game, isAll: true, isNewOnly: isNewOnly)
             let chosen = selection.choose(from: scan.captures, isNew: isNew).chosen
             let shown = AlbumScan(captures: chosen, skipped: scan.skipped)
-            ListFormatter.lines(shown, isNew: isNew, showsPlays: showsPlays, timeZone: .current).forEach { print($0) }
+            ListFormatter.lines(shown, isNew: isNew, timeZone: .current).forEach { print($0) }
             if !scan.skipped.isEmpty {
                 Terminal.error("읽지 못했거나 캡처가 아닌 객체 \(scan.skipped.count)개를 건너뛰었습니다.")
             }

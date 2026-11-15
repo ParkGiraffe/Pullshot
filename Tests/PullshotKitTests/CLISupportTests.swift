@@ -102,20 +102,6 @@ struct CLISupportTests {
             ])
         }
 
-        @Test func `플레이로 보면 플레이 제목 아래에 찍은 순서로 둔다`() {
-            let scan = AlbumScan(captures: [
-                captureFixture("b.jpg", at: "2026-11-14 21:40:00"),
-                captureFixture("a.mp4", at: "2026-11-14 21:12:05", kind: .video),
-            ], skipped: [])
-
-            #expect(ListFormatter.lines(scan, showsPlays: true, timeZone: Self.seoul) == [
-                "젤다무쌍 봉인전기 (2)",
-                "  플레이 2026-11-14 21:12 ~ 21:40 · 사진 1 · 영상 1",
-                "    a.mp4  영상  0.0 MB  2026-11-14 21:12",
-                "    b.jpg  사진  0.0 MB  2026-11-14 21:40",
-            ])
-        }
-
         @Test func `크기나 찍은 시각을 모르면 줄표로 쓴다`() {
             var capture = Self.capture(1, "a.jpg", "Game", 0, "", .photo)
             capture.size = nil

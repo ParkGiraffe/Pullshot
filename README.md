@@ -1,6 +1,6 @@
 # Pullshot
 
-Nintendo Switch 2와 Nintendo Switch에서 찍은 스크린샷과 영상을 USB 케이블로 Mac에 옮기는 앱입니다. 캡처를 게임별로 묶고, 게임 안에서는 한 번 앉아서 플레이한 단위로 나눠 보여 주며, 필요한 것만 골라 가져올 수 있습니다. Nintendo Switch 지원은 실험 단계입니다.
+Nintendo Switch 2와 Nintendo Switch에서 찍은 스크린샷과 영상을 USB 케이블로 Mac에 옮기는 앱입니다. 캡처를 게임별로 묶어 보여 주고, 필요한 것만 골라 가져올 수 있습니다. Nintendo Switch 지원은 실험 단계입니다.
 
 ## 진행 상황
 
@@ -21,7 +21,7 @@ Nintendo Switch 2와 Nintendo Switch에서 찍은 스크린샷과 영상을 USB 
 개발과 문제 확인에 쓰는 명령입니다. `swift run pullshot <명령>`으로 실행합니다.
 
 - `probe`: 기기 정보, 지원 명령, 저장소를 보여 줍니다.
-- `list [--new] [--plays]`: 게임별 캡처 목록을 보여 줍니다. 새 항목에는 줄 끝에 "새"가 붙고, `--plays`를 주면 플레이별로 나눠 보여 줍니다.
+- `list [--new]`: 게임별 캡처 목록을 보여 줍니다. 새 항목에는 줄 끝에 "새"가 붙습니다.
 - `pull (--all | --new | <파일 이름>...)`: 캡처를 `~/Pictures/Pullshot/<게임 이름>/`에 원본 그대로 받습니다.
 - `export (--all | --new | <파일 이름>...) --out <폴더> [--numbered] [--no-game-folder] [--dry-run]`: 고른 캡처를 내보냅니다. `--numbered`를 주면 찍은 순서대로 `001_20261114_211205.jpg`처럼 번호를 붙입니다.
 - `ledger (--from-folder <폴더> | --mark-all | --leave-new)`: 이미 받아 둔 캡처를 옮긴 기록에 넣습니다.
