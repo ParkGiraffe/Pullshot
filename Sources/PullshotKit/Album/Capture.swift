@@ -26,6 +26,20 @@ public struct Capture: Equatable, Sendable, Identifiable {
         !name.isEmpty && name != "." && name != ".." && !name.contains("/") && !name.contains("\0")
     }
 
+    /// 찍은 순서(오래된 것 먼저), 시각을 모르는 것은 끝, 같으면 파일 이름 순입니다. 같은 초의 순번(00, 01)도 이 순서를 따릅니다.
+    public static func oldestFirst(_ lhs: Self, _ rhs: Self) -> Bool {
+        switch (lhs.capturedAt, rhs.capturedAt) {
+        case let (left?, right?) where left != right:
+            left < right
+        case (.some, nil):
+            true
+        case (nil, .some):
+            false
+        default:
+            lhs.filename < rhs.filename
+        }
+    }
+
     /// 찍은 시각이 최근인 것이 먼저, 시각을 모르는 것은 끝, 같으면 파일 이름 순입니다.
     public static func newestFirst(_ lhs: Self, _ rhs: Self) -> Bool {
         switch (lhs.capturedAt, rhs.capturedAt) {
