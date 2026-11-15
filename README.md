@@ -4,7 +4,7 @@ Nintendo Switch 2와 Nintendo Switch에서 찍은 스크린샷과 영상을 USB 
 
 ## 진행 상황
 
-앱 화면은 아직 없습니다. 스위치와 통신하는 라이브러리(PullshotKit)와 개발용 CLI(`pullshot`)가 완성된 상태이고, 지금은 가져오기와 내보내기 기능을 개발하고 있습니다.
+앱 화면은 아직 없습니다. 스위치와 통신하는 라이브러리(PullshotKit)와 개발용 CLI(`pullshot`)로 캡처 목록 보기, 가져오기, 번호 붙여 내보내기까지 할 수 있고, 다음 단계에서 앱 화면을 만듭니다.
 
 ## 요구 사항
 
@@ -15,6 +15,19 @@ Nintendo Switch 2와 Nintendo Switch에서 찍은 스크린샷과 영상을 USB 
 
 1. 독이 아니라 본체 아래쪽 USB-C 포트에 케이블을 연결합니다.
 2. 본체 설정의 데이터 관리 메뉴에서 PC로 복사를 켭니다.
+
+## CLI
+
+개발과 문제 확인에 쓰는 명령입니다. `swift run pullshot <명령>`으로 실행합니다.
+
+- `probe`: 기기 정보, 지원 명령, 저장소를 보여 줍니다.
+- `list [--new] [--plays]`: 게임별 캡처 목록을 보여 줍니다. 새 항목에는 줄 끝에 "새"가 붙고, `--plays`를 주면 플레이별로 나눠 보여 줍니다.
+- `pull (--all | --new | <파일 이름>...)`: 캡처를 `~/Pictures/Pullshot/<게임 이름>/`에 원본 그대로 받습니다.
+- `export (--all | --new | <파일 이름>...) --out <폴더> [--numbered] [--no-game-folder] [--dry-run]`: 고른 캡처를 내보냅니다. `--numbered`를 주면 찍은 순서대로 `001_20261114_211205.jpg`처럼 번호를 붙입니다.
+- `ledger (--from-folder <폴더> | --mark-all | --leave-new)`: 이미 받아 둔 캡처를 옮긴 기록에 넣습니다.
+- `dump --out <폴더>`: 실기기 응답을 그대로 기록합니다. 기기 일련번호가 들어 있으므로 공개하지 않습니다.
+
+가져오기와 내보내기는 `~/Library/Application Support/Pullshot/`에 옮긴 기록을 남깁니다. 기록에 없는 캡처, 곧 아직 한 번도 Mac으로 옮기지 않은 캡처가 새 항목입니다.
 
 ## 개발
 

@@ -47,6 +47,9 @@ enum Terminal {
         } catch SessionError.cancelled {
             Self.error("취소했습니다.")
             throw ExitCode(130)
+        } catch is CancellationError {
+            Self.error("취소했습니다.")
+            throw ExitCode(130)
         } catch {
             Self.error(ErrorMessages.message(for: error))
             throw ExitCode.failure
