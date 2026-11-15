@@ -82,9 +82,10 @@ struct SessionDownloadTests {
             #expect(!session.isValid)
         }
 
-        @Test func `취소하면 아무 파일도 남기지 않고 세션을 버린다`() throws {
+        @Test func `받는 중에 취소하면 남은 데이터와 응답까지 읽어 버리고 파일 없이 세션을 유지한다`() throws {
             let folder = try emptyFolder()
-            let session = Session.openedForTesting(transport: ScriptedTransport(chunkedObject()))
+            let transport = ScriptedTransport(chunkedObject())
+            let session = Session.openedForTesting(transport: transport)
             var checks = 0
 
             #expect(throws: SessionError.cancelled) {
@@ -94,7 +95,8 @@ struct SessionDownloadTests {
                 })
             }
             #expect(try contents(of: folder).isEmpty)
-            #expect(!session.isValid)
+            #expect(session.isValid)
+            #expect(transport.isFinished)
         }
 
         @Test func `받은 크기가 기기가 알린 크기와 다르면 임시 파일을 지운다`() throws {

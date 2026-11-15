@@ -30,7 +30,8 @@ struct Pull: ParsableCommand {
             Terminal.listenForInterrupt()
             let connection = try Connection.open(connection)
             defer { connection.close() }
-            let captures = try List.only(game, in: AlbumScanner(source: connection.session).scan()).captures
+            let scan = try AlbumScanner(source: connection.session).scan(isCancelled: { Terminal.isInterrupted })
+            let captures = List.only(game, in: scan).captures
             let chosen = all ? captures : captures.filter { names.contains($0.filename) || names.contains($0.id) }
             let missing = all ? [] : names.filter { name in !chosen.contains { $0.filename == name || $0.id == name } }
             missing.forEach { Terminal.error("찾지 못한 캡처: \($0)") }

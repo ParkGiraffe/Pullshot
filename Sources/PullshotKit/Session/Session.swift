@@ -105,7 +105,8 @@ public final class Session {
 
     func invalidate(because error: Error) {
         isValid = false
-        Log.ptp.error("세션을 버립니다: \(String(describing: error), privacy: .public)")
+        // 파일 쓰기 오류에는 경로(게임 이름 포함)가 들어 있어 통합 로그에서 가립니다.
+        Log.ptp.error("세션을 버립니다: \(String(describing: error), privacy: .private)")
     }
 
     func send(_ container: Container) throws {

@@ -35,17 +35,19 @@ public struct AlbumScanner {
     }
 
     /// 객체 하나나 저장소 하나를 읽지 못하면 그것만 건너뛰고, 전송이 끊기면 멈춥니다.
-    /// `progress`에는 지금까지 본 객체 수를 넘깁니다.
-    public func scan(progress: (Int) -> Void = { _ in }) throws -> AlbumScan {
+    /// `progress`에는 지금까지 본 객체 수를 넘깁니다. 취소는 객체 사이에서 확인하므로 세션은 계속 쓸 수 있습니다.
+    public func scan(progress: (Int) -> Void = { _ in }, isCancelled: () -> Bool = { false }) throws -> AlbumScan {
         var walk = Walk()
         for storage in try source.storageIDs() {
             let roots: [UInt32]
             do {
                 roots = try source.objectHandles(storage: storage, parent: PTP.rootParent)
-            } catch SessionError.response(.storeNotAvailable, operation: _) {
+            } catch let SessionError.response(response, operation: _) {
+                // 스위치는 앨범 저장소 하나지만, 쓸 수 없는 저장소가 섞여도 나머지는 훑습니다.
+                Log.album.notice("저장소 0x\(String(storage, radix: 16), privacy: .public) 건너뜀: \(response.rawValue)")
                 continue
             }
-            try visit(roots, in: storage, gameFolder: nil, walk: &walk, progress: progress)
+            try visit(roots, in: storage, gameFolder: nil, walk: &walk, progress: progress, isCancelled: isCancelled)
         }
         return AlbumScan(captures: walk.captures.sorted(by: Capture.newestFirst), skipped: walk.skipped)
     }
@@ -55,9 +57,11 @@ public struct AlbumScanner {
         in storage: UInt32,
         gameFolder: String?,
         walk: inout Walk,
-        progress: (Int) -> Void
+        progress: (Int) -> Void,
+        isCancelled: () -> Bool
     ) throws {
         for handle in handles {
+            guard !isCancelled() else { throw SessionError.cancelled }
             walk.seen += 1
             progress(walk.seen)
             guard let info = try readOrSkip(handle, walk: &walk, { try source.objectInfo(handle) }) else { continue }
@@ -70,7 +74,14 @@ public struct AlbumScanner {
                 try source.objectHandles(storage: storage, parent: handle)
             }) else { continue }
             let folder = Capture.isSafeFilename(info.filename) ? info.filename : nil
-            try visit(children, in: storage, gameFolder: folder, walk: &walk, progress: progress)
+            try visit(
+                children,
+                in: storage,
+                gameFolder: folder,
+                walk: &walk,
+                progress: progress,
+                isCancelled: isCancelled
+            )
         }
     }
 
@@ -92,14 +103,16 @@ public struct AlbumScanner {
         ))
     }
 
-    /// 기기가 OK가 아닌 응답을 보낸 객체는 건너뛰고, 그 밖의 실패는 그대로 던집니다.
+    /// 기기가 OK가 아닌 응답을 보냈거나 데이터를 풀 수 없는 객체는 건너뛰고, 그 밖의 실패(전송, 세션)는 그대로 던집니다.
     private func readOrSkip<T>(_ handle: UInt32, walk: inout Walk, _ read: () throws -> T) throws -> T? {
         do {
             return try read()
         } catch let SessionError.response(response, operation: _) {
             walk.skip(handle, "response \(Session.hex(response.rawValue))")
-            return nil
+        } catch let error as PTPDecodingError {
+            walk.skip(handle, String(describing: error))
         }
+        return nil
     }
 
     private func capturedAt(_ info: ObjectInfo) -> Date? {

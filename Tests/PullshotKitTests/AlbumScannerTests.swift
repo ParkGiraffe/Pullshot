@@ -59,6 +59,35 @@ struct AlbumScannerTests {
             #expect(throws: SessionError.transport(.disconnected)) { try AlbumScanner(source: source).scan() }
         }
 
+        @Test func `이름을 풀 수 없는 객체는 그것만 건너뛴다`() throws {
+            let source = FakeAlbumSource.tree([.file(0x11, "a.jpg"), .file(0x12, "b.jpg")])
+            source.objectInfoErrors[0x11] = PTPDecodingError.badString
+            let scan = try AlbumScanner(source: source).scan()
+
+            #expect(scan.captures.map(\.handle) == [0x12])
+            #expect(scan.skipped == [SkippedObject(handle: 0x11, reason: "badString")])
+        }
+
+        @Test func `루트를 읽지 못하는 저장소는 이유와 관계없이 건너뛴다`() throws {
+            let source = FakeAlbumSource.tree(
+                [.file(0x11, "a.jpg")],
+                extraStorage: 0x0002_0001,
+                extraStorageError: .response(.accessDenied, operation: .getObjectHandles)
+            )
+
+            #expect(try AlbumScanner(source: source).scan().captures.count == 1)
+        }
+
+        @Test func `훑는 중에 취소하면 객체 사이에서 멈춘다`() {
+            let source = FakeAlbumSource.tree([.file(0x11, "a.jpg"), .file(0x12, "b.jpg"), .file(0x13, "c.jpg")])
+            var seen = 0
+
+            #expect(throws: SessionError.cancelled) {
+                try AlbumScanner(source: source).scan(progress: { seen = $0 }, isCancelled: { seen >= 2 })
+            }
+            #expect(seen == 2)
+        }
+
         @Test func `쓸 수 없는 저장소는 건너뛴다`() throws {
             let source = FakeAlbumSource.tree(
                 [.file(0x11, "a.jpg")],

@@ -7,7 +7,7 @@ public extension Session {
 
     /// 원본을 받아 `destination`에 바이트 그대로 저장합니다. 이미 있는 파일은 덮어쓰지 않습니다.
     /// 같은 폴더의 임시 파일에 흘려 쓰고 다 받은 뒤에 이름을 바꾸므로, 실패나 취소 뒤에는 아무 파일도 남지 않습니다.
-    /// 취소하면 데이터 단계를 버리게 되어 이 세션은 더 쓸 수 없습니다.
+    /// 취소해도 세션은 계속 쓸 수 있습니다.
     func download(
         _ handle: UInt32,
         expectedSize: UInt64?,
@@ -34,6 +34,7 @@ public extension Session {
         let file = try FileHandle(forWritingTo: partial)
         let reply = try receiveObject(handle, into: file, progress: progress, isCancelled: isCancelled)
         try file.close()
+        guard !reply.isCancelled else { throw SessionError.cancelled }
         guard reply.response.code == PTP.Response.ok.rawValue else {
             throw SessionError.response(PTP.Response(rawValue: reply.response.code), operation: .getObject)
         }
@@ -49,12 +50,14 @@ public extension Session {
     }
 
     /// GetObject의 데이터 단계를 파일에 흘려 쓰고 응답까지 받습니다.
+    /// 취소되면 쓰기만 멈추고 남은 데이터 단계와 응답은 끝까지 읽어 버립니다. 중간에 멈추면 스위치에 세션이 열린 채 남아,
+    /// 다음 연결이 USB 장치 리셋까지 가고 스위치가 PC로 복사 모드에서 나갑니다(2026-11-15, 펌웨어 23.5.0에서 확인).
     private func receiveObject(
         _ handle: UInt32,
         into file: FileHandle,
         progress: (UInt64) -> Void,
         isCancelled: () -> Bool
-    ) throws -> (bytes: UInt64, response: Container) {
+    ) throws -> (bytes: UInt64, response: Container, isCancelled: Bool) {
         let id = takeTransactionID()
         return try invalidatingOnFailure {
             try send(.command(.getObject, transactionID: id, parameters: [handle]))
@@ -62,27 +65,29 @@ public extension Session {
             try requireTransaction(id, header.transactionID)
             guard header.kind == .data else {
                 // 데이터 없이 바로 응답이 오면(예: 없는 핸들) 받은 바이트 없이 그 응답을 돌려줍니다.
-                return try (0, nextContainer(timeout: Self.commandReadTimeout))
+                return try (0, nextContainer(timeout: Self.commandReadTimeout), false)
             }
             _ = buffer.removeFirst(upTo: ContainerHeader.size)
             var remaining = Int(header.length) - ContainerHeader.size
             var written: UInt64 = 0
+            var cancelled = false
             while remaining > 0 {
                 guard !buffer.isEmpty else {
                     try fill(timeout: Self.dataReadTimeout)
                     continue
                 }
-                guard !isCancelled() else { throw SessionError.cancelled }
+                cancelled = cancelled || isCancelled()
                 let piece = buffer.removeFirst(upTo: remaining)
-                try file.write(contentsOf: piece)
                 remaining -= piece.count
+                guard !cancelled else { continue }
+                try file.write(contentsOf: piece)
                 written += UInt64(piece.count)
                 progress(written)
             }
             let response = try nextContainer(timeout: Self.commandReadTimeout)
             guard response.kind == .response else { throw unexpected(response) }
             try requireTransaction(id, response.transactionID)
-            return (written, response)
+            return (written, response, cancelled)
         }
     }
 

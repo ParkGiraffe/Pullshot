@@ -1,5 +1,6 @@
 import ArgumentParser
 import Foundation
+import PullshotKit
 import Synchronization
 
 /// Ctrl-C를 받았는지입니다. 신호 처리기는 값을 잡을 수 없어 전역에 둡니다.
@@ -24,6 +25,9 @@ enum Terminal {
             try body()
         } catch let exit as ExitCode {
             throw exit
+        } catch SessionError.cancelled {
+            Self.error("취소했습니다.")
+            throw ExitCode(130)
         } catch {
             Self.error(ErrorMessages.message(for: error))
             throw ExitCode.failure

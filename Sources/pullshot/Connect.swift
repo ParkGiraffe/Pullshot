@@ -26,7 +26,7 @@ struct Connection {
             if console.model.isExperimental, attempt == 1 {
                 Terminal.error("\(console.model.name)는 실험적 지원입니다. 문제가 있으면 --verbose 출력과 함께 알려 주세요.")
             }
-            let host = try HostTransport(console: console, trace: trace)
+            let host = try openTransport(console, trace: trace, isReattached: attempt > 1)
             let transport: Transport = try record.map { try RecordingTransport(wrapping: host, to: $0) } ?? host
             let session = Session(transport: transport, trace: trace)
             do {
@@ -46,10 +46,27 @@ struct Connection {
         transport.close()
     }
 
+    /// 다시 붙은 기기는 노드가 먼저 보이고 사진 전송 인터페이스는 조금 늦게 생기므로, 그동안은 몇 초 더 기다립니다.
+    private static func openTransport(
+        _ console: AttachedConsole,
+        trace: ((String) -> Void)?,
+        isReattached: Bool
+    ) throws -> HostTransport {
+        let deadline = Date().addingTimeInterval(isReattached ? 5 : 0)
+        while true {
+            do {
+                return try HostTransport(console: console, trace: trace)
+            } catch ConsoleAccessError.noStillImageInterface where Date() < deadline {
+                Thread.sleep(forTimeInterval: 0.5)
+            }
+        }
+    }
+
     /// 사용자가 본체에서 PC로 복사를 다시 켤 때까지 기다립니다.
     private static func waitForReattach() throws {
         let deadline = Date().addingTimeInterval(60)
         while Date() < deadline {
+            guard !Terminal.isInterrupted else { throw SessionError.cancelled }
             Thread.sleep(forTimeInterval: 0.5)
             if !ConsoleLocator.attached().isEmpty {
                 return

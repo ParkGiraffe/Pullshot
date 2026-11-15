@@ -77,7 +77,7 @@ public extension Session {
             try transport.resetPTPDevice()
             buffer = PacketBuffer()
         } catch {
-            Log.usb.error("PTP 장치 리셋 실패: \(String(describing: error), privacy: .public)")
+            Log.usb.error("PTP 장치 리셋 실패: \(String(describing: error), privacy: .private)")
             try resetUSBDevice()
         }
     }
@@ -88,7 +88,7 @@ public extension Session {
         do {
             try transport.resetUSBDevice()
         } catch {
-            Log.usb.error("USB 장치를 다시 붙이지 못했습니다: \(String(describing: error), privacy: .public)")
+            Log.usb.error("USB 장치를 다시 붙이지 못했습니다: \(String(describing: error), privacy: .private)")
         }
         throw SessionError.needsUSBReset
     }

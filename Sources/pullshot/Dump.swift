@@ -14,6 +14,7 @@ struct Dump: ParsableCommand {
 
     func run() throws {
         try Terminal.run {
+            Terminal.listenForInterrupt()
             let folder = URL(filePath: (out as NSString).expandingTildeInPath)
             let files = folder.appending(path: "files")
             try FileManager.default.createDirectory(at: files, withIntermediateDirectories: true)
@@ -21,7 +22,7 @@ struct Dump: ParsableCommand {
             defer { connection.close() }
 
             try write(Probe.report(connection), to: folder.appending(path: "probe.txt"))
-            let scan = try AlbumScanner(source: connection.session).scan()
+            let scan = try AlbumScanner(source: connection.session).scan(isCancelled: { Terminal.isInterrupted })
             try write(ListFormatter.lines(scan, timeZone: .current), to: folder.appending(path: "list.txt"))
             for capture in scan.captures.prefix(3) {
                 do {
