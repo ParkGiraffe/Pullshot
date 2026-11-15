@@ -35,7 +35,10 @@ public final class TransferLedger {
     private static let newline = UInt8(ascii: "\n")
 
     private let file: URL
+    private let answeredFile: URL
     private var recorded: Set<CaptureKey> = []
+    /// 처음 연결 질문에 답한 기기입니다. "모두 새 항목으로"는 기록을 남기지 않아 따로 둡니다.
+    private(set) var answeredSerialNumbers: Set<String> = []
     /// 가져오기나 내보내기로 마지막으로 옮긴 때입니다.
     private var lastTransferDates: [CaptureKey: Date] = [:]
     /// 앞서 꺼진 앱이 줄을 쓰다 말았으면 다음 줄을 새 줄에서 시작해야 합니다.
@@ -44,6 +47,10 @@ public final class TransferLedger {
     public init(directory: URL = defaultDirectory) throws {
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         file = directory.appending(path: "transfers.jsonl")
+        answeredFile = directory.appending(path: "answered-devices.json")
+        if FileManager.default.fileExists(atPath: answeredFile.path(percentEncoded: false)) {
+            answeredSerialNumbers = try Set(JSONDecoder().decode([String].self, from: Data(contentsOf: answeredFile)))
+        }
         guard FileManager.default.fileExists(atPath: file.path(percentEncoded: false)) else { return }
 
         let data = try Data(contentsOf: file)
@@ -104,6 +111,16 @@ public final class TransferLedger {
         guard let latest = dates.max() else { return nil }
         let day = calendar.startOfDay(for: latest)
         return LastTransfer(day: day, count: dates.count { calendar.isDate($0, inSameDayAs: day) })
+    }
+
+    func hasRecords(for serialNumber: String) -> Bool {
+        recorded.contains { $0.serialNumber == serialNumber }
+    }
+
+    func markAnswered(_ serialNumber: String) throws {
+        let answered = answeredSerialNumbers.union([serialNumber])
+        try JSONEncoder().encode(answered.sorted()).write(to: answeredFile, options: .atomic)
+        answeredSerialNumbers = answered
     }
 
     private func index(_ entry: LedgerEntry) {
