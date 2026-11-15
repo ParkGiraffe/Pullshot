@@ -3,6 +3,8 @@ import PullshotKit
 
 enum CLIError: Error, Equatable {
     case noConsole
+    /// 스위치가 꽂혀 있지만 PC로 복사 모드가 아닙니다. 값은 기기 이름입니다.
+    case notInTransferMode(String)
 }
 
 /// 오류를 터미널에 보일 문구로 바꿉니다. Kit 타입에는 문구가 없으므로 CLI는 여기 한 곳에서만 바꿉니다.
@@ -11,6 +13,8 @@ enum ErrorMessages {
         switch error {
         case CLIError.noConsole:
             "연결된 스위치가 없습니다. 본체 아래쪽 USB-C 포트에 데이터 케이블로 연결하고, 본체에서 PC로 복사 모드를 켜 주세요."
+        case let CLIError.notInTransferMode(name):
+            "\(name)가 연결돼 있지만 PC로 복사 모드가 아닙니다. 본체 설정의 데이터 관리에서 PC로 복사를 켜 주세요."
         // ptpcamerad는 미리보기, 이미지 캡처, 사진 앱이 띄우는 시스템 도우미라 앱 이름 대신 그 앱들을 알려 줍니다.
         case let ConsoleAccessError.heldByAnotherApp(_, owner?) where owner != "ptpcamerad":
             "\(owner) 앱이 스위치를 쓰고 있습니다. 그 앱을 닫고 다시 시도해 주세요."

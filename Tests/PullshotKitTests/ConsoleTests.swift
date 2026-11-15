@@ -11,6 +11,11 @@ struct ConsoleTests {
             #expect(ConsoleModel.matching(vendorID: 0x057E, productID: 0x2000) == nil)
         }
 
+        @Test func `PC로 복사 모드가 아닌 스위치 2도 알아본다`() {
+            #expect(ConsoleModel.matchingIdle(vendorID: 0x057E, productID: 0x2060) == .switch2)
+            #expect(ConsoleModel.matchingIdle(vendorID: 0x057E, productID: 0x2061) == nil)
+        }
+
         @Test func `실기기로 확인하지 못한 스위치 1만 실험적 지원이다`() {
             #expect(ConsoleModel.switch1.isExperimental)
             #expect(!ConsoleModel.switch2.isExperimental)

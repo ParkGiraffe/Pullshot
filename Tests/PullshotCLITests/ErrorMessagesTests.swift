@@ -28,6 +28,11 @@ struct ErrorMessagesTests {
             == "스위치 연결이 끊겼습니다. 케이블을 확인하고 다시 시도해 주세요.")
     }
 
+    @Test func `연결은 됐지만 PC로 복사 모드가 아니면 그 모드를 켜라고 한다`() {
+        #expect(ErrorMessages.message(for: CLIError.notInTransferMode("Nintendo Switch 2"))
+            == "Nintendo Switch 2가 연결돼 있지만 PC로 복사 모드가 아닙니다. 본체 설정의 데이터 관리에서 PC로 복사를 켜 주세요.")
+    }
+
     @Test func `기기가 없으면 연결 방법을 알려 준다`() {
         #expect(ErrorMessages.message(for: CLIError.noConsole)
             == "연결된 스위치가 없습니다. 본체 아래쪽 USB-C 포트에 데이터 케이블로 연결하고, 본체에서 PC로 복사 모드를 켜 주세요.")

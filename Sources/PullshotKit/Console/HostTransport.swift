@@ -71,6 +71,7 @@ public final class HostTransport: Transport {
     /// PTP 클래스 요청 Device Reset(bRequest 0x66)을 인터페이스에 보냅니다.
     public func resetPTPDevice() throws {
         guard let interface else { throw TransportError.disconnected }
+        trace?("PTP 장치 리셋")
         let request = IOUSBDeviceRequest(
             bmRequestType: 0x21,
             bRequest: 0x66,
@@ -82,12 +83,14 @@ public final class HostTransport: Transport {
         do {
             try interface.__send(request, data: nil, bytesTransferred: &sent, completionTimeout: Session.writeTimeout)
         } catch {
+            trace?("PTP 장치 리셋 실패 \(String(format: "0x%08X", UInt32(truncatingIfNeeded: (error as NSError).code)))")
             throw TransportError(ioReturn: (error as NSError).code)
         }
     }
 
     /// 인터페이스를 놓고 USB 장치를 다시 붙입니다. 기기가 다시 나타나면 새 전송을 열어야 합니다.
     public func resetUSBDevice() throws {
+        trace?("USB 장치 리셋")
         close()
         do {
             let host = try IOUSBHostDevice(__ioService: device, options: [], queue: nil, interestHandler: nil)

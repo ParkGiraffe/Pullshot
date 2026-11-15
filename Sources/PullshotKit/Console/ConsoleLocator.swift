@@ -13,9 +13,24 @@ public struct AttachedConsole: Equatable, Sendable {
 
 /// USB에 꽂힌 스위치를 찾습니다.
 public enum ConsoleLocator {
+    /// PC로 복사 모드로 꽂혀 있는 스위치입니다.
     public static func attached() -> [AttachedConsole] {
-        // 제조사 ID만 주면 IOKit이 아무 기기와도 맞추지 않습니다(2026-11-15, 스위치 2 펌웨어 23.0.1에서 확인).
-        // 아는 제품 ID 목록을 함께 줍니다.
+        devices(productIDs: ConsoleModel.all.map(\.productID), console(at:))
+    }
+
+    /// 꽂혀 있지만 PC로 복사 모드가 아닌 스위치입니다. 모드를 켜라고 안내할 때 씁니다.
+    public static func idle() -> [ConsoleModel] {
+        devices(productIDs: ConsoleModel.all.compactMap(\.idleProductID)) { service in
+            guard let vendorID: NSNumber = property("idVendor", of: service),
+                  let productID: NSNumber = property("idProduct", of: service)
+            else { return nil }
+            return ConsoleModel.matchingIdle(vendorID: vendorID.uint16Value, productID: productID.uint16Value)
+        }
+    }
+
+    private static func devices<T>(productIDs: [UInt16], _ transform: (io_service_t) -> T?) -> [T] {
+        // 제조사 ID만 주면 IOKit이 아무 기기와도 맞추지 않습니다(2026-11-15, 스위치 2 펌웨어 23.5.0에서 확인).
+        // 제품 ID 목록을 함께 줍니다.
         let matching = IOUSBHostDevice.__createMatchingDictionary(
             withVendorID: NSNumber(value: ConsoleModel.switch2.vendorID),
             productID: nil,
@@ -24,20 +39,20 @@ public enum ConsoleLocator {
             deviceSubclass: nil,
             deviceProtocol: nil,
             speed: nil,
-            productIDArray: ConsoleModel.all.map { NSNumber(value: $0.productID) }
+            productIDArray: productIDs.map { NSNumber(value: $0) }
         ).takeRetainedValue()
         var iterator: io_iterator_t = 0
         guard IOServiceGetMatchingServices(kIOMainPortDefault, matching, &iterator) == KERN_SUCCESS else { return [] }
         defer { IOObjectRelease(iterator) }
 
-        var consoles: [AttachedConsole] = []
+        var found: [T] = []
         while case let service = IOIteratorNext(iterator), service != 0 {
             defer { IOObjectRelease(service) }
-            if let console = console(at: service) {
-                consoles.append(console)
+            if let device = transform(service) {
+                found.append(device)
             }
         }
-        return consoles
+        return found
     }
 
     static func console(at service: io_service_t) -> AttachedConsole? {

@@ -22,7 +22,7 @@ struct Connection {
         let trace = options.verbose ? Terminal.trace : nil
         let record = recordFile ?? options.record.map { URL(filePath: ($0 as NSString).expandingTildeInPath) }
         for attempt in 1 ... 2 {
-            guard let console = ConsoleLocator.attached().first else { throw CLIError.noConsole }
+            guard let console = ConsoleLocator.attached().first else { throw missingConsole() }
             if console.model.isExperimental, attempt == 1 {
                 Terminal.error("\(console.model.name)는 실험적 지원입니다. 문제가 있으면 --verbose 출력과 함께 알려 주세요.")
             }
@@ -33,6 +33,8 @@ struct Connection {
                 return try Self(console: console, transport: transport, session: session, info: session.open())
             } catch SessionError.needsUSBReset where attempt == 1 {
                 transport.close()
+                // USB 장치를 다시 붙이면 스위치가 PC로 복사 모드에서 나갑니다(2026-11-15, 펌웨어 23.5.0에서 확인).
+                Terminal.error("남은 세션을 풀려고 스위치를 USB에서 다시 연결했습니다. 본체에서 PC로 복사를 다시 켜 주세요. 60초 기다립니다.")
                 try waitForReattach()
             }
         }
@@ -44,16 +46,19 @@ struct Connection {
         transport.close()
     }
 
-    /// USB 장치를 다시 붙이면 스위치가 잠시 사라졌다가 다시 나타납니다.
+    /// 사용자가 본체에서 PC로 복사를 다시 켤 때까지 기다립니다.
     private static func waitForReattach() throws {
-        Thread.sleep(forTimeInterval: 1)
-        let deadline = Date().addingTimeInterval(15)
+        let deadline = Date().addingTimeInterval(60)
         while Date() < deadline {
+            Thread.sleep(forTimeInterval: 0.5)
             if !ConsoleLocator.attached().isEmpty {
                 return
             }
-            Thread.sleep(forTimeInterval: 0.5)
         }
-        throw CLIError.noConsole
+        throw missingConsole()
+    }
+
+    private static func missingConsole() -> CLIError {
+        ConsoleLocator.idle().first.map { CLIError.notInTransferMode($0.name) } ?? .noConsole
     }
 }
