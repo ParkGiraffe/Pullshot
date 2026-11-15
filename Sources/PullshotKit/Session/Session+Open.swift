@@ -30,10 +30,19 @@ public extension Session {
     }
 
     /// CloseSession을 보냅니다. 기기가 이미 사라졌을 수 있어 실패는 무시합니다.
+    /// 앞선 실패로 어긋난 세션도 닫아 둡니다. 스위치에 세션이 남으면 다음 연결이 USB 장치 리셋까지 가고
+    /// 스위치가 PC로 복사 모드에서 나갑니다(2026-11-15, 펌웨어 23.5.0에서 확인).
     func close() {
         defer { isOpen = false }
-        guard isOpen, isValid else { return }
-        _ = try? exchange(.closeSession)
+        guard isOpen else { return }
+        guard !isValid else {
+            _ = try? exchange(.closeSession)
+            return
+        }
+        // 끊긴 트랜잭션의 남은 데이터와 응답을 비우면 기기는 다음 트랜잭션 ID를 기다립니다.
+        drainLeftovers()
+        try? send(.command(.closeSession, transactionID: takeTransactionID()))
+        _ = try? nextContainer(timeout: Self.commandReadTimeout)
     }
 
     /// 앞 연결이 취소나 시간 초과로 끝났으면 기기가 그 데이터 단계를 아직 보내고 있습니다.
