@@ -66,3 +66,33 @@ func objectInfoFixture(
     writer.string("")
     return writer.data
 }
+
+/// "yyyy-MM-dd HH:mm:ss"를 서울 시각으로 읽습니다.
+func dateFixture(_ text: String) -> Date {
+    let formatter = DateFormatter()
+    formatter.locale = Locale(identifier: "en_US_POSIX")
+    formatter.timeZone = TimeZone(identifier: "Asia/Seoul")
+    formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+    guard let date = formatter.date(from: text) else { preconditionFailure("날짜 형식이 다릅니다: \(text)") }
+    return date
+}
+
+/// 훑기를 거친 캡처입니다. 찍은 시각은 서울 시각 글로 받습니다.
+func captureFixture(
+    _ filename: String = "2026111421120500_s.jpg",
+    game: String? = "젤다무쌍 봉인전기",
+    at capturedAt: String? = "2026-11-14 21:12:05",
+    size: UInt64? = 5,
+    kind: Capture.Kind = .photo,
+    handle: UInt32 = 1
+) -> Capture {
+    Capture(
+        handle: handle,
+        storageID: 0x0001_0001,
+        filename: filename,
+        size: size,
+        capturedAt: capturedAt.map(dateFixture),
+        kind: kind,
+        gameFolder: game
+    )
+}

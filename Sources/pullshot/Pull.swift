@@ -52,7 +52,7 @@ struct Pull: ParsableCommand {
         for capture in captures {
             // 세션이 어긋났으면 남은 캡처도 모두 실패하므로 멈춥니다.
             guard !Terminal.isInterrupted, session.isValid else { return }
-            let game = capture.gameFolder ?? ListFormatter.otherGames
+            let game = capture.gameName
             let folder = root.appending(path: game)
             try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
             switch DestinationNamer.decide(filename: capture.filename, size: capture.size, in: folder) {
