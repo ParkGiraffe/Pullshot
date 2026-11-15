@@ -65,8 +65,9 @@ public final class Session {
         _ parameters: [UInt32] = [],
         transactionID: UInt32? = nil
     ) throws -> (data: Data, response: Container) {
-        let id = transactionID ?? takeTransactionID()
-        return try invalidatingOnFailure {
+        // 버린 세션에서 ID를 꺼내면 close()의 CloseSession이 기기가 기다리는 ID를 지나칩니다.
+        try invalidatingOnFailure {
+            let id = transactionID ?? takeTransactionID()
             try send(.command(operation, transactionID: id, parameters: parameters))
             var data = Data()
             var strayEvents = 0

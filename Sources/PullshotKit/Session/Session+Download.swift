@@ -58,8 +58,8 @@ public extension Session {
         progress: (UInt64) -> Void,
         isCancelled: () -> Bool
     ) throws -> (bytes: UInt64, response: Container, isCancelled: Bool) {
-        let id = takeTransactionID()
-        return try invalidatingOnFailure {
+        try invalidatingOnFailure {
+            let id = takeTransactionID()
             try send(.command(.getObject, transactionID: id, parameters: [handle]))
             let header = try awaitHeader()
             try requireTransaction(id, header.transactionID)
