@@ -1,0 +1,29 @@
+disabled_rules:
+  - function_body_length
+  - function_parameter_count
+  - identifier_name # 한국어 테스트 이름
+  - large_tuple
+  - trailing_whitespace
+
+opt_in_rules:
+  - contains_over_filter_count
+  - empty_count
+  - first_where
+  - force_unwrapping
+  - for_where
+  - implicit_return
+  - prefer_self_in_static_references
+  - private_over_fileprivate
+  - sorted_first_last
+
+included:
+  - Sources
+  - Tests
+
+excluded:
+  - .build
+
+trailing_comma:
+  mandatory_comma: true
+
+line_length: 120

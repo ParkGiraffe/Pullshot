@@ -1,0 +1,14 @@
+--exclude .build
+--swiftversion 6.2
+--indent 4
+--maxwidth 120
+--trailing-commas collections-only
+--hexliteralcase uppercase
+--ranges spaced
+--importgrouping testable-bottom
+--self remove
+--wraparguments preserve
+--wrapcollections preserve
+--header ignore
+--enable docComments,isEmpty,preferFinalClasses,redundantThrows,sortImports,unusedPrivateDeclarations
+--disable consecutiveSpaces,markTypes,redundantSelf,unusedArguments
