@@ -29,7 +29,10 @@ public final class HostTransport: Transport {
             interface = try IOUSBHostInterface(__ioService: service, options: [], queue: nil, interestHandler: nil)
         } catch {
             IOObjectRelease(device)
-            throw ConsoleAccessError(ioReturn: (error as NSError).code)
+            let owner: String? = ConsoleLocator.property("UsbExclusiveOwner", of: service)
+            let code = UInt32(truncatingIfNeeded: (error as NSError).code)
+            trace?("인터페이스 열기 실패 \(String(format: "0x%08X", code)), 쥔 프로세스: \(owner ?? "모름")")
+            throw ConsoleAccessError(ioReturn: (error as NSError).code, exclusiveOwner: owner)
         }
         do {
             guard let pipes = EndpointSelection.pick(Self.endpoints(of: interface)) else {

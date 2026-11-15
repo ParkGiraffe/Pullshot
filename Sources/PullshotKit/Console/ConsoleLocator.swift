@@ -14,6 +14,8 @@ public struct AttachedConsole: Equatable, Sendable {
 /// USB에 꽂힌 스위치를 찾습니다.
 public enum ConsoleLocator {
     public static func attached() -> [AttachedConsole] {
+        // 제조사 ID만 주면 IOKit이 아무 기기와도 맞추지 않습니다(2026-11-15, 스위치 2 펌웨어 23.0.1에서 확인).
+        // 아는 제품 ID 목록을 함께 줍니다.
         let matching = IOUSBHostDevice.__createMatchingDictionary(
             withVendorID: NSNumber(value: ConsoleModel.switch2.vendorID),
             productID: nil,
@@ -22,7 +24,7 @@ public enum ConsoleLocator {
             deviceSubclass: nil,
             deviceProtocol: nil,
             speed: nil,
-            productIDArray: nil
+            productIDArray: ConsoleModel.all.map { NSNumber(value: $0.productID) }
         ).takeRetainedValue()
         var iterator: io_iterator_t = 0
         guard IOServiceGetMatchingServices(kIOMainPortDefault, matching, &iterator) == KERN_SUCCESS else { return [] }

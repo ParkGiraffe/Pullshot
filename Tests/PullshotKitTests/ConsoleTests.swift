@@ -21,9 +21,18 @@ struct ConsoleTests {
     struct Access {
         @Test func `다른 앱이 잡았을 때 나오는 두 코드는 부호가 붙어 와도 같은 오류다`() {
             for code: UInt32 in [0xE000_02C5, 0xE000_02C9] {
-                #expect(ConsoleAccessError(ioReturn: Int(Int32(bitPattern: code))) == .heldByAnotherApp(code: code))
-                #expect(ConsoleAccessError(ioReturn: Int(code)) == .heldByAnotherApp(code: code))
+                #expect(ConsoleAccessError(ioReturn: Int(Int32(bitPattern: code))) == .heldByAnotherApp(
+                    code: code,
+                    owner: nil
+                ))
+                #expect(ConsoleAccessError(ioReturn: Int(code)) == .heldByAnotherApp(code: code, owner: nil))
             }
+        }
+
+        @Test func `인터페이스를 쥔 앱의 이름을 함께 담는다`() {
+            let error = ConsoleAccessError(ioReturn: 0xE000_02C5, exclusiveOwner: "pid 38635, Tethersnap")
+
+            #expect(error == .heldByAnotherApp(code: 0xE000_02C5, owner: "Tethersnap"))
         }
 
         @Test func `그 밖의 코드는 코드를 그대로 담는다`() {
