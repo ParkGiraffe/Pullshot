@@ -96,6 +96,23 @@ struct TransferTests {
         }
     }
 
+    @Suite("이미 옮긴 캡처")
+    struct AlreadyTransferred {
+        @Test func `이미 있던 파일을 건너뛰면 지난번 옮긴 날을 바꾸지 않는다`() throws {
+            let setup = try Setup()
+            let (a, b) = (captureFixture("a.jpg"), captureFixture("b.jpg"))
+            _ = try setup.run([a])
+            let firstTransfer = setup.ledger.transferredAt(a, serialNumber: "S1")
+            _ = try setup.place(Data(count: 5), named: "b.jpg")
+
+            _ = try setup.run([a, b])
+
+            #expect(setup.ledger.transferredAt(a, serialNumber: "S1") == firstTransfer)
+            #expect(setup.ledger.isTransferred(b, serialNumber: "S1"))
+            #expect(setup.ledger.transferredAt(b, serialNumber: "S1") == nil)
+        }
+    }
+
     @Suite("멈춤")
     struct Stopping {
         @Test func `연결이 끊기면 멈추고 시도하지 못한 수를 센다`() throws {

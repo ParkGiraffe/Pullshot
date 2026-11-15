@@ -3,7 +3,7 @@ import Foundation
 public enum TransferKind: String, Codable, Sendable {
     case imported
     case exported
-    /// 처음 연결 질문에서 고른 폴더에 이미 있던 캡처입니다.
+    /// 처음 연결 질문에서 고른 폴더나 받을 곳에 이미 있던 캡처입니다. 지금 옮긴 것이 아니라 옮긴 날로 세지 않습니다.
     case foundInFolder
     /// 처음 연결 질문에서 모두 옮긴 것으로 표시한 캡처입니다.
     case markedAll

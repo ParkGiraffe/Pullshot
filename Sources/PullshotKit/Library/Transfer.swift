@@ -38,6 +38,7 @@ public struct TransferSummary {
 }
 
 /// 가져오기와 내보내기를 합니다. 캡처마다 받고, 만든 날짜와 수정 날짜를 찍은 시각으로 맞추고, 옮긴 기록을 남깁니다.
+/// 같은 파일이 이미 있어 건너뛴 캡처는 기록에 없을 때만 `foundInFolder`로 남겨, 지난번 옮긴 날이 바뀌지 않게 합니다.
 public struct Transfer {
     private let source: DownloadSource
     private let ledger: TransferLedger
@@ -80,6 +81,9 @@ public struct Transfer {
             switch decision {
             case .skip:
                 summary.skipped += 1
+                if !ledger.isTransferred(item.capture, serialNumber: serialNumber) {
+                    try ledger.record([item.capture], serialNumber: serialNumber, as: .foundInFolder)
+                }
             case let .write(destination):
                 do {
                     try source.download(
@@ -103,8 +107,8 @@ public struct Transfer {
                 }
                 setCaptureDates(of: destination, to: item.capture.capturedAt)
                 summary.saved.append(destination)
+                try ledger.record([item.capture], serialNumber: serialNumber, as: kind)
             }
-            try ledger.record([item.capture], serialNumber: serialNumber, as: kind)
         }
         return summary
     }
