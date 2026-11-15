@@ -66,7 +66,7 @@ public final class Session {
         _ parameters: [UInt32] = [],
         transactionID: UInt32? = nil
     ) throws -> (data: Data, response: Container) {
-        let id = try transactionID ?? takeTransactionID()
+        let id = transactionID ?? takeTransactionID()
         return try guarded {
             try send(.command(operation, transactionID: id, parameters: parameters))
             var data = Data()
@@ -75,10 +75,10 @@ public final class Session {
                 let container = try nextContainer(timeout: Self.commandReadTimeout)
                 switch container.kind {
                 case .data:
-                    try requireTransaction(id, in: container)
+                    try requireTransaction(id, container.transactionID)
                     data.append(container.payload)
                 case .response:
-                    try requireTransaction(id, in: container)
+                    try requireTransaction(id, container.transactionID)
                     return (data, container)
                 case .event:
                     strayEvents += 1
@@ -127,17 +127,15 @@ public final class Session {
         }
     }
 
-    func requireTransaction(_ expected: UInt32, in container: Container) throws {
-        guard container.transactionID == expected else {
-            throw SessionError.transactionMismatch(expected: expected, got: container.transactionID)
-        }
+    func requireTransaction(_ expected: UInt32, _ actual: UInt32) throws {
+        guard actual == expected else { throw SessionError.transactionMismatch(expected: expected, got: actual) }
     }
 
     func unexpected(_ container: Container) -> SessionError {
         .unexpectedContainer(kind: container.kind.rawValue, code: container.code)
     }
 
-    private func takeTransactionID() throws -> UInt32 {
+    func takeTransactionID() -> UInt32 {
         let id = nextTransactionID
         // 0xFFFFFFFF는 표준이 예약해 두었으므로 그 앞에서 1로 돌아갑니다.
         nextTransactionID = id == 0xFFFF_FFFE ? 1 : id + 1
