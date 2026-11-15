@@ -17,6 +17,11 @@ public struct SkippedObject: Equatable, Sendable {
 public struct AlbumScan: Equatable, Sendable {
     public var captures: [Capture]
     public var skipped: [SkippedObject]
+
+    public init(captures: [Capture], skipped: [SkippedObject]) {
+        self.captures = captures
+        self.skipped = skipped
+    }
 }
 
 /// 앨범 폴더를 따라 내려가며 캡처를 모읍니다. 스위치는 저장소 전체를 한 번에 달라는 평면 질의를 거부합니다.
@@ -42,7 +47,7 @@ public struct AlbumScanner {
             }
             try visit(roots, in: storage, gameFolder: nil, walk: &walk, progress: progress)
         }
-        return AlbumScan(captures: walk.captures.sorted(by: Self.newestFirst), skipped: walk.skipped)
+        return AlbumScan(captures: walk.captures.sorted(by: Capture.newestFirst), skipped: walk.skipped)
     }
 
     private func visit(
@@ -129,19 +134,6 @@ public struct AlbumScanner {
             return .video
         }
         return nil
-    }
-
-    private static func newestFirst(_ lhs: Capture, _ rhs: Capture) -> Bool {
-        switch (lhs.capturedAt, rhs.capturedAt) {
-        case let (left?, right?) where left != right:
-            left > right
-        case (.some, nil):
-            true
-        case (nil, .some):
-            false
-        default:
-            lhs.filename < rhs.filename
-        }
     }
 }
 
