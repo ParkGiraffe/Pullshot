@@ -80,6 +80,20 @@ struct FirstConnectionTests {
             #expect(ledger.newCaptures(captures, serialNumber: "S1").map(\.filename) == ["b.jpg", "c.jpg"])
         }
 
+        @Test func `없거나 읽을 수 없는 폴더를 주면 기록하지 않고 다시 묻는다`() throws {
+            let missing = temporaryFolderFixture()
+            let ledger = try TransferLedger(directory: temporaryFolderFixture())
+
+            #expect(throws: FolderMatchError.unreadableFolder(missing)) {
+                try ledger.answerFirstConnectQuestion(
+                    .findInFolder(missing),
+                    captures: [captureFixture()],
+                    serialNumber: "S1"
+                )
+            }
+            #expect(ledger.needsFirstConnectQuestion(serialNumber: "S1"))
+        }
+
         @Test func `읽을 수 없는 하위 폴더가 있어도 나머지에서 찾는다`() throws {
             let root = temporaryFolderFixture()
             let locked = root.appending(path: "locked")

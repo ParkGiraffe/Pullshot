@@ -1,3 +1,4 @@
+import Foundation
 import PullshotKit
 import Testing
 @testable import pullshot
@@ -31,6 +32,11 @@ struct ErrorMessagesTests {
     @Test func `연결은 됐지만 PC로 복사 모드가 아니면 그 모드를 켜라고 한다`() {
         #expect(ErrorMessages.message(for: CLIError.notInTransferMode("Nintendo Switch 2"))
             == "Nintendo Switch 2가 연결돼 있지만 PC로 복사 모드가 아닙니다. 본체 설정의 데이터 관리에서 PC로 복사를 켜 주세요.")
+    }
+
+    @Test func `찾을 폴더를 열 수 없으면 경로와 권한을 확인하라고 한다`() {
+        #expect(ErrorMessages.message(for: FolderMatchError.unreadableFolder(URL(filePath: "/tmp/없는 폴더")))
+            == "폴더를 열 수 없습니다: /tmp/없는 폴더. 경로가 맞는지, 터미널에 그 폴더를 읽을 권한이 있는지 확인해 주세요.")
     }
 
     @Test func `기기가 없으면 연결 방법을 알려 준다`() {

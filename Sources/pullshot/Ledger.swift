@@ -31,12 +31,15 @@ struct Ledger: ParsableCommand {
     func run() throws {
         try Terminal.run {
             Terminal.listenForInterrupt()
+            let folderURL = folder.map { URL(filePath: ($0 as NSString).expandingTildeInPath) }
+            // 훑기에 16초쯤 걸리므로 폴더 경로부터 확인합니다.
+            try folderURL.map(FolderMatcher.requireReadable)
             let ledger = try ledgerOptions.open()
             let connection = try Connection.open(connection)
             defer { connection.close() }
             let scan = try AlbumScanner(source: connection.session).scan(isCancelled: { Terminal.isInterrupted })
-            let answer: FirstConnectAnswer = if let folder {
-                .findInFolder(URL(filePath: (folder as NSString).expandingTildeInPath))
+            let answer: FirstConnectAnswer = if let folderURL {
+                .findInFolder(folderURL)
             } else if marksAll {
                 .markAll
             } else {
