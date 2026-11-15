@@ -13,7 +13,7 @@ final class FakeAlbumSource: AlbumSource {
     private var children: [UInt32: [UInt32]] = [:]
     private var infos: [UInt32: ObjectInfo] = [:]
     private var storages = [storage]
-    private var storageErrors: [UInt32: SessionError] = [:]
+    var storageErrors: [UInt32: SessionError] = [:]
     var objectInfoErrors: [UInt32: Error] = [:]
     private(set) var requestedParents: [UInt32] = []
 

@@ -78,6 +78,15 @@ struct AlbumScannerTests {
             #expect(try AlbumScanner(source: source).scan().captures.count == 1)
         }
 
+        @Test func `읽을 수 있는 저장소가 하나도 없으면 빈 앨범이 아니라 마지막 응답 오류로 끝난다`() {
+            let source = FakeAlbumSource.tree([.file(0x11, "a.jpg")])
+            source.storageErrors[FakeAlbumSource.storage] = .response(.deviceBusy, operation: .getObjectHandles)
+
+            #expect(throws: SessionError.response(.deviceBusy, operation: .getObjectHandles)) {
+                try AlbumScanner(source: source).scan()
+            }
+        }
+
         @Test func `훑는 중에 취소하면 객체 사이에서 멈춘다`() {
             let source = FakeAlbumSource.tree([.file(0x11, "a.jpg"), .file(0x12, "b.jpg"), .file(0x13, "c.jpg")])
             var seen = 0

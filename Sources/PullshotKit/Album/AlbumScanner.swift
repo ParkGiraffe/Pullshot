@@ -35,19 +35,26 @@ public struct AlbumScanner {
     }
 
     /// 객체 하나나 저장소 하나를 읽지 못하면 그것만 건너뛰고, 전송이 끊기면 멈춥니다.
+    /// 저장소를 하나도 읽지 못하면 빈 앨범이 아니라 마지막 응답 오류로 끝납니다. 스위치의 저장소는 앨범 하나뿐입니다.
     /// `progress`에는 지금까지 본 객체 수를 넘깁니다. 취소는 객체 사이에서 확인하므로 세션은 계속 쓸 수 있습니다.
     public func scan(progress: (Int) -> Void = { _ in }, isCancelled: () -> Bool = { false }) throws -> AlbumScan {
         var walk = Walk()
+        var rootError: SessionError?
+        var hasReadableStorage = false
         for storage in try source.storageIDs() {
             let roots: [UInt32]
             do {
                 roots = try source.objectHandles(storage: storage, parent: PTP.rootParent)
-            } catch let SessionError.response(response, operation: _) {
-                // 스위치는 앨범 저장소 하나지만, 쓸 수 없는 저장소가 섞여도 나머지는 훑습니다.
+            } catch let SessionError.response(response, operation: operation) {
                 Log.album.notice("저장소 0x\(String(storage, radix: 16), privacy: .public) 건너뜀: \(response.rawValue)")
+                rootError = .response(response, operation: operation)
                 continue
             }
+            hasReadableStorage = true
             try visit(roots, in: storage, gameFolder: nil, walk: &walk, progress: progress, isCancelled: isCancelled)
+        }
+        if !hasReadableStorage, let rootError {
+            throw rootError
         }
         return AlbumScan(captures: walk.captures.sorted(by: Capture.newestFirst), skipped: walk.skipped)
     }
