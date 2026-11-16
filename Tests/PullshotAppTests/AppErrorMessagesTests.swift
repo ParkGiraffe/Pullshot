@@ -32,4 +32,21 @@ struct AppErrorMessagesTests {
         #expect(AppErrorMessages.message(for: FolderMatchError.unreadableFolder(URL(filePath: "/tmp/없는 폴더")))
             == "폴더를 열 수 없습니다: 없는 폴더. 폴더가 있는지, 읽을 권한이 있는지 확인해 주세요.")
     }
+
+    /// Foundation은 받을 파일과 폴더의 쓰기 오류를 `NSCocoaErrorDomain`의 NSError로 던집니다(2026-11-16, macOS 27.2 확인).
+    @Test func `디스크가 차서 받은 파일을 쓰지 못하면 Mac에 저장하지 못했다고 알린다`() {
+        #expect(AppErrorMessages.message(for: NSError(domain: NSCocoaErrorDomain, code: NSFileWriteOutOfSpaceError))
+            == "Mac에 파일을 저장하지 못했습니다. 저장할 폴더가 있는지, 빈 공간과 쓰기 권한이 있는지 확인해 주세요.")
+    }
+
+    @Test func `내보낼 폴더에 쓰기 권한이 없으면 Mac에 저장하지 못했다고 알린다`() {
+        #expect(AppErrorMessages.message(for: NSError(domain: NSCocoaErrorDomain, code: NSFileWriteNoPermissionError))
+            == "Mac에 파일을 저장하지 못했습니다. 저장할 폴더가 있는지, 빈 공간과 쓰기 권한이 있는지 확인해 주세요.")
+    }
+
+    /// 옮긴 기록은 `TransferLedger`가 errno를 담은 `POSIXError`로 던집니다.
+    @Test func `옮긴 기록을 쓸 공간이 없어도 Mac에 저장하지 못했다고 알린다`() {
+        #expect(AppErrorMessages.message(for: POSIXError(.ENOSPC))
+            == "Mac에 파일을 저장하지 못했습니다. 저장할 폴더가 있는지, 빈 공간과 쓰기 권한이 있는지 확인해 주세요.")
+    }
 }

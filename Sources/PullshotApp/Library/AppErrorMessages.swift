@@ -19,9 +19,20 @@ enum AppErrorMessages {
             String(localized: "취소했습니다.")
         case let FolderMatchError.unreadableFolder(folder):
             String(localized: "폴더를 열 수 없습니다: \(folder.lastPathComponent). 폴더가 있는지, 읽을 권한이 있는지 확인해 주세요.")
+        // Kit은 Mac 쪽 파일 오류를 감싸지 않고 넘깁니다. 받을 폴더와 파일은 Foundation의 CocoaError(공간 부족 640,
+        // 권한 없음 513, 읽기 전용 볼륨 642, 경로 없음 4), 옮긴 기록은 errno를 담은 POSIXError입니다(2026-11-16, macOS 27.2 확인).
+        case let error as CocoaError where error.isFileError:
+            fileNotSaved
+        case is POSIXError:
+            fileNotSaved
         default:
             String(localized: "스위치와 통신하지 못했습니다. 도움말 메뉴의 로그 파일 보기에서 자세한 내용을 볼 수 있습니다.")
         }
+    }
+
+    /// 디스크가 차거나 권한이 없을 때 케이블이 아니라 저장할 곳을 보게 합니다.
+    private static var fileNotSaved: String {
+        String(localized: "Mac에 파일을 저장하지 못했습니다. 저장할 폴더가 있는지, 빈 공간과 쓰기 권한이 있는지 확인해 주세요.")
     }
 
     private static func message(for error: ConsoleAccessError) -> String {

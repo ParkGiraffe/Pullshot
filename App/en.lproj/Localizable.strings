@@ -24,6 +24,7 @@
 "받은 크기가 스위치가 알린 크기와 달라 저장하지 않았습니다." = "The file wasn't saved because its size didn't match the size the Switch reported.";
 "취소했습니다." = "Cancelled.";
 "폴더를 열 수 없습니다: %@. 폴더가 있는지, 읽을 권한이 있는지 확인해 주세요." = "Couldn't open the folder: %@. Make sure it exists and that you have permission to read it.";
+"Mac에 파일을 저장하지 못했습니다. 저장할 폴더가 있는지, 빈 공간과 쓰기 권한이 있는지 확인해 주세요." = "Couldn't save the file on your Mac. Make sure the destination folder exists and has free space and write permission.";
 "스위치와 통신하지 못했습니다. 도움말 메뉴의 로그 파일 보기에서 자세한 내용을 볼 수 있습니다." = "Couldn't communicate with the Switch. See Show Log File in the Help menu for details.";
 "사진 %lld" = "Photos: %lld";
 "영상 %lld" = "Videos: %lld";
