@@ -1,4 +1,4 @@
-.PHONY: build test lint format check setup-hooks app run-app
+.PHONY: build test lint format check setup-hooks app dmg run-app
 
 build:
 	swift build
@@ -27,6 +27,16 @@ app:
 	cp App/Info.plist dist/Pullshot.app/Contents/
 	cp -R App/*.lproj dist/Pullshot.app/Contents/Resources/
 	codesign --force --sign - dist/Pullshot.app
+
+dmg: app
+	rm -rf dist/dmg-staging
+	mkdir -p dist/dmg-staging
+	cp -R dist/Pullshot.app dist/dmg-staging/
+	ln -s /Applications dist/dmg-staging/Applications
+	version="$$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' App/Info.plist)" && \
+	rm -f "dist/Pullshot-$$version.dmg" && \
+	hdiutil create -volname Pullshot -srcfolder dist/dmg-staging -format UDZO "dist/Pullshot-$$version.dmg"
+	rm -rf dist/dmg-staging
 
 run-app: app
 	open dist/Pullshot.app
