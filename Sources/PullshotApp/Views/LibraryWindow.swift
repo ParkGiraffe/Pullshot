@@ -62,6 +62,8 @@ struct LibraryWindow: View {
                             } label: {
                                 Image(systemName: "line.3.horizontal.decrease.circle")
                             }
+                            // 이름이 없으면 접근성 이름이 펼침 화살표 이미지 이름(chevron.pulldown)이 됩니다(2026-11-17, macOS 27).
+                            .accessibilityLabel("종류")
                         }
                     }
                     .onChange(of: captures.map(\.id)) { _, visible in model.selection.keep(visible) }

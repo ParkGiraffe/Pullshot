@@ -49,6 +49,7 @@ struct DeviceSwitcher: View {
                 .buttonStyle(.plain)
                 .menuIndicator(.hidden)
                 .fixedSize()
+                .accessibilityLabel("기기 바꾸기")
                 .disabled(model.isTransferring)
             }
         }

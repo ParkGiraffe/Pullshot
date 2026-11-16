@@ -10,6 +10,7 @@
 "연결됨 · %@" = "Connected · %@";
 "연결하지 못함" = "Couldn't connect";
 "연결된 스위치 없음" = "No Switch connected";
+"기기 바꾸기" = "Change Console";
 "실험적 지원" = "Experimental";
 "실기기로 시험하지 못한 기기입니다. 문제가 있으면 설정에서 자세한 로그 남기기를 켜고 다시 해 본 뒤, 로그 파일과 함께 GitHub 이슈로 알려 주세요." = "This console hasn't been tested yet. If something goes wrong, turn on detailed logging in Settings, try again, and report it as a GitHub issue with the log file.";
 "옮긴 기록을 열지 못했습니다" = "Couldn't open the transfer history";
