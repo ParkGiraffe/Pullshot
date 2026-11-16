@@ -35,6 +35,9 @@ final class LibraryModel {
     private(set) var serialNumber: String?
     let isDemo: Bool
     var isAskingFirstConnect = false
+    var scope = LibraryScope.all
+    var kind = KindFilter.all
+    var gameSearch = ""
     let worker: DeviceWorker
     let thumbnails: ThumbnailStore
 
@@ -54,6 +57,12 @@ final class LibraryModel {
         thumbnails.isDemo = true
         thumbnails.serialNumber = serialNumber
         connection = .ready(DemoAlbum.console, DemoAlbum.info)
+    }
+
+    /// 사이드바 범위와 종류 필터를 거쳐 격자에 보일 캡처입니다.
+    var visibleCaptures: [Capture] {
+        CaptureQuery(scope: scope, kind: kind)
+            .captures(in: captures, index: index, serialNumber: serialNumber ?? "", now: .now)
     }
 
     /// 꽂힌 기기를 한 번 살피고, 그 뒤로는 기기가 꽂히거나 빠질 때마다 다시 살핍니다. 데모에서는 감시하지 않습니다.
@@ -108,6 +117,8 @@ final class LibraryModel {
         serialNumber = nil
         thumbnails.serialNumber = nil
         isAskingFirstConnect = false
+        scope = .all
+        gameSearch = ""
     }
 
     /// 열고 훑습니다. 취소됐으면 뒤에 연 기기의 상태를 덮지 않도록 아무것도 바꾸지 않습니다.
