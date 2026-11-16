@@ -2,7 +2,7 @@ import AppKit
 import PullshotKit
 import SwiftUI
 
-enum ViewMode: String, CaseIterable {
+enum ViewMode: String {
     case newest
     case byDate
 }

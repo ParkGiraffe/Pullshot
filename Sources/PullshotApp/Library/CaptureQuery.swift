@@ -8,7 +8,7 @@ enum LibraryScope: Hashable {
 }
 
 /// 툴바 필터 메뉴에서 고른 종류입니다.
-enum KindFilter: String, CaseIterable {
+enum KindFilter {
     case all, photos, videos
 }
 

@@ -15,7 +15,7 @@ actor DeviceWorker {
     private var transport: HostTransport?
     private var session: Session?
     /// 연 기기의 일련번호입니다. 닫으면 nil입니다.
-    private(set) var serialNumber: String?
+    private var serialNumber: String?
 
     nonisolated var unownedExecutor: UnownedSerialExecutor {
         queue.asUnownedSerialExecutor()
