@@ -23,6 +23,9 @@
 	<string>0.1.0</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>15.0</string>
+	<key>NSHumanReadableCopyright</key>
+	<string>© 2026 ParkGiraffe
+Pullshot은 Nintendo가 만들거나 승인한 프로젝트가 아닌 개인 오픈소스 프로젝트입니다. Nintendo Switch와 Nintendo Switch 2는 Nintendo의 상표이며, 이 앱에서는 지원하는 기기를 밝히는 데에만 씁니다.</string>
 	<key>NSHighResolutionCapable</key>
 	<true/>
 	<key>NSPrincipalClass</key>

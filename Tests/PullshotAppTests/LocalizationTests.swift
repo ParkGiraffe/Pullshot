@@ -19,6 +19,13 @@ struct LocalizationTests {
             #expect(key == value)
         }
     }
+
+    @Test func `정보 창은 두 언어로 Nintendo와 관계없다고 밝힌다`() throws {
+        let korean = try #require(infoPlist()["NSHumanReadableCopyright"] as? String)
+        let english = try #require(stringsTable("en", table: "InfoPlist")["NSHumanReadableCopyright"])
+        #expect(korean.contains("Nintendo가 만들거나 승인한 프로젝트가 아닌"))
+        #expect(english.contains("not made or endorsed by Nintendo"))
+    }
 }
 
 /// 위치 지정(`%1$@`)을 뺀 서식 지정자 종류를 정렬해 돌려줍니다. 영어에서 순서를 바꿔도 같다고 봅니다.

@@ -7,18 +7,30 @@ enum StringsTableError: Error {
     case unreadable(String)
 }
 
-/// 앱 뿌리의 `App/<언어>.lproj/Localizable.strings`를 읽습니다. 테스트 파일 위치에서 리포 뿌리를 찾습니다.
-func stringsTable(_ language: String) throws -> [String: String] {
-    let repositoryRoot = URL(filePath: #filePath)
-        .deletingLastPathComponent()
-        .deletingLastPathComponent()
-        .deletingLastPathComponent()
-        .deletingLastPathComponent()
-    let data = try Data(contentsOf: repositoryRoot.appending(path: "App/\(language).lproj/Localizable.strings"))
+/// 리포 뿌리의 `App` 폴더입니다. 테스트 파일 위치에서 찾습니다.
+private let appFolder = URL(filePath: #filePath)
+    .deletingLastPathComponent()
+    .deletingLastPathComponent()
+    .deletingLastPathComponent()
+    .deletingLastPathComponent()
+    .appending(path: "App")
+
+/// `App/<언어>.lproj/<표>.strings`를 읽습니다.
+func stringsTable(_ language: String, table: String = "Localizable") throws -> [String: String] {
+    let data = try Data(contentsOf: appFolder.appending(path: "\(language).lproj/\(table).strings"))
     guard let table = try PropertyListSerialization.propertyList(from: data, format: nil) as? [String: String],
           !table.isEmpty
     else { throw StringsTableError.unreadable(language) }
     return table
+}
+
+/// `App/Info.plist`를 읽습니다. 개발 언어인 한국어 값이 여기 있습니다.
+func infoPlist() throws -> [String: Any] {
+    let data = try Data(contentsOf: appFolder.appending(path: "Info.plist"))
+    guard let plist = try PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any] else {
+        throw StringsTableError.unreadable("Info.plist")
+    }
+    return plist
 }
 
 /// "yyyy-MM-dd HH:mm:ss"를 서울 시각으로 읽습니다.
