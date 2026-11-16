@@ -102,3 +102,4 @@
 "로그 파일 보기" = "Show Log File";
 "PC로 복사 모드가 아님" = "Not in Copy to PC mode";
 "PC로 복사를 다시 켜야 함" = "Turn on Copy to PC again";
+"%@ 폴더가 있는지, 쓸 권한이 있는지 확인해 주세요. 도움말 메뉴의 로그 파일 보기에서 자세한 내용을 볼 수 있습니다." = "Make sure the folder %@ exists and that you have permission to write to it. See Show Log File in the Help menu for details.";

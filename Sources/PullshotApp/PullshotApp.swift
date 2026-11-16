@@ -12,8 +12,12 @@ struct PullshotApp: App {
                 if let model = appDelegate.model {
                     LibraryWindow(model: model)
                 } else {
-                    Text("옮긴 기록을 열지 못했습니다")
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    ContentUnavailableView {
+                        Label("옮긴 기록을 열지 못했습니다", systemImage: "exclamationmark.triangle")
+                    } description: {
+                        let folder = appDelegate.ledgerDirectory.abbreviatedPath
+                        Text("\(folder) 폴더가 있는지, 쓸 권한이 있는지 확인해 주세요. 도움말 메뉴의 로그 파일 보기에서 자세한 내용을 볼 수 있습니다.")
+                    }
                 }
             }
             .tint(.pullshotAccent)
@@ -45,8 +49,11 @@ struct PullshotApp: App {
 final class AppDelegate: NSObject, NSApplicationDelegate {
     /// 기록 창과 설정 창이 같은 설정을 보도록 하나만 만듭니다.
     let settings = AppSettings()
+    /// 실행 인자 `-ledgerFolder <경로>`로 바꿀 수 있습니다. 기록을 열지 못하면 화면에 이 폴더를 보입니다.
+    let ledgerDirectory = UserDefaults.standard.string(forKey: SettingsKey.ledgerFolder.rawValue)
+        .map { URL(filePath: $0, directoryHint: .isDirectory) } ?? TransferLedger.defaultDirectory
     /// 옮긴 기록을 열지 못하면 nil이고, 그때는 기기를 열지 않습니다.
-    private(set) lazy var model = Self.makeModel(settings: settings)
+    private(set) lazy var model = Self.makeModel(ledgerDirectory: ledgerDirectory, settings: settings)
 
     func applicationShouldTerminateAfterLastWindowClosed(_: NSApplication) -> Bool {
         true
@@ -81,10 +88,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         timer.cancel()
     }
 
-    private static func makeModel(settings: AppSettings) -> LibraryModel? {
+    private static func makeModel(ledgerDirectory: URL, settings: AppSettings) -> LibraryModel? {
         let log = FileLog()
-        let ledgerDirectory = UserDefaults.standard.string(forKey: SettingsKey.ledgerFolder.rawValue)
-            .map { URL(filePath: $0, directoryHint: .isDirectory) } ?? TransferLedger.defaultDirectory
         do {
             let worker = try DeviceWorker(ledgerDirectory: ledgerDirectory, log: log)
             return LibraryModel(worker: worker, settings: settings)
