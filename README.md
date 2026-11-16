@@ -21,7 +21,7 @@ Nintendo Switch 2와 Nintendo Switch에서 찍은 스크린샷과 영상을 USB 
 소스에서 앱을 만들어 엽니다.
 
 ```bash
-make app                 # dist/Pullshot.app을 만들고 ad-hoc 서명
+make app                 # Apple 실리콘과 Intel을 함께 담은 dist/Pullshot.app을 만들고 ad-hoc 서명
 open dist/Pullshot.app
 ```
 

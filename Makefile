@@ -19,11 +19,16 @@ check:
 setup-hooks:
 	git config core.hooksPath Scripts/git-hooks
 
+# Apple 실리콘과 Intel Mac에서 모두 열리도록 아키텍처마다 따로 빌드해 합칩니다.
+# Command Line Tools에는 `swift build --arch`를 여럿 받는 xcbuild가 없습니다(2026-11-16 확인).
 app:
-	swift build -c release --product PullshotApp
+	swift build -c release --product PullshotApp --triple arm64-apple-macosx
+	swift build -c release --product PullshotApp --triple x86_64-apple-macosx
 	rm -rf dist/Pullshot.app
 	mkdir -p dist/Pullshot.app/Contents/MacOS dist/Pullshot.app/Contents/Resources
-	cp "$$(swift build -c release --show-bin-path)/PullshotApp" dist/Pullshot.app/Contents/MacOS/Pullshot
+	lipo -create -output dist/Pullshot.app/Contents/MacOS/Pullshot \
+		"$$(swift build -c release --triple arm64-apple-macosx --show-bin-path)/PullshotApp" \
+		"$$(swift build -c release --triple x86_64-apple-macosx --show-bin-path)/PullshotApp"
 	cp App/Info.plist dist/Pullshot.app/Contents/
 	cp -R App/*.lproj dist/Pullshot.app/Contents/Resources/
 	codesign --force --sign - dist/Pullshot.app
