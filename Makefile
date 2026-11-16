@@ -36,7 +36,7 @@ app:
 dmg: app
 	rm -rf dist/dmg-staging
 	mkdir -p dist/dmg-staging
-	cp -R dist/Pullshot.app dist/dmg-staging/
+	cp -R dist/Pullshot.app LICENSE dist/dmg-staging/
 	ln -s /Applications dist/dmg-staging/Applications
 	version="$$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' App/Info.plist)" && \
 	rm -f "dist/Pullshot-$$version.dmg" && \
