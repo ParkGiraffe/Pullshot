@@ -9,24 +9,37 @@ struct LibraryWindow: View {
     /// 창이 좁으면 사용자가 둔 상태(`isInspectorShown`)와 상관없이 오른쪽 칸을 접습니다.
     @State private var isNarrow = false
 
+    /// 기기를 열고 훑기를 마쳐 격자와 오른쪽 칸을 보일 수 있습니다.
+    private var isReady: Bool {
+        if case .ready = model.connection {
+            true
+        } else {
+            false
+        }
+    }
+
     var body: some View {
         NavigationSplitView {
             Sidebar(model: model)
                 .navigationSplitViewColumnWidth(236)
         } detail: {
-            if case .ready = model.connection {
+            if isReady {
                 let captures = model.visibleCaptures
                 content(captures)
                     .navigationTitle(model.scope.title)
                     .navigationSubtitle(subtitle(of: captures))
                     .toolbar {
                         ToolbarItem {
-                            HStack {
-                                Image(systemName: "minus.magnifyingglass")
+                            // Liquid Glass 툴바는 항목을 안쪽 여백 없는 캡슐로 감싸, 여백을 두어야 아이콘이 캡슐 끝에 붙지 않습니다.
+                            // 막대 폭은 창 폭 980pt에서도 격자 열 툴바 항목이 넘침 메뉴로 숨지 않는 폭입니다(2026-11-17, macOS 27, 제목이 짧을 때).
+                            HStack(spacing: 0) {
+                                Image(systemName: "minus")
                                 Slider(value: $thumbnailSize, in: 120 ... 360)
-                                    .frame(width: 100)
-                                Image(systemName: "plus.magnifyingglass")
+                                    .controlSize(.mini)
+                                    .frame(width: 80)
+                                Image(systemName: "plus")
                             }
+                            .padding(.horizontal, 10)
                             .foregroundStyle(.secondary)
                             .accessibilityElement(children: .combine)
                             .accessibilityLabel("썸네일 크기")
@@ -50,26 +63,31 @@ struct LibraryWindow: View {
                                 Image(systemName: "line.3.horizontal.decrease.circle")
                             }
                         }
-                        ToolbarItem {
-                            Button("오른쪽 칸", systemImage: "sidebar.right") {
-                                model.isInspectorShown.toggle()
-                            }
-                        }
-                    }
-                    .inspector(isPresented: Binding(
-                        get: { model.isInspectorShown && !isNarrow },
-                        set: { isShown in
-                            if !isNarrow {
-                                model.isInspectorShown = isShown
-                            }
-                        }
-                    )) {
-                        Inspector(model: model, captures: captures)
                     }
                     .onChange(of: captures.map(\.id)) { _, visible in model.selection.keep(visible) }
                     .onChange(of: model.scope) { model.selection.clear() }
             } else {
                 ConnectionGuide(model: model)
+            }
+        }
+        // 오른쪽 칸을 창 전체에 붙이고 그 안에 툴바를 두어야 툴바가 열마다 나뉘어, 격자 툴바 항목이 오른쪽 칸 경계 앞에서 끝납니다.
+        // 오른쪽 칸 툴바의 단추는 오른쪽 칸을 접어도 창 오른쪽 끝에 남으므로, 안내 화면에서는 오른쪽 칸 내용을 두지 않습니다.
+        .inspector(isPresented: Binding(
+            get: { isReady && model.isInspectorShown && !isNarrow },
+            set: { isShown in
+                if !isNarrow {
+                    model.isInspectorShown = isShown
+                }
+            }
+        )) {
+            if isReady {
+                Inspector(model: model, captures: model.visibleCaptures)
+                    .toolbar {
+                        Spacer()
+                        Button("오른쪽 칸", systemImage: "sidebar.right") {
+                            model.isInspectorShown.toggle()
+                        }
+                    }
             }
         }
         .onGeometryChange(for: Bool.self) { $0.size.width < 980 } action: { isNarrow = $0 }
