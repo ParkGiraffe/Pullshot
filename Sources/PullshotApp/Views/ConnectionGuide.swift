@@ -85,9 +85,9 @@ struct ConnectionGuide: View {
                         .foregroundStyle(.white)
                         .frame(width: 22, height: 22)
                         .background(Color.pullshotAccent, in: .circle)
+                    // fixedSize(vertical:)를 붙이면 창이 최소 높이를 잴 때 폭 0에서 잰 높이를 써서, 창이 화면 아래로 커집니다.
                     Text(steps[number])
                         .multilineTextAlignment(.leading)
-                        .fixedSize(horizontal: false, vertical: true)
                 }
             }
         }
