@@ -36,6 +36,7 @@ final class LibraryModel {
     let isDemo: Bool
     var isAskingFirstConnect = false
     let worker: DeviceWorker
+    let thumbnails: ThumbnailStore
 
     /// 감시를 놓으면 `changes`가 끝나므로 창이 있는 동안 쥐고 있습니다.
     @ObservationIgnored private var monitor: ConsoleMonitor?
@@ -44,11 +45,14 @@ final class LibraryModel {
 
     init(worker: DeviceWorker) {
         self.worker = worker
+        thumbnails = ThumbnailStore(worker: worker)
         isDemo = UserDefaults.standard.bool(forKey: SettingsKey.demoAlbum.rawValue)
         guard isDemo else { return }
         consoles = [DemoAlbum.console]
         captures = DemoAlbum.captures(now: .now)
         serialNumber = DemoAlbum.info.serialNumber
+        thumbnails.isDemo = true
+        thumbnails.serialNumber = serialNumber
         connection = .ready(DemoAlbum.console, DemoAlbum.info)
     }
 
@@ -102,6 +106,7 @@ final class LibraryModel {
         deviceTask?.cancel()
         captures = []
         serialNumber = nil
+        thumbnails.serialNumber = nil
         isAskingFirstConnect = false
     }
 
@@ -123,6 +128,7 @@ final class LibraryModel {
             captures = scan.captures
             self.index = index
             serialNumber = info.serialNumber
+            thumbnails.serialNumber = info.serialNumber
             isAskingFirstConnect = needsFirstConnectQuestion
             connection = .ready(console, info)
         } catch SessionError.needsUSBReset where connection.console == nil || connection.console == console {
