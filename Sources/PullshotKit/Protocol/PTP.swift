@@ -1,7 +1,5 @@
 /// PIMA 15740(PTP) 표준의 코드 값입니다.
 public enum PTP {
-    /// 저장소 인자 자리에 넣으면 모든 저장소를 뜻합니다.
-    public static let allStorages: UInt32 = 0xFFFF_FFFF
     /// GetObjectHandles의 세 번째 인자로 넣으면 루트 바로 아래 객체만 돌려받습니다.
     /// 0을 넣는 평면 질의는 스위치가 거부하므로 쓰지 않습니다.
     public static let rootParent: UInt32 = 0xFFFF_FFFF

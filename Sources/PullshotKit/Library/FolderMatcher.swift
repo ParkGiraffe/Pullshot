@@ -20,8 +20,7 @@ public enum FolderMatcher {
         let files = FileManager.default.enumerator(
             at: folder,
             includingPropertiesForKeys: Array(keys),
-            options: [.skipsPackageDescendants],
-            errorHandler: { _, _ in true }
+            options: [.skipsPackageDescendants]
         )
         var sizesByName: [String: Set<UInt64>] = [:]
         while let file = files?.nextObject() as? URL {
