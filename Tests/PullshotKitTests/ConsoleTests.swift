@@ -44,4 +44,16 @@ struct ConsoleTests {
             #expect(ConsoleAccessError(ioReturn: Int(Int32(bitPattern: 0xE000_02BC))) == .other(code: 0xE000_02BC))
         }
     }
+
+    @Suite("기기 감시")
+    struct Monitoring {
+        @Test(.timeLimit(.minutes(1)))
+        func `감시를 놓으면 알림 스트림이 끝난다`() async throws {
+            var monitor: ConsoleMonitor? = ConsoleMonitor()
+            var changes = try #require(monitor).changes.makeAsyncIterator()
+            monitor = nil
+
+            #expect(await changes.next() == nil)
+        }
+    }
 }

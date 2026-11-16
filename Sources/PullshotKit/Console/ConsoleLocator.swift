@@ -28,10 +28,11 @@ public enum ConsoleLocator {
         }
     }
 
-    private static func devices<T>(productIDs: [UInt16], _ transform: (io_service_t) -> T?) -> [T] {
+    /// 스위치를 찾는 IOKit 사전입니다. 찾기와 알림 걸기가 사전의 참조 하나를 가져가므로 쓸 때마다 새로 만듭니다.
+    static func matchingDictionary(productIDs: [UInt16]) -> CFMutableDictionary {
         // 제조사 ID만 주면 IOKit이 아무 기기와도 맞추지 않습니다(2026-11-15, 스위치 2 펌웨어 23.5.0에서 확인).
         // 제품 ID 목록을 함께 줍니다.
-        let matching = IOUSBHostDevice.__createMatchingDictionary(
+        IOUSBHostDevice.__createMatchingDictionary(
             withVendorID: NSNumber(value: ConsoleModel.switch2.vendorID),
             productID: nil,
             bcdDevice: nil,
@@ -41,6 +42,10 @@ public enum ConsoleLocator {
             speed: nil,
             productIDArray: productIDs.map { NSNumber(value: $0) }
         ).takeRetainedValue()
+    }
+
+    private static func devices<T>(productIDs: [UInt16], _ transform: (io_service_t) -> T?) -> [T] {
+        let matching = matchingDictionary(productIDs: productIDs)
         var iterator: io_iterator_t = 0
         guard IOServiceGetMatchingServices(kIOMainPortDefault, matching, &iterator) == KERN_SUCCESS else { return [] }
         defer { IOObjectRelease(iterator) }
