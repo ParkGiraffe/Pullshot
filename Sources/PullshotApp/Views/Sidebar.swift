@@ -18,12 +18,6 @@ extension LibraryScope {
 struct Sidebar: View {
     @Bindable var model: LibraryModel
 
-    private var games: [Game] {
-        let games = Game.games(in: model.captures)
-        guard !model.gameSearch.isEmpty else { return games }
-        return games.filter { $0.name.localizedStandardContains(model.gameSearch) }
-    }
-
     var body: some View {
         VStack(spacing: 0) {
             DeviceSwitcher(model: model)
@@ -37,16 +31,26 @@ struct Sidebar: View {
     }
 
     private var list: some View {
-        List(selection: Binding(get: { model.scope }, set: { model.scope = $0 ?? .all })) {
-            pinnedRow("모든 항목", icon: "square.grid.2x2", scope: .all)
-            pinnedRow("새 항목", icon: "tray.and.arrow.down", scope: .new)
-            pinnedRow("영상", icon: "video", scope: .videos)
-            pinnedRow("최근 옮긴 항목", icon: "clock", scope: .recentlyTransferred)
-            Section("게임 (\(Game.games(in: model.captures).count))") {
-                ForEach(games) { game in
-                    gameRow(game)
+        let serialNumber = model.serialNumber ?? ""
+        let allGames = Game.games(in: model.captures)
+        let newIDs = Set(model.index.newCaptures(model.captures, serialNumber: serialNumber).map(\.id))
+        let shownGames = model.gameSearch.isEmpty
+            ? allGames
+            : allGames.filter { $0.name.localizedStandardContains(model.gameSearch) }
+        func count(_ scope: LibraryScope) -> Int {
+            CaptureQuery(scope: scope, kind: .all)
+                .captures(in: model.captures, index: model.index, serialNumber: serialNumber, now: .now).count
+        }
+        return List(selection: Binding(get: { model.scope }, set: { model.scope = $0 ?? .all })) {
+            pinnedRow("모든 항목", icon: "square.grid.2x2", scope: .all, count: model.captures.count)
+            pinnedRow("새 항목", icon: "tray.and.arrow.down", scope: .new, count: newIDs.count)
+            pinnedRow("영상", icon: "video", scope: .videos, count: count(.videos))
+            pinnedRow("최근 옮긴 항목", icon: "clock", scope: .recentlyTransferred, count: count(.recentlyTransferred))
+            Section("게임 (\(allGames.count))") {
+                ForEach(shownGames) { game in
+                    gameRow(game, hasNew: game.captures.contains { newIDs.contains($0.id) })
                 }
-                if games.isEmpty {
+                if shownGames.isEmpty {
                     Text("찾는 게임이 없습니다")
                         .foregroundStyle(.secondary)
                 }
@@ -65,36 +69,36 @@ struct Sidebar: View {
         }
     }
 
-    private func count(_ scope: LibraryScope) -> Int {
-        CaptureQuery(scope: scope, kind: .all)
-            .captures(in: model.captures, index: model.index, serialNumber: model.serialNumber ?? "", now: .now).count
-    }
-
-    private func pinnedRow(_ title: LocalizedStringKey, icon: String, scope: LibraryScope) -> some View {
+    private func pinnedRow(_ title: LocalizedStringKey, icon: String, scope: LibraryScope, count: Int) -> some View {
         HStack {
-            Label(title, systemImage: icon)
+            Label {
+                Text(title)
+            } icon: {
+                Image(systemName: icon)
+                    .foregroundStyle(Color.pullshotAccent)
+            }
             Spacer()
-            if scope == .new, count(.new) > 0 {
-                Text(count(.new), format: .number)
+            if scope == .new, count > 0 {
+                Text(count, format: .number)
                     .font(.caption.bold())
                     .foregroundStyle(.white)
                     .padding(.horizontal, 6)
                     .background(Color.newCapture, in: .capsule)
             } else {
-                Text(count(scope), format: .number)
+                Text(count, format: .number)
                     .foregroundStyle(.secondary)
             }
         }
         .tag(scope)
     }
 
-    private func gameRow(_ game: Game) -> some View {
+    private func gameRow(_ game: Game, hasNew: Bool) -> some View {
         HStack(spacing: 8) {
             Thumbnail(capture: game.captures[0])
                 .frame(width: 22, height: 22)
                 .clipShape(.rect(cornerRadius: 6))
                 .overlay(alignment: .topTrailing) {
-                    if !model.index.newCaptures(game.captures, serialNumber: model.serialNumber ?? "").isEmpty {
+                    if hasNew {
                         Circle()
                             .fill(Color.newCapture)
                             .frame(width: 7, height: 7)

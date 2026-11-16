@@ -12,9 +12,10 @@ struct LibraryWindow: View {
                 .navigationSplitViewColumnWidth(236)
         } detail: {
             if case .ready = model.connection {
-                content
+                let captures = model.visibleCaptures
+                content(captures)
                     .navigationTitle(model.scope.title)
-                    .navigationSubtitle(subtitle)
+                    .navigationSubtitle(subtitle(of: captures))
                     .toolbar {
                         ToolbarItem {
                             HStack {
@@ -55,8 +56,7 @@ struct LibraryWindow: View {
         .task { await model.watchConsoles() }
     }
 
-    @ViewBuilder private var content: some View {
-        let captures = model.visibleCaptures
+    @ViewBuilder private func content(_ captures: [Capture]) -> some View {
         if captures.isEmpty {
             emptyState
         } else {
@@ -82,8 +82,8 @@ struct LibraryWindow: View {
     }
 
     /// "11월 1일~14일 · 사진 80 · 영상 6"처럼 보이는 캡처의 기간과 수입니다. 없는 칸은 뺍니다.
-    private var subtitle: String {
-        let summary = CaptureSummary(model.visibleCaptures)
+    private func subtitle(of captures: [Capture]) -> String {
+        let summary = CaptureSummary(captures)
         var parts: [String] = []
         if let first = summary.first, let last = summary.last {
             parts.append((first ..< last).formatted(.interval.month().day()))
