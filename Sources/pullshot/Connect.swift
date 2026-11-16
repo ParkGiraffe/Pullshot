@@ -7,7 +7,7 @@ struct ConnectionOptions: ParsableArguments {
     var verbose = false
 
     @Option(help: "주고받은 바이트를 이 파일에 JSON Lines로 남깁니다.")
-    var record: String?
+    var record: Path?
 }
 
 /// 열린 연결 하나입니다. 명령이 끝나면 `close()`로 세션과 인터페이스를 놓습니다.
@@ -20,7 +20,7 @@ struct Connection {
     /// 첫 스위치를 엽니다. 남은 세션을 풀려고 USB 장치를 다시 붙였으면, 다시 나타나길 기다려 한 번 더 엽니다.
     static func open(_ options: ConnectionOptions, recordingTo recordFile: URL? = nil) throws -> Self {
         let trace = options.verbose ? Terminal.trace : nil
-        let record = recordFile ?? options.record.map { URL(filePath: ($0 as NSString).expandingTildeInPath) }
+        let record = recordFile ?? options.record?.url
         for attempt in 1 ... 2 {
             guard let console = ConsoleLocator.attached().first else { throw missingConsole() }
             if console.model.isExperimental, attempt == 1 {
@@ -44,6 +44,11 @@ struct Connection {
     func close() {
         session.close()
         transport.close()
+    }
+
+    /// 앨범을 훑습니다. Ctrl-C를 누르면 객체 사이에서 멈춥니다.
+    func scanAlbum() throws -> AlbumScan {
+        try AlbumScanner(source: session).scan(isCancelled: { Terminal.isInterrupted })
     }
 
     /// 다시 붙은 기기는 노드가 먼저 보이고 사진 전송 인터페이스는 조금 늦게 생기므로, 그동안은 몇 초 더 기다립니다.

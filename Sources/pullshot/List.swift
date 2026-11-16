@@ -16,16 +16,15 @@ struct List: ParsableCommand {
 
     func run() throws {
         try Terminal.run {
-            Terminal.listenForInterrupt()
             let ledger = try ledgerOptions.open()
             let connection = try Connection.open(connection)
             defer { connection.close() }
             let serialNumber = connection.info.serialNumber
             ledger.hintIfFirstConnection(serialNumber: serialNumber)
 
-            let scan = try AlbumScanner(source: connection.session).scan(isCancelled: { Terminal.isInterrupted })
+            let scan = try connection.scanAlbum()
             let isNew = { (capture: Capture) in !ledger.index.isTransferred(capture, serialNumber: serialNumber) }
-            let selection = CaptureSelection(names: [], game: game, isAll: true, isNewOnly: isNewOnly)
+            let selection = CaptureSelection(names: [], game: game, isNewOnly: isNewOnly)
             let chosen = selection.choose(from: scan.captures, isNew: isNew).chosen
             let shown = AlbumScan(captures: chosen, skipped: scan.skipped)
             ListFormatter.lines(shown, isNew: isNew, timeZone: .current).forEach { print($0) }

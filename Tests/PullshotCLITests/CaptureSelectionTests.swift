@@ -7,7 +7,6 @@ struct CaptureSelectionTests {
         let selection = CaptureSelection(
             names: ["a.jpg", "Mario Kart World/m.jpg", "zz.jpg"],
             game: nil,
-            isAll: false,
             isNewOnly: false
         )
         let result = selection.choose(
@@ -20,7 +19,7 @@ struct CaptureSelectionTests {
     }
 
     @Test func `새 항목만 고르면 기록에 없는 캡처 중 그 게임 것만 남는다`() {
-        let selection = CaptureSelection(names: [], game: "기타", isAll: false, isNewOnly: true)
+        let selection = CaptureSelection(names: [], game: "기타", isNewOnly: true)
         let captures = [
             captureFixture("a.jpg", game: nil),
             captureFixture("b.jpg", game: "기타"),

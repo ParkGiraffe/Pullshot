@@ -11,7 +11,7 @@ struct Ledger: ParsableCommand {
         name: .customLong("from-folder"),
         help: "이 폴더 아래 어디에 있든 파일 이름과 크기가 같은 캡처를 옮긴 것으로 기록합니다."
     )
-    var folder: String?
+    var folder: Path?
 
     @Flag(name: .customLong("mark-all"), help: "지금 있는 캡처를 모두 옮긴 것으로 기록합니다.")
     var marksAll = false
@@ -30,16 +30,16 @@ struct Ledger: ParsableCommand {
 
     func run() throws {
         try Terminal.run {
-            Terminal.listenForInterrupt()
-            let folderURL = folder.map { URL(filePath: ($0 as NSString).expandingTildeInPath) }
             // 훑기에 16초쯤 걸리므로 폴더 경로부터 확인합니다.
-            try folderURL.map(FolderMatcher.requireReadable)
+            if let folder {
+                try FolderMatcher.requireReadable(folder.url)
+            }
             let ledger = try ledgerOptions.open()
             let connection = try Connection.open(connection)
             defer { connection.close() }
-            let scan = try AlbumScanner(source: connection.session).scan(isCancelled: { Terminal.isInterrupted })
-            let answer: FirstConnectAnswer = if let folderURL {
-                .findInFolder(folderURL)
+            let scan = try connection.scanAlbum()
+            let answer: FirstConnectAnswer = if let folder {
+                .findInFolder(folder.url)
             } else if marksAll {
                 .markAll
             } else {

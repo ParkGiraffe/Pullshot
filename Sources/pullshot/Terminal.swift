@@ -38,8 +38,9 @@ enum Terminal {
         error("\(formatter.string(from: Date())) \(line)")
     }
 
-    /// 명령 본문을 돌리고, 오류는 문구로 바꿔 표준 오류에 쓴 뒤 종료 코드 1로 끝냅니다.
+    /// Ctrl-C를 듣기 시작한 뒤 명령 본문을 돌리고, 오류는 문구로 바꿔 표준 오류에 쓴 뒤 종료 코드 1로 끝냅니다.
     static func run(_ body: () throws -> Void) throws {
+        listenForInterrupt()
         do {
             try body()
         } catch let exit as ExitCode {

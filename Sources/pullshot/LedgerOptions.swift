@@ -7,11 +7,10 @@ struct LedgerOptions: ParsableArguments {
         name: .customLong("ledger-folder"),
         help: "옮긴 기록을 둘 폴더입니다. 기본은 ~/Library/Application Support/Pullshot입니다."
     )
-    var folder: String?
+    var folder: Path?
 
     func open() throws -> TransferLedger {
-        let directory = folder.map { URL(filePath: ($0 as NSString).expandingTildeInPath) }
-        return try TransferLedger(directory: directory ?? TransferLedger.defaultDirectory)
+        try TransferLedger(directory: folder?.url ?? TransferLedger.defaultDirectory)
     }
 }
 

@@ -9,7 +9,6 @@ struct Probe: ParsableCommand {
 
     func run() throws {
         try Terminal.run {
-            Terminal.listenForInterrupt()
             let connection = try Connection.open(connection)
             defer { connection.close() }
             try Self.report(connection).forEach { print($0) }

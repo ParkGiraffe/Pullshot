@@ -8,21 +8,20 @@ struct Dump: ParsableCommand {
     )
 
     @Option(help: "기록을 남길 폴더입니다.")
-    var out: String
+    var out: Path
 
     @OptionGroup var connection: ConnectionOptions
 
     func run() throws {
         try Terminal.run {
-            Terminal.listenForInterrupt()
-            let folder = URL(filePath: (out as NSString).expandingTildeInPath)
+            let folder = out.url
             let files = folder.appending(path: "files")
             try FileManager.default.createDirectory(at: files, withIntermediateDirectories: true)
             let connection = try Connection.open(connection, recordingTo: folder.appending(path: "transcript.jsonl"))
             defer { connection.close() }
 
             try write(Probe.report(connection), to: folder.appending(path: "probe.txt"))
-            let scan = try AlbumScanner(source: connection.session).scan(isCancelled: { Terminal.isInterrupted })
+            let scan = try connection.scanAlbum()
             try write(ListFormatter.lines(scan, timeZone: .current), to: folder.appending(path: "list.txt"))
             for capture in scan.captures.prefix(3) {
                 do {
