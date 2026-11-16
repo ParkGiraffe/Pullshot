@@ -1,3 +1,4 @@
+import AppKit
 import PullshotKit
 import SwiftUI
 
@@ -6,23 +7,72 @@ enum ViewMode: String, CaseIterable {
     case byDate
 }
 
+/// 캡처 격자입니다. 누르기와 키보드로 캡처를 고르고, 스페이스나 두 번 누르기로 기준 캡처를 크게 봅니다.
 struct CaptureGrid: View {
     let captures: [Capture]
     let viewMode: ViewMode
     let cellWidth: CGFloat
+    @Binding var selection: GridSelection
     let isNew: (Capture) -> Bool
+    let preview: () -> Void
+    @FocusState private var isFocused: Bool
+
+    private static let margin: CGFloat = 12
+    private static let gap: CGFloat = 3
 
     var body: some View {
-        switch viewMode {
-        case .newest:
-            grid(captures.sorted(by: Capture.newestFirst))
-                .padding(12)
-        case .byDate:
-            byDate
+        // 날짜 보기도 달, 날, 날 안의 캡처가 모두 최신순이라 두 보기의 칸 순서가 같습니다. 고르기와 화살표는 이 순서를 씁니다.
+        let ordered = captures.sorted(by: Capture.newestFirst)
+        let order = ordered.map(\.id)
+        GeometryReader { viewport in
+            // 화살표의 한 줄이 격자가 놓는 열 수와 같도록 같은 폭과 간격으로 셉니다.
+            let columns = GridSelection.columns(
+                width: viewport.size.width - Self.margin * 2,
+                minimum: cellWidth,
+                spacing: Self.gap
+            )
+            ScrollViewReader { scroller in
+                ScrollView {
+                    Group {
+                        switch viewMode {
+                        case .newest: grid(ordered, order: order)
+                        case .byDate: byDate(ordered, order: order)
+                        }
+                    }
+                    .padding(Self.margin)
+                    // 캡처가 적어도 아래 빈 곳을 눌러 고른 것을 지울 수 있게 보이는 높이까지 채웁니다.
+                    .frame(minHeight: viewport.size.height, alignment: .top)
+                    .contentShape(.rect)
+                    .onTapGesture {
+                        selection.clear()
+                        isFocused = true
+                    }
+                }
+                .focusable()
+                .focusEffectDisabled()
+                .focused($isFocused)
+                .onKeyPress(.leftArrow) { move(.left, columns: columns, in: order, scroller: scroller) }
+                .onKeyPress(.rightArrow) { move(.right, columns: columns, in: order, scroller: scroller) }
+                .onKeyPress(.upArrow) { move(.up, columns: columns, in: order, scroller: scroller) }
+                .onKeyPress(.downArrow) { move(.down, columns: columns, in: order, scroller: scroller) }
+                .onKeyPress(.space) {
+                    preview()
+                    return .handled
+                }
+                .onKeyPress(.escape) {
+                    selection.clear()
+                    return .handled
+                }
+                // 찾기 칸에 초점이 있을 때는 ⌘A가 글자를 고르도록 넘깁니다.
+                .onCommand(
+                    #selector(NSResponder.selectAll(_:)),
+                    perform: isFocused ? { selection.selectAll(order) } : nil
+                )
+            }
         }
     }
 
-    private var byDate: some View {
+    private func byDate(_ captures: [Capture], order: [Capture.ID]) -> some View {
         let sections = DateSections(captures)
         return LazyVStack(alignment: .leading, spacing: 16) {
             ForEach(sections.months) { month in
@@ -31,7 +81,7 @@ struct CaptureGrid: View {
                     ForEach(month.days) { day in
                         VStack(alignment: .leading, spacing: 6) {
                             dayHeader(day)
-                            grid(day.captures)
+                            grid(day.captures, order: order)
                         }
                     }
                 }
@@ -39,19 +89,54 @@ struct CaptureGrid: View {
             if !sections.undated.isEmpty {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("날짜 모름").font(.headline)
-                    grid(sections.undated)
+                    grid(sections.undated, order: order)
                 }
             }
         }
-        .padding(12)
     }
 
-    private func grid(_ captures: [Capture]) -> some View {
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: cellWidth), spacing: 3)], spacing: 3) {
+    private func grid(_ captures: [Capture], order: [Capture.ID]) -> some View {
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: cellWidth), spacing: Self.gap)], spacing: Self.gap) {
             ForEach(captures) { capture in
-                CaptureCell(capture: capture, isNew: isNew(capture))
+                CaptureCell(
+                    capture: capture,
+                    isNew: isNew(capture),
+                    isSelected: selection.selected.contains(capture.id)
+                )
+                .onTapGesture { click(capture.id, in: order) }
             }
         }
+    }
+
+    /// ⌘를 누른 채면 넣고 빼기, ⇧를 누른 채면 기준부터 이어 고르기입니다. 두 번 누르면 그 캡처를 크게 봅니다.
+    private func click(_ id: Capture.ID, in order: [Capture.ID]) {
+        let modifiers = NSEvent.modifierFlags
+        let click: GridSelection.Click = if modifiers.contains(.command) {
+            .toggle
+        } else if modifiers.contains(.shift) {
+            .extend
+        } else {
+            .only
+        }
+        selection.click(id, click, in: order)
+        isFocused = true
+        if NSApp.currentEvent?.clickCount == 2 {
+            preview()
+        }
+    }
+
+    /// 고른 칸이 화면 밖으로 나가면 따라 스크롤합니다.
+    private func move(
+        _ move: GridSelection.Move,
+        columns: Int,
+        in order: [Capture.ID],
+        scroller: ScrollViewProxy
+    ) -> KeyPress.Result {
+        selection.move(move, columns: columns, in: order)
+        if let anchor = selection.anchor {
+            scroller.scrollTo(anchor)
+        }
+        return .handled
     }
 
     private func monthHeader(_ month: DateSections.Month) -> some View {

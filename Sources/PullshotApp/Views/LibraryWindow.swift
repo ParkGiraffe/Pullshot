@@ -1,4 +1,5 @@
 import PullshotKit
+import QuickLook
 import SwiftUI
 
 struct LibraryWindow: View {
@@ -48,10 +49,13 @@ struct LibraryWindow: View {
                             }
                         }
                     }
+                    .onChange(of: captures.map(\.id)) { _, visible in model.selection.keep(visible) }
+                    .onChange(of: model.scope) { model.selection.clear() }
             } else {
                 ConnectionGuide(model: model)
             }
         }
+        .quickLookPreview($model.previewURL)
         .environment(model.thumbnails)
         .task { await model.watchConsoles() }
     }
@@ -60,10 +64,15 @@ struct LibraryWindow: View {
         if captures.isEmpty {
             emptyState
         } else {
-            ScrollView {
-                CaptureGrid(captures: captures, viewMode: viewMode, cellWidth: thumbnailSize) { capture in
-                    model.serialNumber.map { !model.index.isTransferred(capture, serialNumber: $0) } ?? false
-                }
+            CaptureGrid(
+                captures: captures,
+                viewMode: viewMode,
+                cellWidth: thumbnailSize,
+                selection: $model.selection
+            ) { capture in
+                model.serialNumber.map { !model.index.isTransferred(capture, serialNumber: $0) } ?? false
+            } preview: {
+                Task { await model.preview() }
             }
             .id(model.scope)
         }

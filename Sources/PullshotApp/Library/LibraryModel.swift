@@ -38,6 +38,9 @@ final class LibraryModel {
     var scope = LibraryScope.all
     var kind = KindFilter.all
     var gameSearch = ""
+    var selection = GridSelection()
+    /// Quick Look으로 보는 원본입니다. Quick Look을 닫으면 nil이 됩니다.
+    var previewURL: URL?
     let worker: DeviceWorker
     let thumbnails: ThumbnailStore
 
@@ -47,6 +50,8 @@ final class LibraryModel {
     @ObservationIgnored private var deviceTask: Task<Void, Never>?
 
     init(worker: DeviceWorker) {
+        // 앞 실행이 끝내기 전에 멈췄으면 미리보기 원본이 남아 있습니다.
+        try? FileManager.default.removeItem(at: DeviceWorker.previewFolder)
         self.worker = worker
         thumbnails = ThumbnailStore(worker: worker)
         isDemo = UserDefaults.standard.bool(forKey: SettingsKey.demoAlbum.rawValue)
@@ -63,6 +68,23 @@ final class LibraryModel {
     var visibleCaptures: [Capture] {
         CaptureQuery(scope: scope, kind: kind)
             .captures(in: captures, index: index, serialNumber: serialNumber ?? "", now: .now)
+    }
+
+    /// 고른 캡처를 격자에 보이는 순서(최신순)로 둡니다. 보이지 않게 된 캡처는 넣지 않습니다.
+    var selectedCaptures: [Capture] {
+        visibleCaptures.filter { selection.selected.contains($0.id) }.sorted(by: Capture.newestFirst)
+    }
+
+    /// 기준 캡처의 원본을 받아 Quick Look으로 엽니다. 데모 캡처는 기기에 없으므로 하지 않습니다.
+    func preview() async {
+        guard !isDemo, let anchor = selection.anchor, let capture = captures.first(where: { $0.id == anchor }) else {
+            return
+        }
+        do {
+            previewURL = try await worker.preview(capture)
+        } catch {
+            worker.log.write("미리보기를 받지 못함: \(FileLog.describe(error))")
+        }
     }
 
     /// 꽂힌 기기를 한 번 살피고, 그 뒤로는 기기가 꽂히거나 빠질 때마다 다시 살핍니다. 데모에서는 감시하지 않습니다.
@@ -110,10 +132,11 @@ final class LibraryModel {
         deviceTask = Task { await load(console) }
     }
 
-    /// 하던 일을 취소하고 연 기기의 캡처와 질문을 치웁니다.
+    /// 하던 일을 취소하고 연 기기의 캡처, 고른 것, 질문을 치웁니다.
     private func leaveConsole() {
         deviceTask?.cancel()
         captures = []
+        selection.clear()
         serialNumber = nil
         thumbnails.serialNumber = nil
         isAskingFirstConnect = false
