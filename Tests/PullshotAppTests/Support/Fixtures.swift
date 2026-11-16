@@ -54,3 +54,8 @@ func captureFixture(
 func temporaryFolderFixture() -> URL {
     FileManager.default.temporaryDirectory.appending(path: "pullshot-\(UUID())")
 }
+
+/// PC로 복사 모드로 꽂힌 스위치입니다. 같은 기기인지는 `registryID`로 가립니다.
+func consoleFixture(_ registryID: UInt64, model: ConsoleModel = .switch2) -> AttachedConsole {
+    AttachedConsole(model: model, registryID: registryID, locationID: nil, serialNumber: "XKJ1000\(registryID)")
+}

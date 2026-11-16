@@ -10,7 +10,8 @@ actor DeviceWorker {
     /// 블로킹 USB 읽기가 협력 스레드 풀을 막지 않도록 전용 큐에서 돕니다.
     private let queue = DispatchSerialQueue(label: "com.parkgiraffe.Pullshot.device")
     private let ledger: TransferLedger
-    private let log: FileLog
+    /// 화면 쪽도 연결 오류를 같은 파일에 남기도록 내놓습니다.
+    let log: FileLog
     private var transport: HostTransport?
     private var session: Session?
     /// 연 기기의 일련번호입니다. 닫으면 nil입니다.
@@ -136,6 +137,8 @@ actor DeviceWorker {
     private func openTransport(_ console: AttachedConsole, trace: ((String) -> Void)?) throws -> HostTransport {
         let deadline = Date().addingTimeInterval(5)
         while true {
+            // 기기를 바꾸려 취소한 열기가 재시도로 큐를 막지 않게 합니다.
+            try Task.checkCancellation()
             do {
                 return try HostTransport(console: console, trace: trace)
             } catch ConsoleAccessError.noStillImageInterface where Date() < deadline {

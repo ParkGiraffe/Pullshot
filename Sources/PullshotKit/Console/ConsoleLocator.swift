@@ -9,6 +9,13 @@ public struct AttachedConsole: Equatable, Sendable {
     public var registryID: UInt64
     public var locationID: UInt32?
     public var serialNumber: String?
+
+    public init(model: ConsoleModel, registryID: UInt64, locationID: UInt32?, serialNumber: String?) {
+        self.model = model
+        self.registryID = registryID
+        self.locationID = locationID
+        self.serialNumber = serialNumber
+    }
 }
 
 /// USB에 꽂힌 스위치를 찾습니다.

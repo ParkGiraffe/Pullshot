@@ -10,6 +10,24 @@ public struct DeviceInfo: Equatable, Sendable {
     /// 스위치는 펌웨어 버전(예: "23.0.1")을 담습니다.
     public var deviceVersion: String
     public var serialNumber: String
+
+    public init(
+        standardVersion: UInt16,
+        vendorExtensionID: UInt32,
+        operationsSupported: [UInt16],
+        manufacturer: String,
+        model: String,
+        deviceVersion: String,
+        serialNumber: String
+    ) {
+        self.standardVersion = standardVersion
+        self.vendorExtensionID = vendorExtensionID
+        self.operationsSupported = operationsSupported
+        self.manufacturer = manufacturer
+        self.model = model
+        self.deviceVersion = deviceVersion
+        self.serialNumber = serialNumber
+    }
 }
 
 public extension DeviceInfo {

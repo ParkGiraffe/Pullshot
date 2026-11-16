@@ -17,6 +17,24 @@ public struct Capture: Equatable, Sendable, Identifiable {
     /// 캡처가 든 앨범 폴더 이름, 곧 게임 이름입니다. 루트에 있거나 폴더 이름을 경로로 쓸 수 없으면 nil입니다.
     public var gameFolder: String?
 
+    public init(
+        handle: UInt32,
+        storageID: UInt32,
+        filename: String,
+        size: UInt64?,
+        capturedAt: Date?,
+        kind: Kind,
+        gameFolder: String?
+    ) {
+        self.handle = handle
+        self.storageID = storageID
+        self.filename = filename
+        self.size = size
+        self.capturedAt = capturedAt
+        self.kind = kind
+        self.gameFolder = gameFolder
+    }
+
     public var id: String {
         "\(gameFolder ?? "")/\(filename)"
     }
