@@ -168,28 +168,8 @@ struct CaptureGrid: View {
         .joined(separator: " · ")
     }
 
-    /// 시각은 로케일에 맞춰 만듭니다. 두 시각의 때(한국어는 "밤")가 같으면 둘째는 때 없이 "밤 10:02 ~ 11:48"로 씁니다.
     private func timeRange(_ summary: CaptureSummary) -> String {
         guard let first = summary.first, let last = summary.last else { return "" }
-        guard Self.dayPeriodFormatter.string(from: first) == Self.dayPeriodFormatter.string(from: last) else {
-            return "\(Self.timeFormatter.string(from: first)) ~ \(Self.timeFormatter.string(from: last))"
-        }
-        return first == last
-            ? Self.timeFormatter.string(from: first)
-            : "\(Self.timeFormatter.string(from: first)) ~ \(Self.timeWithoutPeriodFormatter.string(from: last))"
-    }
-
-    private static let timePattern = DateFormatter.dateFormat(fromTemplate: "Bhmm", options: 0, locale: .current)
-        ?? "h:mm"
-    private static let timeFormatter = formatter(timePattern)
-    private static let timeWithoutPeriodFormatter = formatter(
-        timePattern.replacing("B", with: "").trimmingCharacters(in: .whitespaces)
-    )
-    private static let dayPeriodFormatter = formatter("B")
-
-    private static func formatter(_ pattern: String) -> DateFormatter {
-        let formatter = DateFormatter()
-        formatter.dateFormat = pattern
-        return formatter
+        return CaptureTimeText.current.timeRange(first, last)
     }
 }

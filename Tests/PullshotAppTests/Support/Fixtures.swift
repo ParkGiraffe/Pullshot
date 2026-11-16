@@ -55,6 +55,15 @@ func temporaryFolderFixture() -> URL {
     FileManager.default.temporaryDirectory.appending(path: "pullshot-\(UUID())")
 }
 
+/// 테스트마다 따로 쓰는 설정 저장소입니다. suite 이름에 절대 경로를 주면 `~/Library/Preferences`가 아니라
+/// 그 경로의 plist에 써서, 테스트가 사용자 설정 폴더에 파일을 남기지 않습니다(2026-11-16, macOS 27.2 확인).
+func defaultsFixture() -> UserDefaults {
+    guard let defaults = UserDefaults(suiteName: temporaryFolderFixture().path(percentEncoded: false)) else {
+        preconditionFailure("설정 저장소를 만들지 못했습니다")
+    }
+    return defaults
+}
+
 /// PC로 복사 모드로 꽂힌 스위치입니다. 같은 기기인지는 `registryID`로 가립니다.
 func consoleFixture(_ registryID: UInt64, model: ConsoleModel = .switch2) -> AttachedConsole {
     AttachedConsole(model: model, registryID: registryID, locationID: nil, serialNumber: "XKJ1000\(registryID)")

@@ -45,16 +45,18 @@ final class LibraryModel {
     var isInspectorShown = true
     let worker: DeviceWorker
     let thumbnails: ThumbnailStore
+    let settings: AppSettings
 
     /// 감시를 놓으면 `changes`가 끝나므로 창이 있는 동안 쥐고 있습니다.
     @ObservationIgnored private var monitor: ConsoleMonitor?
     /// 연 기기에서 하는 일입니다. 기기를 바꾸거나 기기가 빠지면 취소합니다.
     @ObservationIgnored private var deviceTask: Task<Void, Never>?
 
-    init(worker: DeviceWorker) {
+    init(worker: DeviceWorker, settings: AppSettings) {
         // 앞 실행이 끝내기 전에 멈췄으면 미리보기 원본이 남아 있습니다.
         try? FileManager.default.removeItem(at: DeviceWorker.previewFolder)
         self.worker = worker
+        self.settings = settings
         thumbnails = ThumbnailStore(worker: worker)
         isDemo = UserDefaults.standard.bool(forKey: SettingsKey.demoAlbum.rawValue)
         guard isDemo else { return }
@@ -79,19 +81,14 @@ final class LibraryModel {
 
     /// 가져올 곳입니다. 설정에서 고르지 않았으면 `~/Pictures/Pullshot`입니다.
     var importFolder: URL {
-        UserDefaults.standard.string(forKey: SettingsKey.importFolder.rawValue)
-            .map { URL(filePath: $0, directoryHint: .isDirectory) } ?? TransferItem.defaultImportFolder
+        settings.importFolder
     }
 
-    /// 내보낼 기준 폴더와 규칙입니다. 기준 폴더는 기본값이 없어 처음 내보낼 때 고르기 전까지 nil입니다.
+    /// 내보낼 기준 폴더와 규칙입니다. 기준 폴더를 고르기 전에는 nil입니다.
     var exportOptions: ExportOptions? {
-        let defaults = UserDefaults.standard
-        guard let path = defaults.string(forKey: SettingsKey.exportFolder.rawValue) else { return nil }
-        return ExportOptions(
-            baseFolder: URL(filePath: path, directoryHint: .isDirectory),
-            makesGameFolder: defaults.object(forKey: SettingsKey.makesGameFolder.rawValue) as? Bool ?? true,
-            naming: defaults.string(forKey: SettingsKey.exportNaming.rawValue).flatMap(ExportNaming.init) ?? .original
-        )
+        settings.exportFolder.map {
+            ExportOptions(baseFolder: $0, makesGameFolder: settings.makesGameFolder, naming: settings.exportNaming)
+        }
     }
 
     /// 기준 캡처의 원본을 받아 Quick Look으로 엽니다. 데모 캡처는 기기에 없으므로 하지 않습니다.
@@ -167,8 +164,7 @@ final class LibraryModel {
     /// USB 리셋만은 리셋이 낸 빠짐 알림이 먼저 와서 취소됐을 수 있으므로, 다른 기기를 열고 있지 않으면 안내를 남깁니다.
     private func load(_ console: AttachedConsole) async {
         do {
-            let isVerbose = UserDefaults.standard.bool(forKey: SettingsKey.isVerboseLog.rawValue)
-            let info = try await worker.open(console, isVerbose: isVerbose)
+            let info = try await worker.open(console, isVerbose: settings.isVerboseLog)
             try Task.checkCancellation()
             connection = .scanning(console, seen: 0)
             let scan = try await worker.scan { seen in

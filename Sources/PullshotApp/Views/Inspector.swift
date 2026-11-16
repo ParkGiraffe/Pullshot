@@ -6,12 +6,6 @@ struct Inspector: View {
     let model: LibraryModel
     /// 격자에 보이는 캡처입니다.
     let captures: [Capture]
-    /// 화면이 설정 창에서 바꾼 값을 따라가도록 모델(`importFolder`)이 아니라 여기서 읽습니다.
-    @AppStorage(SettingsKey.importFolder.rawValue)
-    private var importPath = TransferItem.defaultImportFolder.path(percentEncoded: false)
-    @AppStorage(SettingsKey.exportFolder.rawValue) private var exportPath: String?
-    @AppStorage(SettingsKey.makesGameFolder.rawValue) private var makesGameFolder = true
-    @AppStorage(SettingsKey.exportNaming.rawValue) private var naming = ExportNaming.original
     @State private var isChoosingImportFolder = false
     @State private var isChoosingExportFolder = false
 
@@ -73,7 +67,7 @@ struct Inspector: View {
         }
         .fileImporter(isPresented: $isChoosingImportFolder, allowedContentTypes: [.folder]) { result in
             if case let .success(folder) = result {
-                importPath = folder.path(percentEncoded: false)
+                model.settings.importFolder = folder
             }
         }
         Button {} label: {
@@ -101,33 +95,37 @@ struct Inspector: View {
 
     /// 게임을 보면 그 게임 폴더까지 보입니다. 다른 범위는 게임마다 폴더가 갈리므로 기준 폴더만 보입니다.
     private var importFolder: URL {
-        let root = URL(filePath: importPath, directoryHint: .isDirectory)
-        guard case let .game(name) = model.scope else { return root }
-        return root.appending(path: name)
+        guard case let .game(name) = model.scope else { return model.importFolder }
+        return model.importFolder.appending(path: name)
     }
 
     @ViewBuilder private func selectionInfo(_ selected: [Capture]) -> some View {
+        @Bindable var settings = model.settings
         let summary = CaptureSummary(selected)
         // 미리보기는 기준 폴더 이름을 보이지 않으므로, 기준 폴더를 고르기 전에도 아무 폴더로 만들어 봅니다.
-        let options = ExportOptions(baseFolder: .temporaryDirectory, makesGameFolder: makesGameFolder, naming: naming)
+        let options = ExportOptions(
+            baseFolder: .temporaryDirectory,
+            makesGameFolder: settings.makesGameFolder,
+            naming: settings.exportNaming
+        )
         stack(Array(selected.prefix(3)))
         field(Text("\(selected.count)개 고름"))
         properties("고른 항목") {
             row("사진, 영상", Text("사진 \(summary.photoCount), 영상 \(summary.videoCount)"))
             row("크기", size(summary))
             if let first = summary.first, let last = summary.last {
-                row("찍은 때", Text(captureRange(first, last)))
+                row("찍은 때", Text(CaptureTimeText.current.span(first, last)))
             }
         }
         Divider()
         folderButton(
             "내보낼 곳",
-            path: exportPath.map { Text(verbatim: URL(filePath: $0).abbreviatedPath) } ?? Text("고르기…")
+            path: settings.exportFolder.map { Text(verbatim: $0.abbreviatedPath) } ?? Text("고르기…")
         ) {
             isChoosingExportFolder = true
         }
-        Toggle("게임 이름 폴더 만들기", isOn: $makesGameFolder)
-        Picker("파일 이름", selection: $naming) {
+        Toggle("게임 이름 폴더 만들기", isOn: $settings.makesGameFolder)
+        Picker("파일 이름", selection: $settings.exportNaming) {
             Text("원래 이름 그대로").tag(ExportNaming.original)
             Text("찍은 순서대로 번호 붙이기").tag(ExportNaming.numbered)
         }
@@ -151,7 +149,7 @@ struct Inspector: View {
         .disabled(model.isDemo)
         .fileImporter(isPresented: $isChoosingExportFolder, allowedContentTypes: [.folder]) { result in
             if case let .success(folder) = result {
-                exportPath = folder.path(percentEncoded: false)
+                settings.exportFolder = folder
             }
         }
     }
@@ -176,13 +174,6 @@ struct Inspector: View {
 
     private static let tilts: [Double] = [0, 4, -5]
     private static let shifts: [CGFloat] = [0, 14, -14]
-
-    /// 같은 날이면 시각까지, 여러 날에 걸치면 날짜만 씁니다.
-    private func captureRange(_ first: Date, _ last: Date) -> String {
-        Calendar.current.isDate(first, inSameDayAs: last)
-            ? (first ..< last).formatted(.interval.month().day().hour().minute())
-            : (first ..< last).formatted(.interval.month().day())
-    }
 
     private func field(_ text: Text) -> some View {
         text
@@ -248,8 +239,8 @@ struct Inspector: View {
 }
 
 extension URL {
-    /// 홈 폴더를 `~`로 줄인 경로입니다.
+    /// 홈 폴더를 `~`로 줄인 경로입니다. 폴더 고르기가 돌려준 URL의 끝 `/`는 뗍니다.
     var abbreviatedPath: String {
-        (path(percentEncoded: false) as NSString).abbreviatingWithTildeInPath
+        ((path(percentEncoded: false) as NSString).standardizingPath as NSString).abbreviatingWithTildeInPath
     }
 }
