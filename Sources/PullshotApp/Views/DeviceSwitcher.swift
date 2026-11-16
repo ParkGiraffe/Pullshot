@@ -68,7 +68,11 @@ struct DeviceSwitcher: View {
             Text("연결하는 중")
         case .failed:
             Text("연결하지 못함")
-        case .searching, .notInTransferMode, .reattachNeeded:
+        case .notInTransferMode:
+            Text("PC로 복사 모드가 아님")
+        case .reattachNeeded:
+            Text("PC로 복사를 다시 켜야 함")
+        case .searching:
             Text("연결된 스위치 없음")
         }
     }

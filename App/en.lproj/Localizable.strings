@@ -100,3 +100,5 @@
 "기록에 넣은 캡처 %lld개" = "Captures added to history: %lld";
 "확인" = "OK";
 "로그 파일 보기" = "Show Log File";
+"PC로 복사 모드가 아님" = "Not in Copy to PC mode";
+"PC로 복사를 다시 켜야 함" = "Turn on Copy to PC again";
