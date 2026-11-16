@@ -1,10 +1,11 @@
 import Foundation
+import PullshotKit
 
-/// 훑은 앨범을 게임별 목록 글로 씁니다. CLI의 `list`와 `dump`가 씁니다.
-public enum ListFormatter {
+/// 훑은 앨범을 게임별 목록 글로 씁니다. `list`와 `dump`가 씁니다.
+enum ListFormatter {
     /// 게임은 가장 최근 캡처 순, 기타는 끝입니다(`Game.games`). 칸은 공백 두 칸으로 나누고,
     /// 파일 이름은 왼쪽, 크기는 오른쪽에 맞춥니다. 새 항목은 줄 끝에 "새"를 붙입니다.
-    public static func lines(
+    static func lines(
         _ scan: AlbumScan,
         isNew: (Capture) -> Bool = { _ in false },
         timeZone: TimeZone
@@ -26,7 +27,7 @@ public enum ListFormatter {
         }
 
         return Game.games(in: scan.captures).flatMap { game in
-            ["\(game.name) (\(game.captures.count))"] + game.captures.map(line)
+            ["\(game.isOther ? "기타" : game.name) (\(game.captures.count))"] + game.captures.map(line)
         }
     }
 

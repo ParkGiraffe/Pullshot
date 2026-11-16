@@ -5,7 +5,7 @@ import PullshotKit
 struct List: ParsableCommand {
     static let configuration = CommandConfiguration(abstract: "게임별 캡처 목록을 보여 줍니다. 새 항목에는 줄 끝에 \"새\"를 붙입니다.")
 
-    @Option(help: "이 게임만 보여 줍니다. 게임 폴더 밖의 캡처는 \"\(Game.otherName)\"입니다.")
+    @Option(help: "이 게임만 보여 줍니다. 게임 폴더 밖의 캡처는 \"\(Game.otherFolderName)\"입니다.")
     var game: String?
 
     @Flag(name: .customLong("new"), help: "옮긴 적 없는 새 항목만 보여 줍니다.")

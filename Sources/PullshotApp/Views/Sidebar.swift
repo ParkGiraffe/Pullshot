@@ -9,9 +9,14 @@ extension LibraryScope {
         case .new: Text("새 항목")
         case .videos: Text("영상")
         case .recentlyTransferred: Text("최근 옮긴 항목")
-        case let .game(name): Text(verbatim: name)
+        case let .game(name): Text(verbatim: gameTitle(name))
         }
     }
+}
+
+/// Kit은 기타 묶음을 가져올 폴더 이름으로 부르므로, 화면에는 문자열 표의 이름을 보입니다.
+private func gameTitle(_ name: String) -> String {
+    name == Game.otherFolderName ? String(localized: "기타") : name
 }
 
 /// 기기 칸 아래 보기 범위 목록입니다. 고정 항목, 게임 목록, 게임 찾기 칸 순서입니다.
@@ -36,7 +41,7 @@ struct Sidebar: View {
         let newIDs = Set(model.index.newCaptures(model.captures, serialNumber: serialNumber).map(\.id))
         let shownGames = model.gameSearch.isEmpty
             ? allGames
-            : allGames.filter { $0.name.localizedStandardContains(model.gameSearch) }
+            : allGames.filter { gameTitle($0.name).localizedStandardContains(model.gameSearch) }
         func count(_ scope: LibraryScope) -> Int {
             CaptureQuery(scope: scope, kind: .all)
                 .captures(in: model.captures, index: model.index, serialNumber: serialNumber, now: .now).count
@@ -105,7 +110,7 @@ struct Sidebar: View {
                             .offset(x: 3, y: -3)
                     }
                 }
-            Text(verbatim: game.name)
+            Text(verbatim: gameTitle(game.name))
                 .lineLimit(2)
                 .truncationMode(.tail)
             Spacer(minLength: 0)
