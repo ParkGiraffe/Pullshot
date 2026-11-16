@@ -106,6 +106,7 @@ final class LibraryModel {
     }
 
     /// 열고 훑습니다. 취소됐으면 뒤에 연 기기의 상태를 덮지 않도록 아무것도 바꾸지 않습니다.
+    /// USB 리셋만은 리셋이 낸 빠짐 알림이 먼저 와서 취소됐을 수 있으므로, 다른 기기를 열고 있지 않으면 안내를 남깁니다.
     private func load(_ console: AttachedConsole) async {
         do {
             let isVerbose = UserDefaults.standard.bool(forKey: SettingsKey.isVerboseLog.rawValue)
@@ -124,12 +125,13 @@ final class LibraryModel {
             serialNumber = info.serialNumber
             isAskingFirstConnect = needsFirstConnectQuestion
             connection = .ready(console, info)
+        } catch SessionError.needsUSBReset where connection.console == nil || connection.console == console {
+            worker.log.write("연결하지 못함: \(FileLog.describe(SessionError.needsUSBReset))")
+            connection = .reattachNeeded
         } catch {
             guard !Task.isCancelled else { return }
             worker.log.write("연결하지 못함: \(FileLog.describe(error))")
-            connection = error as? SessionError == .needsUSBReset
-                ? .reattachNeeded
-                : .failed(console, message: AppErrorMessages.message(for: error))
+            connection = .failed(console, message: AppErrorMessages.message(for: error))
         }
     }
 
