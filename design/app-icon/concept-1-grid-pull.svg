@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <title>Pullshot 시안 1: 격자와 당김</title>
+  <defs>
+    <linearGradient id="bg" gradientUnits="userSpaceOnUse" x1="512" y1="100" x2="512" y2="924">
+      <stop offset="0" stop-color="#9384FF"/>
+      <stop offset="1" stop-color="#5A46EC"/>
+    </linearGradient>
+    <clipPath id="shape"><path d="M383.4 100 H640.6 C667.5 100 694.5 99.9 721.4 101.4 C748.2 103 775.2 106.3 800.9 114.1 C826.4 121.9 851.3 135.2 870.1 154.1 C888.9 172.9 902.2 197.8 909.9 223.3 C917.8 249 921.1 276.1 922.6 302.9 C924.1 329.7 924 356.6 924 383.4 V640.6 C924 667.5 924.1 694.5 922.6 721.4 C921 748.2 917.7 775.2 909.9 800.9 C902.1 826.4 888.8 851.3 869.9 870.1 C851.1 888.9 826.2 902.2 800.7 909.9 C775 917.8 747.9 921.1 721.1 922.6 C694.3 924.1 667.4 924 640.6 924 H383.4 C356.5 924 329.5 924.1 302.6 922.6 C275.8 921 248.8 917.7 223.1 909.9 C197.6 902.1 172.7 888.8 153.9 869.9 C135.1 851.1 121.8 826.2 114.1 800.7 C106.2 775 102.9 747.9 101.4 721.1 C99.9 694.3 100 667.4 100 640.6 V383.4 C100 356.5 99.9 329.5 101.4 302.6 C103 275.8 106.3 248.8 114.1 223.1 C121.9 197.6 135.2 172.7 154.1 153.9 C172.9 135.1 197.8 121.8 223.3 114.1 C249 106.2 276.1 102.9 302.9 101.4 C329.7 99.9 356.6 100 383.4 100 Z"/></clipPath>
+    <filter id="icon-shadow" x="-10%" y="-10%" width="120%" height="125%">
+      <feGaussianBlur stdDeviation="12"/>
+    </filter>
+    <clipPath id="t0-clip"><rect x="244" y="244" width="248" height="248" rx="52"/></clipPath>
+    <linearGradient id="t0-sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6FA8E8"/><stop offset="1" stop-color="#CFE6F7"/>
+    </linearGradient>
+    <linearGradient id="t0-ground" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4E9A47"/><stop offset="1" stop-color="#2F6B2E"/>
+    </linearGradient>
+    <clipPath id="t1-clip"><rect x="532" y="244" width="248" height="248" rx="52"/></clipPath>
+    <linearGradient id="t1-sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6FA8E8"/><stop offset="1" stop-color="#CFE6F7"/>
+    </linearGradient>
+    <linearGradient id="t1-ground" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4E9A47"/><stop offset="1" stop-color="#2F6B2E"/>
+    </linearGradient>
+    <clipPath id="t2-clip"><rect x="244" y="532" width="248" height="248" rx="52"/></clipPath>
+    <linearGradient id="t2-sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6FA8E8"/><stop offset="1" stop-color="#CFE6F7"/>
+    </linearGradient>
+    <linearGradient id="t2-ground" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4E9A47"/><stop offset="1" stop-color="#2F6B2E"/>
+    </linearGradient>
+    <linearGradient id="badge" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFB859"/><stop offset="1" stop-color="#FF8C1A"/>
+    </linearGradient>
+  </defs>
+  <path d="M383.4 100 H640.6 C667.5 100 694.5 99.9 721.4 101.4 C748.2 103 775.2 106.3 800.9 114.1 C826.4 121.9 851.3 135.2 870.1 154.1 C888.9 172.9 902.2 197.8 909.9 223.3 C917.8 249 921.1 276.1 922.6 302.9 C924.1 329.7 924 356.6 924 383.4 V640.6 C924 667.5 924.1 694.5 922.6 721.4 C921 748.2 917.7 775.2 909.9 800.9 C902.1 826.4 888.8 851.3 869.9 870.1 C851.1 888.9 826.2 902.2 800.7 909.9 C775 917.8 747.9 921.1 721.1 922.6 C694.3 924.1 667.4 924 640.6 924 H383.4 C356.5 924 329.5 924.1 302.6 922.6 C275.8 921 248.8 917.7 223.1 909.9 C197.6 902.1 172.7 888.8 153.9 869.9 C135.1 851.1 121.8 826.2 114.1 800.7 C106.2 775 102.9 747.9 101.4 721.1 C99.9 694.3 100 667.4 100 640.6 V383.4 C100 356.5 99.9 329.5 101.4 302.6 C103 275.8 106.3 248.8 114.1 223.1 C121.9 197.6 135.2 172.7 154.1 153.9 C172.9 135.1 197.8 121.8 223.3 114.1 C249 106.2 276.1 102.9 302.9 101.4 C329.7 99.9 356.6 100 383.4 100 Z" transform="translate(0 10)" fill="#000" fill-opacity="0.3" filter="url(#icon-shadow)"/>
+  <path d="M383.4 100 H640.6 C667.5 100 694.5 99.9 721.4 101.4 C748.2 103 775.2 106.3 800.9 114.1 C826.4 121.9 851.3 135.2 870.1 154.1 C888.9 172.9 902.2 197.8 909.9 223.3 C917.8 249 921.1 276.1 922.6 302.9 C924.1 329.7 924 356.6 924 383.4 V640.6 C924 667.5 924.1 694.5 922.6 721.4 C921 748.2 917.7 775.2 909.9 800.9 C902.1 826.4 888.8 851.3 869.9 870.1 C851.1 888.9 826.2 902.2 800.7 909.9 C775 917.8 747.9 921.1 721.1 922.6 C694.3 924.1 667.4 924 640.6 924 H383.4 C356.5 924 329.5 924.1 302.6 922.6 C275.8 921 248.8 917.7 223.1 909.9 C197.6 902.1 172.7 888.8 153.9 869.9 C135.1 851.1 121.8 826.2 114.1 800.7 C106.2 775 102.9 747.9 101.4 721.1 C99.9 694.3 100 667.4 100 640.6 V383.4 C100 356.5 99.9 329.5 101.4 302.6 C103 275.8 106.3 248.8 114.1 223.1 C121.9 197.6 135.2 172.7 154.1 153.9 C172.9 135.1 197.8 121.8 223.3 114.1 C249 106.2 276.1 102.9 302.9 101.4 C329.7 99.9 356.6 100 383.4 100 Z" fill="url(#bg)"/>
+  <g clip-path="url(#shape)">
+    <g clip-path="url(#t0-clip)">
+      <rect x="244" y="244" width="248" height="248" fill="url(#t0-sky)"/>
+
+      <circle cx="422.6" cy="318.4" r="27.3" fill="#FFC84A"/>
+      <path d="M244 392.8 C313.4 360.6 380.4 382.9 492 358.1 V492 H244 Z" fill="#6DB463"/>
+      <path d="M244 432.5 C323.4 397.8 397.8 422.6 492 402.7 V492 H244 Z" fill="url(#t0-ground)"/>
+    </g>
+    <g clip-path="url(#t1-clip)">
+      <rect x="532" y="244" width="248" height="248" fill="url(#t1-sky)"/>
+
+      <circle cx="606.4" cy="313.4" r="27.3" fill="#FFC84A"/>
+      <path d="M532 392.8 C601.4 360.6 668.4 382.9 780 358.1 V492 H532 Z" fill="#6DB463"/>
+      <path d="M532 432.5 C611.4 397.8 685.8 422.6 780 402.7 V492 H532 Z" fill="url(#t1-ground)"/>
+    </g>
+    <g clip-path="url(#t2-clip)">
+      <rect x="244" y="532" width="248" height="248" fill="url(#t2-sky)"/>
+
+      <circle cx="407.7" cy="596.5" r="27.3" fill="#FFC84A"/>
+      <path d="M244 680.8 C313.4 648.6 380.4 670.9 492 646.1 V780 H244 Z" fill="#6DB463"/>
+      <path d="M244 720.5 C323.4 685.8 397.8 710.6 492 690.7 V780 H244 Z" fill="url(#t2-ground)"/>
+    </g>
+    <circle cx="656" cy="656" r="146" fill="url(#badge)"/>
+    <path d="M656 578 V724 M592 662 L656 726 L720 662"
+          fill="none" stroke="#FFFFFF" stroke-width="46" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>
