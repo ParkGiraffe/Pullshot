@@ -14,11 +14,13 @@ struct ThumbnailCacheTests {
 
     @Test func `크기가 다르면 다른 캡처로 본다`() {
         cache.store(Data([1]), for: CaptureKey(captureFixture("a.jpg", size: 5), serialNumber: "S1"))
+        #expect(cache.data(for: CaptureKey(captureFixture("a.jpg", size: 5), serialNumber: "S1")) == Data([1]))
         #expect(cache.data(for: CaptureKey(captureFixture("a.jpg", size: 6), serialNumber: "S1")) == nil)
     }
 
     @Test func `폴더 밖 캡처와 기타 폴더 캡처를 섞지 않는다`() {
         cache.store(Data([1]), for: CaptureKey(captureFixture("a.jpg", game: nil), serialNumber: "S1"))
+        #expect(cache.data(for: CaptureKey(captureFixture("a.jpg", game: nil), serialNumber: "S1")) == Data([1]))
         #expect(cache.data(for: CaptureKey(captureFixture("a.jpg", game: "기타"), serialNumber: "S1")) == nil)
     }
 
@@ -28,13 +30,16 @@ struct ThumbnailCacheTests {
         #expect(cache.data(for: key) == nil)
     }
 
-    @Test func `경로로 쓸 수 없는 게임 폴더나 파일 이름이면 저장하지 않는다`() {
-        let folderKey = CaptureKey(captureFixture("a.jpg", game: "a/b"), serialNumber: "S1")
-        let filenameKey = CaptureKey(captureFixture("../a.jpg"), serialNumber: "S1")
-        cache.store(Data([1]), for: folderKey)
-        cache.store(Data([1]), for: filenameKey)
-        #expect(cache.data(for: folderKey) == nil)
-        #expect(cache.data(for: filenameKey) == nil)
+    @Test func `경로로 쓸 수 없는 게임 폴더면 저장하지 않는다`() {
+        let key = CaptureKey(captureFixture("a.jpg", game: "a/b"), serialNumber: "S1")
+        cache.store(Data([1]), for: key)
+        #expect(cache.data(for: key) == nil)
+    }
+
+    @Test func `경로로 쓸 수 없는 파일 이름이면 저장하지 않는다`() {
+        let key = CaptureKey(captureFixture("../a.jpg"), serialNumber: "S1")
+        cache.store(Data([1]), for: key)
+        #expect(cache.data(for: key) == nil)
     }
 
     @Test func `크기를 모르는 캡처도 저장하고 읽는다`() {

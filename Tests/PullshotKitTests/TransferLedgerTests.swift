@@ -73,10 +73,8 @@ struct TransferLedgerTests {
             try ledger.record([a, b], serialNumber: "S1", as: .imported, at: dateFixture("2026-11-08 10:00:00"))
             try ledger.record([a], serialNumber: "S1", as: .exported, at: dateFixture("2026-11-09 21:00:00"))
             try ledger.record([c], serialNumber: "S1", as: .markedAll, at: dateFixture("2026-11-10 09:00:00"))
-            var seoul = Calendar(identifier: .gregorian)
-            seoul.timeZone = TimeZone(identifier: "Asia/Seoul") ?? .gmt
 
-            #expect(ledger.index.lastTransfer(of: [a, b, c], serialNumber: "S1", calendar: seoul)
+            #expect(ledger.index.lastTransfer(of: [a, b, c], serialNumber: "S1", calendar: calendarFixture())
                 == LastTransfer(day: dateFixture("2026-11-09 00:00:00"), count: 1))
             #expect(ledger.index.transferredAt(a, serialNumber: "S1") == dateFixture("2026-11-09 21:00:00"))
             #expect(ledger.index.transferredAt(c, serialNumber: "S1") == nil)

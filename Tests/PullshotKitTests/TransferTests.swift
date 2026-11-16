@@ -41,7 +41,7 @@ struct TransferTests {
             let capture = captureFixture("a.jpg")
             let summary = try setup.run([capture])
 
-            let saved = summary.saved[0].path(percentEncoded: false)
+            let saved = try #require(summary.saved.first).path(percentEncoded: false)
             let attributes = try FileManager.default.attributesOfItem(atPath: saved)
             #expect(attributes[.creationDate] as? Date == capture.capturedAt)
             #expect(attributes[.modificationDate] as? Date == capture.capturedAt)
