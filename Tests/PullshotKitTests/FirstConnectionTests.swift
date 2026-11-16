@@ -29,6 +29,20 @@ struct FirstConnectionTests {
 
             #expect(!ledger.needsFirstConnectQuestion(serialNumber: "S1"))
         }
+
+        @Test func `답한 기기 파일이 깨져도 기록을 열고 다시 묻는다`() throws {
+            let folder = temporaryFolderFixture()
+            try TransferLedger(directory: folder).record([captureFixture("a.jpg")], serialNumber: "S1", as: .imported)
+            try Data(#"["S2""#.utf8).write(to: folder.appending(path: "answered-devices.json"))
+            let ledger = try TransferLedger(directory: folder)
+
+            #expect(ledger.index.isTransferred(captureFixture("a.jpg"), serialNumber: "S1"))
+            #expect(ledger.needsFirstConnectQuestion(serialNumber: "S2"))
+
+            _ = try ledger.answerFirstConnectQuestion(.leaveAllNew, captures: [], serialNumber: "S2")
+
+            #expect(try !TransferLedger(directory: folder).needsFirstConnectQuestion(serialNumber: "S2"))
+        }
     }
 
     @Suite("답")

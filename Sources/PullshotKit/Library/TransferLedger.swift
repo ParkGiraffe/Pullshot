@@ -42,7 +42,13 @@ public final class TransferLedger {
         file = directory.appending(path: "transfers.jsonl")
         answeredFile = directory.appending(path: "answered-devices.json")
         if FileManager.default.fileExists(atPath: answeredFile.path(percentEncoded: false)) {
-            answeredSerialNumbers = try Set(JSONDecoder().decode([String].self, from: Data(contentsOf: answeredFile)))
+            // 이 파일을 잃으면 처음 연결 질문을 한 번 더 물을 뿐이라 기록 전체를 막지 않습니다. 다음 답이 다시 씁니다.
+            do {
+                let data = try Data(contentsOf: answeredFile)
+                answeredSerialNumbers = try Set(JSONDecoder().decode([String].self, from: data))
+            } catch {
+                Log.library.error("답한 기기 파일을 읽지 못해 비우고 시작합니다: \(String(describing: error), privacy: .private)")
+            }
         }
         guard FileManager.default.fileExists(atPath: file.path(percentEncoded: false)) else { return }
 
