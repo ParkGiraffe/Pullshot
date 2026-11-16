@@ -2,7 +2,9 @@ import Foundation
 import Observation
 import PullshotKit
 
-/// 오른쪽 칸, 설정 창, 옮기기가 함께 쓰는 설정입니다. 기본값과 `UserDefaults`를 읽는 법을 여기 한 곳에 둡니다.
+/// 오른쪽 칸, 설정 창, 옮기기가 함께 쓰는 설정입니다. 이 설정들의 기본값과 `UserDefaults`를 읽는 법을 여기 둡니다.
+/// 앱을 열 때 한 번만 읽는 기록 폴더(`AppDelegate`)와 데모 여부(`LibraryModel`), 화면만 쓰는 썸네일 크기와
+/// 보기 방식(`LibraryWindow`의 `@AppStorage`)은 쓰는 곳에서 읽습니다.
 /// 실행 인자(`-makesGameFolder NO`)는 문자열로 들어오므로 참거짓은 `bool(forKey:)`로 읽습니다.
 @MainActor @Observable
 final class AppSettings {
