@@ -49,6 +49,7 @@ struct DeviceSwitcher: View {
                 .buttonStyle(.plain)
                 .menuIndicator(.hidden)
                 .fixedSize()
+                .disabled(model.isTransferring)
             }
         }
         .padding(8)

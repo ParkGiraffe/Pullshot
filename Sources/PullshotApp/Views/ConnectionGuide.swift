@@ -1,11 +1,16 @@
+import PullshotKit
 import SwiftUI
 
 /// 기기를 열기 전까지 상세 칸에 두는 안내입니다. 기기가 없으면 PC로 복사 모드를 켜는 방법을 단계별로 보여 줍니다.
+/// 옮기던 중 기기가 빠졌으면 그 결과를 맨 위에 남겨 둡니다.
 struct ConnectionGuide: View {
     let model: LibraryModel
 
     var body: some View {
         VStack(spacing: 16) {
+            if let summary = model.transferRun?.summary {
+                transferResult(summary)
+            }
             switch model.connection {
             case .searching:
                 symbol("cable.connector")
@@ -49,6 +54,22 @@ struct ConnectionGuide: View {
         .frame(maxWidth: 420)
         .padding(32)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    private func transferResult(_ summary: TransferSummary) -> some View {
+        VStack(spacing: 6) {
+            Text(TransferText.summary(summary))
+                .font(.headline)
+                .monospacedDigit()
+            // 취소하지 않았는데 받지 못한 캡처가 남았다면 세션이 끊겨 멈춘 것입니다.
+            if summary.notAttempted > 0, !summary.isCancelled {
+                Text("연결이 끊겨 남은 캡처를 받지 못했습니다. 다시 연결하면 새 항목으로 남아 있습니다.")
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity)
+        .background(.quaternary, in: .rect(cornerRadius: 8))
     }
 
     private func symbol(_ name: String) -> some View {

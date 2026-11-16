@@ -74,6 +74,9 @@ struct LibraryWindow: View {
         }
         .onGeometryChange(for: Bool.self) { $0.size.width < 980 } action: { isNarrow = $0 }
         .quickLookPreview($model.previewURL)
+        .sheet(isPresented: $model.isAskingFirstConnect) {
+            FirstConnectSheet(model: model)
+        }
         .environment(model.thumbnails)
         .task { await model.watchConsoles() }
     }

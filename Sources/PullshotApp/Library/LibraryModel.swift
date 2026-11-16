@@ -1,4 +1,4 @@
-import Foundation
+import AppKit
 import Observation
 import PullshotKit
 
@@ -27,6 +27,21 @@ final class LibraryModel {
         }
     }
 
+    /// 가져오기나 내보내기 한 번입니다. 끝난 뒤에도 사용자가 닫을 때까지 결과를 남겨 둡니다.
+    struct TransferRun {
+        var kind: TransferKind
+        /// 가져올 곳이나 내보낼 기준 폴더입니다.
+        var folder: URL
+        var progress: TransferProgress?
+        var summary: TransferSummary?
+        /// 옮긴 기록을 쓰지 못하는 등 결과 없이 멈췄을 때의 문구입니다. Kit이 이때는 결과 대신 오류를 던집니다.
+        var errorMessage: String?
+
+        var isFinished: Bool {
+            summary != nil || errorMessage != nil
+        }
+    }
+
     private(set) var connection = Connection.searching
     /// PC로 복사 모드로 꽂힌 스위치입니다.
     private(set) var consoles: [AttachedConsole] = []
@@ -35,6 +50,10 @@ final class LibraryModel {
     private(set) var serialNumber: String?
     let isDemo: Bool
     var isAskingFirstConnect = false
+    /// 처음 연결 질문에 답해 옮긴 기록에 넣은 캡처 수입니다. 답하기 전에는 nil입니다.
+    private(set) var firstConnectRecordedCount: Int?
+    /// 옮기는 중이거나 사용자가 닫지 않은 옮기기 결과입니다. 기기가 빠져도 남겨 안내 화면에 보입니다.
+    private(set) var transferRun: TransferRun?
     var scope = LibraryScope.all
     var kind = KindFilter.all
     var gameSearch = ""
@@ -51,6 +70,8 @@ final class LibraryModel {
     @ObservationIgnored private var monitor: ConsoleMonitor?
     /// 연 기기에서 하는 일입니다. 기기를 바꾸거나 기기가 빠지면 취소합니다.
     @ObservationIgnored private var deviceTask: Task<Void, Never>?
+    /// 기기가 빠져도 취소하지 않습니다. 끊긴 연결로 끝나야 결과에 받지 못한 수가 남습니다.
+    @ObservationIgnored private var transferTask: Task<Void, Never>?
 
     init(worker: DeviceWorker, settings: AppSettings) {
         // 앞 실행이 끝내기 전에 멈췄으면 미리보기 원본이 남아 있습니다.
@@ -91,6 +112,11 @@ final class LibraryModel {
         }
     }
 
+    /// 옮기는 동안은 가져오기, 내보내기, 기기 전환을 끕니다.
+    var isTransferring: Bool {
+        transferRun.map { !$0.isFinished } ?? false
+    }
+
     /// 기준 캡처의 원본을 받아 Quick Look으로 엽니다. 데모 캡처는 기기에 없으므로 하지 않습니다.
     func preview() async {
         guard !isDemo, let anchor = selection.anchor, let capture = captures.first(where: { $0.id == anchor }) else {
@@ -115,8 +141,55 @@ final class LibraryModel {
     }
 
     func choose(_ console: AttachedConsole) async {
-        guard console != connection.console else { return }
+        guard console != connection.console, !isTransferring else { return }
         open(console)
+    }
+
+    /// 보이는 캡처 가운데 새 항목을 가져올 곳에 가져옵니다.
+    func importNew() {
+        guard let serialNumber else { return }
+        let captures = index.newCaptures(visibleCaptures, serialNumber: serialNumber)
+        transfer(TransferItem.imports(captures, into: importFolder), as: .imported, folder: importFolder)
+    }
+
+    /// 고른 캡처를 기준 폴더로 내보냅니다. 기준 폴더를 고르기 전에는 하지 않습니다.
+    func export() {
+        guard let exportOptions else { return }
+        transfer(
+            TransferItem.exports(selectedCaptures, options: exportOptions),
+            as: .exported,
+            folder: exportOptions.baseFolder
+        )
+    }
+
+    /// Kit이 받던 파일의 남은 데이터를 끝까지 읽어 버리고 멈춥니다. 결과에 취소했다고 남습니다.
+    func cancelTransfer() {
+        transferTask?.cancel()
+    }
+
+    func dismissTransferResult() {
+        guard transferRun?.isFinished == true else { return }
+        transferRun = nil
+    }
+
+    /// 저장한 파일이 한 폴더에 있으면 그 파일들을, 여러 폴더에 있거나 저장한 파일이 없으면 기준 폴더를 Finder에서 보입니다.
+    func revealInFinder() {
+        guard let run = transferRun else { return }
+        let saved = run.summary?.saved ?? []
+        let folders = Set(saved.map { $0.deletingLastPathComponent() })
+        NSWorkspace.shared.activateFileViewerSelecting(folders.count == 1 ? saved : [run.folder])
+    }
+
+    /// 처음 연결 질문의 답을 옮긴 기록에 남깁니다. 폴더를 읽지 못하거나 취소했으면 시트에 둘 문구를 돌려줍니다.
+    func answerFirstConnect(_ answer: FirstConnectAnswer) async -> String? {
+        do {
+            firstConnectRecordedCount = try await worker.answerFirstConnectQuestion(answer, captures: captures)
+            index = await worker.index
+            return nil
+        } catch {
+            worker.log.write("처음 연결 질문에 답하지 못함: \(FileLog.describe(error))")
+            return AppErrorMessages.message(for: error)
+        }
     }
 
     func retry() async {
@@ -148,7 +221,7 @@ final class LibraryModel {
         deviceTask = Task { await load(console) }
     }
 
-    /// 하던 일을 취소하고 연 기기의 캡처, 고른 것, 질문을 치웁니다.
+    /// 하던 일을 취소하고 연 기기의 캡처, 고른 것, 질문을 치웁니다. 옮기기 결과는 안내 화면에 보이도록 남깁니다.
     private func leaveConsole() {
         deviceTask?.cancel()
         captures = []
@@ -156,6 +229,7 @@ final class LibraryModel {
         serialNumber = nil
         thumbnails.serialNumber = nil
         isAskingFirstConnect = false
+        firstConnectRecordedCount = nil
         scope = .all
         gameSearch = ""
     }
@@ -188,6 +262,33 @@ final class LibraryModel {
             worker.log.write("연결하지 못함: \(FileLog.describe(error))")
             connection = .failed(console, message: AppErrorMessages.message(for: error))
         }
+    }
+
+    /// 옮기기를 시작합니다. 끝나면 결과와 옮긴 기록 색인을 맞춥니다.
+    private func transfer(_ items: [TransferItem], as kind: TransferKind, folder: URL) {
+        guard !isTransferring else { return }
+        transferRun = TransferRun(kind: kind, folder: folder)
+        transferTask = Task {
+            do {
+                let summary = try await worker.transfer(items, as: kind) { progress in
+                    Task { @MainActor in self.showTransferProgress(progress) }
+                }
+                transferRun?.summary = summary
+            } catch {
+                worker.log.write("옮기기를 마치지 못함: \(FileLog.describe(error))")
+                transferRun?.errorMessage = AppErrorMessages.message(for: error)
+            }
+            index = await worker.index
+        }
+    }
+
+    /// 옮기기 진행도 큐를 거쳐 늦게 올 수 있으므로, 옮기는 중이고 앞 값보다 뒤일 때만 반영합니다.
+    private func showTransferProgress(_ progress: TransferProgress) {
+        guard isTransferring else { return }
+        if let previous = transferRun?.progress, (progress.index, progress.bytes) < (previous.index, previous.bytes) {
+            return
+        }
+        transferRun?.progress = progress
     }
 
     /// 훑기 진행은 큐를 거쳐 늦게 올 수 있으므로, 그 기기를 아직 훑는 중이고 앞 값보다 클 때만 반영합니다.

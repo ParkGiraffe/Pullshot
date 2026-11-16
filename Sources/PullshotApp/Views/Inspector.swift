@@ -8,6 +8,8 @@ struct Inspector: View {
     let captures: [Capture]
     @State private var isChoosingImportFolder = false
     @State private var isChoosingExportFolder = false
+    /// 기준 폴더 없이 내보내기를 눌러 폴더를 고르면, 고른 직후 내보냅니다.
+    @State private var shouldExportAfterChoosingFolder = false
 
     var body: some View {
         let selected = model.selectedCaptures
@@ -70,27 +72,33 @@ struct Inspector: View {
                 model.settings.importFolder = folder
             }
         }
-        Button {} label: {
-            Label("새 항목 \(newCount)개 가져오기", systemImage: "square.and.arrow.down")
-                .frame(maxWidth: .infinity)
-        }
-        .buttonStyle(.borderedProminent)
-        .controlSize(.large)
-        .disabled(newCount == 0 || model.isDemo)
-        Button {
-            model.selection.selectAll(captures.map(\.id))
-        } label: {
-            Group {
-                if case .game = model.scope {
-                    Text("게임 전체 내보내기")
-                } else {
-                    Text("모두 내보내기")
-                }
+        if let run = model.transferRun {
+            TransferPanel(run: run, model: model)
+        } else {
+            Button {
+                model.importNew()
+            } label: {
+                Label("새 항목 \(newCount)개 가져오기", systemImage: "square.and.arrow.down")
+                    .frame(maxWidth: .infinity)
             }
-            .frame(maxWidth: .infinity)
+            .buttonStyle(.borderedProminent)
+            .controlSize(.large)
+            .disabled(newCount == 0 || model.isDemo)
+            Button {
+                model.selection.selectAll(captures.map(\.id))
+            } label: {
+                Group {
+                    if case .game = model.scope {
+                        Text("게임 전체 내보내기")
+                    } else {
+                        Text("모두 내보내기")
+                    }
+                }
+                .frame(maxWidth: .infinity)
+            }
+            .controlSize(.large)
+            .disabled(captures.isEmpty)
         }
-        .controlSize(.large)
-        .disabled(captures.isEmpty)
     }
 
     /// 게임을 보면 그 게임 폴더까지 보입니다. 다른 범위는 게임마다 폴더가 갈리므로 기준 폴더만 보입니다.
@@ -122,7 +130,16 @@ struct Inspector: View {
             "내보낼 곳",
             path: settings.exportFolder.map { Text(verbatim: $0.abbreviatedPath) } ?? Text("고르기…")
         ) {
+            shouldExportAfterChoosingFolder = false
             isChoosingExportFolder = true
+        }
+        .fileImporter(isPresented: $isChoosingExportFolder, allowedContentTypes: [.folder]) { result in
+            if case let .success(folder) = result {
+                settings.exportFolder = folder
+                if shouldExportAfterChoosingFolder {
+                    model.export()
+                }
+            }
         }
         Toggle("게임 이름 폴더 만들기", isOn: $settings.makesGameFolder)
         Picker("파일 이름", selection: $settings.exportNaming) {
@@ -136,21 +153,23 @@ struct Inspector: View {
             .padding(.horizontal, 10)
             .padding(.vertical, 8)
             .background(.quaternary, in: .rect(cornerRadius: 8))
-        Button {
-            if model.exportOptions == nil {
-                isChoosingExportFolder = true
+        if let run = model.transferRun {
+            TransferPanel(run: run, model: model)
+        } else {
+            Button {
+                if model.exportOptions == nil {
+                    shouldExportAfterChoosingFolder = true
+                    isChoosingExportFolder = true
+                } else {
+                    model.export()
+                }
+            } label: {
+                Label("내보내기", systemImage: "square.and.arrow.up")
+                    .frame(maxWidth: .infinity)
             }
-        } label: {
-            Label("내보내기", systemImage: "square.and.arrow.up")
-                .frame(maxWidth: .infinity)
-        }
-        .buttonStyle(.borderedProminent)
-        .controlSize(.large)
-        .disabled(model.isDemo)
-        .fileImporter(isPresented: $isChoosingExportFolder, allowedContentTypes: [.folder]) { result in
-            if case let .success(folder) = result {
-                settings.exportFolder = folder
-            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.large)
+            .disabled(model.isDemo)
         }
     }
 
