@@ -6,6 +6,8 @@ struct LibraryWindow: View {
     @Bindable var model: LibraryModel
     @AppStorage(SettingsKey.thumbnailSize.rawValue) private var thumbnailSize = 180.0
     @AppStorage(SettingsKey.viewMode.rawValue) private var viewMode = ViewMode.newest
+    /// 창이 좁으면 사용자가 둔 상태(`isInspectorShown`)와 상관없이 오른쪽 칸을 접습니다.
+    @State private var isNarrow = false
 
     var body: some View {
         NavigationSplitView {
@@ -48,6 +50,21 @@ struct LibraryWindow: View {
                                 Image(systemName: "line.3.horizontal.decrease.circle")
                             }
                         }
+                        ToolbarItem {
+                            Button("오른쪽 칸", systemImage: "sidebar.right") {
+                                model.isInspectorShown.toggle()
+                            }
+                        }
+                    }
+                    .inspector(isPresented: Binding(
+                        get: { model.isInspectorShown && !isNarrow },
+                        set: { isShown in
+                            if !isNarrow {
+                                model.isInspectorShown = isShown
+                            }
+                        }
+                    )) {
+                        Inspector(model: model, captures: captures)
                     }
                     .onChange(of: captures.map(\.id)) { _, visible in model.selection.keep(visible) }
                     .onChange(of: model.scope) { model.selection.clear() }
@@ -55,6 +72,7 @@ struct LibraryWindow: View {
                 ConnectionGuide(model: model)
             }
         }
+        .onGeometryChange(for: Bool.self) { $0.size.width < 980 } action: { isNarrow = $0 }
         .quickLookPreview($model.previewURL)
         .environment(model.thumbnails)
         .task { await model.watchConsoles() }

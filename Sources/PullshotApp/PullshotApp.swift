@@ -18,6 +18,10 @@ struct PullshotApp: App {
             }
             .tint(.pullshotAccent)
         }
+        Settings {
+            SettingsView()
+                .tint(.pullshotAccent)
+        }
     }
 
     private static func makeModel() -> LibraryModel? {

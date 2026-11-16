@@ -41,6 +41,8 @@ final class LibraryModel {
     var selection = GridSelection()
     /// Quick Look으로 보는 원본입니다. Quick Look을 닫으면 nil이 됩니다.
     var previewURL: URL?
+    /// 사용자가 툴바 단추로 둔 오른쪽 칸 상태입니다. 창이 좁아 접힐 때도 바꾸지 않습니다.
+    var isInspectorShown = true
     let worker: DeviceWorker
     let thumbnails: ThumbnailStore
 
@@ -73,6 +75,23 @@ final class LibraryModel {
     /// 고른 캡처를 격자에 보이는 순서(최신순)로 둡니다. 보이지 않게 된 캡처는 넣지 않습니다.
     var selectedCaptures: [Capture] {
         visibleCaptures.filter { selection.selected.contains($0.id) }.sorted(by: Capture.newestFirst)
+    }
+
+    /// 가져올 곳입니다. 설정에서 고르지 않았으면 `~/Pictures/Pullshot`입니다.
+    var importFolder: URL {
+        UserDefaults.standard.string(forKey: SettingsKey.importFolder.rawValue)
+            .map { URL(filePath: $0, directoryHint: .isDirectory) } ?? TransferItem.defaultImportFolder
+    }
+
+    /// 내보낼 기준 폴더와 규칙입니다. 기준 폴더는 기본값이 없어 처음 내보낼 때 고르기 전까지 nil입니다.
+    var exportOptions: ExportOptions? {
+        let defaults = UserDefaults.standard
+        guard let path = defaults.string(forKey: SettingsKey.exportFolder.rawValue) else { return nil }
+        return ExportOptions(
+            baseFolder: URL(filePath: path, directoryHint: .isDirectory),
+            makesGameFolder: defaults.object(forKey: SettingsKey.makesGameFolder.rawValue) as? Bool ?? true,
+            naming: defaults.string(forKey: SettingsKey.exportNaming.rawValue).flatMap(ExportNaming.init) ?? .original
+        )
     }
 
     /// 기준 캡처의 원본을 받아 Quick Look으로 엽니다. 데모 캡처는 기기에 없으므로 하지 않습니다.
