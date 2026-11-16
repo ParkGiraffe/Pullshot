@@ -1,5 +1,6 @@
 // 사용법: render <입력.svg> <출력.png> [크기=1024]
 import AppKit
+
 let args = CommandLine.arguments
 guard args.count >= 3 else { print("usage: render in.svg out.png [size]"); exit(2) }
 let size = args.count > 3 ? Int(args[3])! : 1024
