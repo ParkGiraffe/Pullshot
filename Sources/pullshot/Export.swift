@@ -16,7 +16,7 @@ struct Export: ParsableCommand {
     var isNumbered = false
 
     @Flag(name: .customLong("no-game-folder"), help: "게임 이름 폴더를 만들지 않고 기준 폴더에 바로 둡니다.")
-    var skipsGameFolder = false
+    var shouldSkipGameFolder = false
 
     @Flag(name: .customLong("dry-run"), help: "내보내지 않고 만들어질 \"폴더/파일 이름\"만 보여 줍니다.")
     var isDryRun = false
@@ -36,7 +36,7 @@ struct Export: ParsableCommand {
             let (chosen, missing) = selection.choose(from: scan.captures, ledger: ledger, serialNumber: serialNumber)
             let options = ExportOptions(
                 baseFolder: out.url,
-                makesGameFolder: !skipsGameFolder,
+                makesGameFolder: !shouldSkipGameFolder,
                 naming: isNumbered ? .numbered : .original
             )
             let items = TransferItem.exports(chosen, options: options)

@@ -14,16 +14,16 @@ struct Ledger: ParsableCommand {
     var folder: Path?
 
     @Flag(name: .customLong("mark-all"), help: "지금 있는 캡처를 모두 옮긴 것으로 기록합니다.")
-    var marksAll = false
+    var shouldMarkAll = false
 
     @Flag(name: .customLong("leave-new"), help: "기록하지 않고 모두 새 항목으로 둡니다. 다시 묻지 않습니다.")
-    var leavesNew = false
+    var shouldLeaveNew = false
 
     @OptionGroup var connection: ConnectionOptions
     @OptionGroup var ledgerOptions: LedgerOptions
 
     func validate() throws {
-        guard [folder != nil, marksAll, leavesNew].count(where: { $0 }) == 1 else {
+        guard [folder != nil, shouldMarkAll, shouldLeaveNew].count(where: { $0 }) == 1 else {
             throw ValidationError("--from-folder, --mark-all, --leave-new 중 하나를 주세요.")
         }
     }
@@ -40,7 +40,7 @@ struct Ledger: ParsableCommand {
             let scan = try connection.scanAlbum()
             let answer: FirstConnectAnswer = if let folder {
                 .findInFolder(folder.url)
-            } else if marksAll {
+            } else if shouldMarkAll {
                 .markAll
             } else {
                 .leaveAllNew

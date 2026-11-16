@@ -68,7 +68,8 @@ enum Terminal {
         source.setEventHandler {
             switch interruptRequest.receive() {
             case .cancel:
-                Self.error("취소하는 중입니다. 바로 끝내려면 Ctrl-C를 한 번 더 누르세요.")
+                // 바로 끝내면 세션이 남아 다음 연결이 USB 리셋까지 가고 PC로 복사 모드가 꺼집니다(hardware-notes "세션이 남은 경우").
+                Self.error("취소하는 중입니다. Ctrl-C를 한 번 더 누르면 바로 끝나지만, 다음에 연결할 때 본체에서 PC로 복사를 다시 켜야 할 수 있습니다.")
             case .quit:
                 exit(130)
             }
