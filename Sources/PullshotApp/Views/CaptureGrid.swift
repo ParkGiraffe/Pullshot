@@ -16,6 +16,8 @@ struct CaptureGrid: View {
     let isNew: (Capture) -> Bool
     let preview: () -> Void
     @FocusState private var isFocused: Bool
+    /// 격자가 실제로 놓이는 폭입니다. 스크롤 막대가 늘 보이는 설정에서는 그 폭만큼 좁아집니다.
+    @State private var gridWidth: CGFloat = 0
 
     private static let margin: CGFloat = 12
     private static let gap: CGFloat = 3
@@ -25,12 +27,6 @@ struct CaptureGrid: View {
         let ordered = captures.sorted(by: Capture.newestFirst)
         let order = ordered.map(\.id)
         GeometryReader { viewport in
-            // 화살표의 한 줄이 격자가 놓는 열 수와 같도록 같은 폭과 간격으로 셉니다.
-            let columns = GridSelection.columns(
-                width: viewport.size.width - Self.margin * 2,
-                minimum: cellWidth,
-                spacing: Self.gap
-            )
             ScrollViewReader { scroller in
                 ScrollView {
                     Group {
@@ -39,6 +35,7 @@ struct CaptureGrid: View {
                         case .byDate: byDate(ordered, order: order)
                         }
                     }
+                    .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { gridWidth = $0 }
                     .padding(Self.margin)
                     // 캡처가 적어도 아래 빈 곳을 눌러 고른 것을 지울 수 있게 보이는 높이까지 채웁니다.
                     .frame(minHeight: viewport.size.height, alignment: .top)
@@ -51,10 +48,10 @@ struct CaptureGrid: View {
                 .focusable()
                 .focusEffectDisabled()
                 .focused($isFocused)
-                .onKeyPress(.leftArrow) { move(.left, columns: columns, in: order, scroller: scroller) }
-                .onKeyPress(.rightArrow) { move(.right, columns: columns, in: order, scroller: scroller) }
-                .onKeyPress(.upArrow) { move(.up, columns: columns, in: order, scroller: scroller) }
-                .onKeyPress(.downArrow) { move(.down, columns: columns, in: order, scroller: scroller) }
+                .onKeyPress(.leftArrow) { move(.left, in: order, scroller: scroller) }
+                .onKeyPress(.rightArrow) { move(.right, in: order, scroller: scroller) }
+                .onKeyPress(.upArrow) { move(.up, in: order, scroller: scroller) }
+                .onKeyPress(.downArrow) { move(.down, in: order, scroller: scroller) }
                 .onKeyPress(.space) {
                     preview()
                     return .handled
@@ -125,13 +122,13 @@ struct CaptureGrid: View {
         }
     }
 
-    /// 고른 칸이 화면 밖으로 나가면 따라 스크롤합니다.
+    /// 한 줄은 격자가 놓이는 폭과 간격으로 센 열 수입니다. 고른 칸이 화면 밖으로 나가면 따라 스크롤합니다.
     private func move(
         _ move: GridSelection.Move,
-        columns: Int,
         in order: [Capture.ID],
         scroller: ScrollViewProxy
     ) -> KeyPress.Result {
+        let columns = GridSelection.columns(width: gridWidth, minimum: cellWidth, spacing: Self.gap)
         selection.move(move, columns: columns, in: order)
         if let anchor = selection.anchor {
             scroller.scrollTo(anchor)

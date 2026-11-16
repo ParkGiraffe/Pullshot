@@ -13,7 +13,8 @@ struct GridSelection: Equatable {
     }
 
     private(set) var selected: Set<Capture.ID> = []
-    /// 마지막으로 누른 캡처입니다. ⇧ 누르기와 화살표는 여기서 시작하고, 미리보기는 이 캡처를 봅니다.
+    /// 마지막으로 그냥 누르거나 ⌘를 누른 채 누른 캡처입니다. ⇧ 누르기는 기준을 바꾸지 않습니다(Finder와 같음).
+    /// ⇧ 누르기, 화살표, 미리보기가 여기서 출발합니다.
     private(set) var anchor: Capture.ID?
 
     /// `extend`는 기준이 없거나 보이는 순서에 없으면 `only`처럼 합니다.
