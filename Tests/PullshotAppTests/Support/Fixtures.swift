@@ -1,6 +1,11 @@
 import Foundation
 @testable import PullshotKit
 
+/// 문자열 표가 사전이 아니거나 비어 있을 때 던집니다. 빈 표끼리 비교해 테스트가 통과하는 일을 막습니다.
+enum StringsTableError: Error {
+    case unreadable(String)
+}
+
 /// 앱 뿌리의 `App/<언어>.lproj/Localizable.strings`를 읽습니다. 테스트 파일 위치에서 리포 뿌리를 찾습니다.
 func stringsTable(_ language: String) throws -> [String: String] {
     let repositoryRoot = URL(filePath: #filePath)
@@ -9,8 +14,10 @@ func stringsTable(_ language: String) throws -> [String: String] {
         .deletingLastPathComponent()
         .deletingLastPathComponent()
     let data = try Data(contentsOf: repositoryRoot.appending(path: "App/\(language).lproj/Localizable.strings"))
-    let table = try PropertyListSerialization.propertyList(from: data, format: nil)
-    return table as? [String: String] ?? [:]
+    guard let table = try PropertyListSerialization.propertyList(from: data, format: nil) as? [String: String],
+          !table.isEmpty
+    else { throw StringsTableError.unreadable(language) }
+    return table
 }
 
 /// "yyyy-MM-dd HH:mm:ss"를 서울 시각으로 읽습니다.
