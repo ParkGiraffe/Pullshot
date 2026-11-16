@@ -2,7 +2,6 @@ import Foundation
 
 /// 찍은 때를 글로 씁니다. 날짜 보기의 날 머리와 오른쪽 칸이 같은 꼴을 쓰도록 한곳에 둡니다.
 struct CaptureTimeText {
-    /// 화면이 쓰는 지금 로케일과 시간대의 것입니다.
     static let current = Self(locale: .current, timeZone: .current)
 
     private let calendar: Calendar

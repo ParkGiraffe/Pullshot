@@ -2,7 +2,6 @@ import Foundation
 import IOKit
 import IOUSBHost
 
-/// 지금 꽂혀 있는 스위치 하나입니다.
 public struct AttachedConsole: Equatable, Sendable {
     public var model: ConsoleModel
     /// IOKit 레지스트리 ID입니다. 다시 꽂으면 바뀝니다.
@@ -18,7 +17,6 @@ public struct AttachedConsole: Equatable, Sendable {
     }
 }
 
-/// USB에 꽂힌 스위치를 찾습니다.
 public enum ConsoleLocator {
     /// PC로 복사 모드로 꽂혀 있는 스위치입니다.
     public static func attached() -> [AttachedConsole] {

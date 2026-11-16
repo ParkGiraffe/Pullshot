@@ -15,7 +15,6 @@ private let appFolder = URL(filePath: #filePath)
     .deletingLastPathComponent()
     .appending(path: "App")
 
-/// `App/<언어>.lproj/<표>.strings`를 읽습니다.
 func stringsTable(_ language: String, table: String = "Localizable") throws -> [String: String] {
     let data = try Data(contentsOf: appFolder.appending(path: "\(language).lproj/\(table).strings"))
     guard let table = try PropertyListSerialization.propertyList(from: data, format: nil) as? [String: String],

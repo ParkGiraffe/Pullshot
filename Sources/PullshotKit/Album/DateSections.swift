@@ -21,7 +21,6 @@ public struct DateSections: Equatable, Sendable {
     }
 
     public var months: [Month]
-    /// 찍은 시각을 모르는 캡처입니다.
     public var undated: [Capture]
 
     public init(_ captures: [Capture], calendar: Calendar = .current) {

@@ -30,7 +30,6 @@ struct Inspector: View {
         let summary = CaptureSummary(captures)
         let newCount = model.index.newCaptures(captures, serialNumber: model.serialNumber ?? "").count
         let lastTransfer = model.index.lastTransfer(of: captures, serialNumber: model.serialNumber ?? "")
-        // 가장 최근 캡처입니다.
         if let latest = captures.min(by: Capture.newestFirst) {
             Thumbnail(capture: latest)
                 .aspectRatio(16 / 9, contentMode: .fit)

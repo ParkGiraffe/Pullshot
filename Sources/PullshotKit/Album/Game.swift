@@ -32,7 +32,7 @@ public struct Game: Equatable, Sendable, Identifiable {
 }
 
 public extension Capture {
-    /// 게임을 가르고 가져올 곳의 폴더 이름으로 쓰는 게임 이름입니다. 기록의 열쇠에는 원래 `gameFolder`를 씁니다.
+    /// 게임을 가르고 가져올 곳의 폴더 이름으로 쓰는 게임 이름입니다. 옮긴 기록의 키에는 원래 `gameFolder`를 씁니다.
     var gameName: String {
         gameFolder ?? Game.otherFolderName
     }

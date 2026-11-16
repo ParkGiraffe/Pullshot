@@ -14,7 +14,7 @@ public enum DateTimeString {
             hour: Int(hour), minute: Int(minute), second: Int(second)
         )
         guard let date = calendar.date(from: components) else { return nil }
-        // Calendar는 없는 날짜를 다음 달로 넘기므로, 되풀어 입력과 같은지 확인합니다.
+        // Calendar는 없는 날짜를 다음 달로 넘기므로, 만든 날짜를 다시 풀어 입력과 같은지 확인합니다.
         let roundTrip = calendar.dateComponents([.year, .month, .day, .hour, .minute, .second], from: date)
         return roundTrip == components ? date : nil
     }
