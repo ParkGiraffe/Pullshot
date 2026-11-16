@@ -144,9 +144,23 @@ struct AlbumScannerTests {
             let captures = try AlbumScanner(source: source, timeZone: seoul).scan().captures
             let byHandle = Dictionary(uniqueKeysWithValues: captures.map { ($0.handle, $0.capturedAt) })
 
-            #expect(byHandle[0x11] == DateTimeString.parse("20261114T211205", timeZone: seoul))
-            #expect(byHandle[0x12] == DateTimeString.parse("20261113T160500", timeZone: seoul))
+            #expect(byHandle[0x11] == dateFixture("2026-11-14 21:12:05"))
+            #expect(byHandle[0x12] == dateFixture("2026-11-13 16:05:00"))
             #expect(byHandle[0x13] == .some(nil))
+        }
+
+        @Test func `찍은 시각은 정한 시간대의 시각으로 읽는다`() throws {
+            let source = FakeAlbumSource.tree([
+                .file(0x11, "20200101000000_1.jpg", captureDate: "20261114T211205"),
+                .file(0x12, "20261113160500_1.jpg"),
+            ])
+            let losAngeles = try #require(TimeZone(identifier: "America/Los_Angeles"))
+            let captures = try AlbumScanner(source: source, timeZone: losAngeles).scan().captures
+            let byHandle = Dictionary(uniqueKeysWithValues: captures.map { ($0.handle, $0.capturedAt) })
+
+            // 11월의 로스앤젤레스는 UTC-8이라 서울(UTC+9)로 적으면 17시간 뒤입니다.
+            #expect(byHandle[0x11] == dateFixture("2026-11-15 14:12:05"))
+            #expect(byHandle[0x12] == dateFixture("2026-11-14 09:05:00"))
         }
 
         @Test func `크기가 모두 1인 비트면 알 수 없음이다`() throws {
