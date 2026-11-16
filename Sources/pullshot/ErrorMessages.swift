@@ -23,11 +23,31 @@ enum ErrorMessages {
             "스위치가 응답하지 않습니다. PC로 복사 화면이 켜져 있는지 확인해 주세요."
         case let SessionError.destinationExists(name):
             "이미 같은 이름의 파일이 있습니다: \(name)"
+        case SessionError.needsUSBReset:
+            "남은 세션을 풀려고 스위치를 USB에서 다시 연결했습니다. 본체에서 PC로 복사를 다시 켠 뒤 다시 실행해 주세요."
+        case let SessionError.sizeMismatch(expected, actual):
+            "받은 크기(\(actual)바이트)가 스위치가 알린 크기(\(expected)바이트)와 달라 저장하지 않았습니다."
         case let FolderMatchError.unreadableFolder(folder):
             "폴더를 열 수 없습니다: \(folder.path(percentEncoded: false)). 경로가 맞는지, 터미널에 그 폴더를 읽을 권한이 있는지 확인해 주세요."
         default:
-            "스위치와 통신하지 못했습니다: \(error)"
+            fileNotSaved(error) ?? "스위치와 통신하지 못했습니다: \(error)"
         }
+    }
+
+    /// Mac 쪽 파일 오류면 문구를, 아니면 nil을 돌려줍니다. 원인이 Mac인데 케이블과 스위치를 의심하지 않게 하려는 것입니다.
+    /// Kit은 이 오류를 감싸지 않고 넘깁니다. 받을 폴더와 파일은 경로를 담은 CocoaError, 옮긴 기록은 errno만 담은 POSIXError입니다.
+    private static func fileNotSaved(_ error: Error) -> String? {
+        let path: String?
+        switch error {
+        case let error as CocoaError where error.isFileError:
+            path = error.filePath
+        case is POSIXError:
+            path = nil
+        default:
+            return nil
+        }
+        return path.map { "Mac에 파일을 저장하지 못했습니다: \($0). 폴더가 있는지, 빈 공간과 쓰기 권한이 있는지 확인해 주세요." }
+            ?? "Mac에 파일을 저장하지 못했습니다. 받을 폴더와 옮긴 기록 폴더에 빈 공간과 쓰기 권한이 있는지 확인해 주세요."
     }
 
     private static func message(for error: ConsoleAccessError) -> String {

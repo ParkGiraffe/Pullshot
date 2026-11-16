@@ -43,4 +43,30 @@ struct ErrorMessagesTests {
         #expect(ErrorMessages.message(for: CLIError.noConsole)
             == "연결된 스위치가 없습니다. 본체 아래쪽 USB-C 포트에 데이터 케이블로 연결하고, 본체에서 PC로 복사 모드를 켜 주세요.")
     }
+
+    @Test func `받을 폴더에 쓰지 못하면 스위치가 아니라 Mac에 저장하지 못한 경로를 알린다`() {
+        let error = CocoaError(.fileWriteNoPermission, userInfo: [NSFilePathErrorKey: "/Volumes/외장/Pullshot/기타"])
+
+        #expect(ErrorMessages.message(for: error)
+            == "Mac에 파일을 저장하지 못했습니다: /Volumes/외장/Pullshot/기타. 폴더가 있는지, 빈 공간과 쓰기 권한이 있는지 확인해 주세요.")
+    }
+
+    @Test func `옮긴 기록을 쓰지 못하면 스위치가 아니라 Mac에 저장하지 못했다고 알린다`() {
+        #expect(ErrorMessages.message(for: POSIXError(.ENOSPC))
+            == "Mac에 파일을 저장하지 못했습니다. 받을 폴더와 옮긴 기록 폴더에 빈 공간과 쓰기 권한이 있는지 확인해 주세요.")
+    }
+
+    @Test func `USB에서 다시 연결한 뒤에도 열지 못하면 PC로 복사를 다시 켜라고 한다`() {
+        #expect(ErrorMessages.message(for: SessionError.needsUSBReset)
+            == "남은 세션을 풀려고 스위치를 USB에서 다시 연결했습니다. 본체에서 PC로 복사를 다시 켠 뒤 다시 실행해 주세요.")
+    }
+
+    @Test func `받은 크기가 알린 크기와 다르면 두 크기와 함께 저장하지 않았다고 알린다`() {
+        #expect(ErrorMessages.message(for: SessionError.sizeMismatch(expected: 1000, actual: 998))
+            == "받은 크기(998바이트)가 스위치가 알린 크기(1000바이트)와 달라 저장하지 않았습니다.")
+    }
+
+    @Test func `그 밖의 오류는 스위치와 통신하지 못했다며 원래 오류를 함께 보인다`() {
+        #expect(ErrorMessages.message(for: SessionError.invalidated) == "스위치와 통신하지 못했습니다: invalidated")
+    }
 }
