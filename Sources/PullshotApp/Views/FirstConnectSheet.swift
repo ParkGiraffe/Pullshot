@@ -6,9 +6,6 @@ import SwiftUI
 struct FirstConnectSheet: View {
     let model: LibraryModel
     @State private var isChoosingFolder = false
-    /// 답을 기록에 남기는 작업입니다. 폴더에서 찾기는 폴더가 크면 오래 걸려 취소할 수 있게 둡니다.
-    @State private var answering: Task<Void, Never>?
-    @State private var errorMessage: String?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -26,15 +23,13 @@ struct FirstConnectSheet: View {
                     }
                     .keyboardShortcut(.defaultAction)
                 }
-            } else if answering != nil {
+            } else if model.isAnsweringFirstConnect {
                 HStack {
                     ProgressView()
                         .controlSize(.small)
                     Spacer()
-                    Button("취소") {
-                        answering?.cancel()
-                    }
-                    .keyboardShortcut(.cancelAction)
+                    Button("취소", action: model.cancelFirstConnectAnswer)
+                        .keyboardShortcut(.cancelAction)
                 }
             } else {
                 choices
@@ -44,16 +39,14 @@ struct FirstConnectSheet: View {
         .frame(width: 460)
         .fileImporter(isPresented: $isChoosingFolder, allowedContentTypes: [.folder]) { result in
             if case let .success(folder) = result {
-                answer(.findInFolder(folder))
+                model.answerFirstConnect(.findInFolder(folder))
             }
         }
-        .onDisappear {
-            answering?.cancel()
-        }
+        .onDisappear(perform: model.cancelFirstConnectAnswer)
     }
 
     @ViewBuilder private var choices: some View {
-        if let errorMessage {
+        if let errorMessage = model.firstConnectErrorMessage {
             Text(errorMessage)
                 .foregroundStyle(.red)
                 .fixedSize(horizontal: false, vertical: true)
@@ -67,13 +60,13 @@ struct FirstConnectSheet: View {
             }
             .buttonStyle(.borderedProminent)
             Button {
-                answer(.markAll)
+                model.answerFirstConnect(.markAll)
             } label: {
                 Text("지금 있는 캡처를 모두 옮긴 것으로 표시")
                     .frame(maxWidth: .infinity)
             }
             Button {
-                answer(.leaveAllNew)
+                model.answerFirstConnect(.leaveAllNew)
             } label: {
                 Text("모두 새 항목으로 두기")
                     .frame(maxWidth: .infinity)
@@ -86,14 +79,6 @@ struct FirstConnectSheet: View {
                 model.isAskingFirstConnect = false
             }
             .keyboardShortcut(.cancelAction)
-        }
-    }
-
-    private func answer(_ answer: FirstConnectAnswer) {
-        errorMessage = nil
-        answering = Task {
-            errorMessage = await model.answerFirstConnect(answer)
-            answering = nil
         }
     }
 }

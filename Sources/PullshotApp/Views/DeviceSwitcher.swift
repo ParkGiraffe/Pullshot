@@ -38,7 +38,7 @@ struct DeviceSwitcher: View {
                 Menu {
                     ForEach(model.consoles, id: \.registryID) { console in
                         Button(name(of: console)) {
-                            Task { await model.choose(console) }
+                            model.choose(console)
                         }
                     }
                 } label: {

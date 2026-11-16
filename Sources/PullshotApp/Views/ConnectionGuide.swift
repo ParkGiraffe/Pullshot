@@ -42,10 +42,8 @@ struct ConnectionGuide: View {
                 symbol("exclamationmark.triangle")
                 Text(message)
                     .font(.title3)
-                Button("다시 시도") {
-                    Task { await model.retry() }
-                }
-                .buttonStyle(.borderedProminent)
+                Button("다시 시도", action: model.retry)
+                    .buttonStyle(.borderedProminent)
             case .ready:
                 EmptyView()
             }

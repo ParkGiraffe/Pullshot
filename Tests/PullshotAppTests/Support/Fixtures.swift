@@ -1,4 +1,5 @@
 import Foundation
+@testable import PullshotApp
 @testable import PullshotKit
 
 /// 문자열 표가 사전이 아니거나 비어 있을 때 던집니다. 빈 표끼리 비교해 테스트가 통과하는 일을 막습니다.
@@ -62,6 +63,16 @@ func defaultsFixture() -> UserDefaults {
         preconditionFailure("설정 저장소를 만들지 못했습니다")
     }
     return defaults
+}
+
+/// 기기를 열지 않은 모델입니다. 옮긴 기록, 로그, 설정은 테스트마다 따로 둡니다.
+@MainActor
+func libraryModelFixture() throws -> LibraryModel {
+    let worker = try DeviceWorker(
+        ledgerDirectory: temporaryFolderFixture(),
+        log: FileLog(file: temporaryFolderFixture().appending(path: "pullshot.log"))
+    )
+    return LibraryModel(worker: worker, settings: AppSettings(defaults: defaultsFixture()))
 }
 
 /// PC로 복사 모드로 꽂힌 스위치입니다. 같은 기기인지는 `registryID`로 가립니다.
