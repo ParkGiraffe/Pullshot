@@ -11,7 +11,7 @@ struct FirstConnectSheet: View {
         VStack(alignment: .leading, spacing: 14) {
             Text("이미 받아 둔 캡처가 있나요?")
                 .font(.title3.bold())
-            Text("처음 연결한 스위치입니다. 지금 있는 캡처가 모두 새 항목으로 보이지 않도록, 이미 Mac에 받아 둔 캡처를 옮긴 기록에 넣을 수 있습니다.")
+            Text("처음 연결한 스위치입니다. 이미 Mac에 받아 둔 캡처를 옮긴 기록에 넣으면, 그 캡처는 새 항목에 나오지 않습니다.")
                 .fixedSize(horizontal: false, vertical: true)
             if let count = model.firstConnectRecordedCount {
                 Text("기록에 넣은 캡처 \(count)개")

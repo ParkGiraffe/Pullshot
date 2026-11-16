@@ -24,7 +24,7 @@ struct Connection {
         for attempt in 1 ... 2 {
             guard let console = ConsoleLocator.attached().first else { throw missingConsole() }
             if console.model.isExperimental, attempt == 1 {
-                Terminal.error("\(console.model.name)는 실험적 지원입니다. 문제가 있으면 --verbose 출력과 함께 알려 주세요.")
+                Terminal.error("\(console.model.name) 지원은 실험 단계입니다. 문제가 있으면 --verbose 출력과 함께 GitHub 이슈로 알려 주세요.")
             }
             let host = try openTransport(console, trace: trace, isReattached: attempt > 1)
             let transport: Transport = try record.map { try RecordingTransport(wrapping: host, to: $0) } ?? host
@@ -34,7 +34,7 @@ struct Connection {
             } catch SessionError.needsUSBReset where attempt == 1 {
                 transport.close()
                 // USB 장치를 다시 붙이면 스위치가 PC로 복사 모드에서 나갑니다(2026-11-15, 펌웨어 23.5.0에서 확인).
-                Terminal.error("남은 세션을 풀려고 스위치를 USB에서 다시 연결했습니다. 본체에서 PC로 복사를 다시 켜 주세요. 60초 기다립니다.")
+                Terminal.error("이전 연결이 남아 있어 스위치의 USB 연결을 재설정했고, 이때 PC로 복사가 꺼졌습니다. 본체에서 PC로 복사를 다시 켜 주세요. 60초 기다립니다.")
                 try waitForReattach()
             }
         }

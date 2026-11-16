@@ -22,12 +22,12 @@ struct ConnectionGuide: View {
                 ])
             case let .notInTransferMode(name):
                 symbol("gamecontroller")
-                Text("\(name)가 연결돼 있지만 PC로 복사 모드가 아닙니다.")
+                Text("\(name)가 연결되어 있지만 PC로 복사 모드가 아닙니다.")
                     .font(.title3.bold())
                 steps(["본체 설정의 데이터 관리에서 PC로 복사를 켭니다."])
             case .reattachNeeded:
                 symbol("arrow.triangle.2.circlepath")
-                Text("남은 연결을 풀려고 스위치를 USB에서 다시 연결했습니다. 본체에서 PC로 복사를 다시 켜 주세요.")
+                Text("이전 연결이 남아 있어 스위치의 USB 연결을 재설정했고, 이때 PC로 복사가 꺼졌습니다. 본체에서 PC로 복사를 다시 켜 주세요.")
                     .font(.title3)
             case .connecting:
                 ProgressView()
@@ -61,7 +61,7 @@ struct ConnectionGuide: View {
                 .monospacedDigit()
             // 취소하지 않았는데 받지 못한 캡처가 남았다면 세션이 끊겨 멈춘 것입니다.
             if summary.notAttempted > 0, !summary.isCancelled {
-                Text("연결이 끊겨 남은 캡처를 받지 못했습니다. 다시 연결하면 새 항목으로 남아 있습니다.")
+                Text("연결이 끊겨 남은 캡처를 받지 못했습니다. 받지 못한 캡처는 옮긴 기록에 넣지 않았으므로, 다시 연결한 뒤 이어서 받을 수 있습니다.")
                     .foregroundStyle(.secondary)
             }
         }

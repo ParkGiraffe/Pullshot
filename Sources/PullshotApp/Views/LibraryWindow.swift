@@ -106,7 +106,7 @@ struct LibraryWindow: View {
             ContentUnavailableView(
                 "캡처가 없습니다",
                 systemImage: "photo.on.rectangle",
-                description: Text("다른 범위나 종류를 골라 보세요.")
+                description: Text("사이드바에서 다른 게임이나 목록을 고르거나 종류를 바꿔 주세요.")
             )
         }
     }

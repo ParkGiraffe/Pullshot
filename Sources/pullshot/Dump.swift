@@ -39,7 +39,7 @@ struct Dump: ParsableCommand {
                 )
             }
             print("기록을 남겼습니다: \(folder.path(percentEncoded: false))")
-            Terminal.error("이 폴더에는 기기 일련번호와 캡처가 들어 있습니다. 공개 리포에 올리지 마세요.")
+            Terminal.error("이 폴더에는 기기 일련번호와 캡처가 들어 있습니다. 공개 리포에 올리지 말아 주세요.")
         }
     }
 

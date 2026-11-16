@@ -10,11 +10,11 @@ enum AppErrorMessages {
         case SessionError.transport(.disconnected):
             String(localized: "스위치 연결이 끊겼습니다. 케이블을 확인해 주세요.")
         case SessionError.transport(.timedOut):
-            String(localized: "스위치가 응답하지 않습니다. PC로 복사 화면이 켜져 있는지 확인해 주세요.")
+            String(localized: "스위치가 응답하지 않습니다. 본체에서 PC로 복사 모드가 켜져 있는지 확인해 주세요.")
         case let SessionError.destinationExists(name):
             String(localized: "이미 같은 이름의 파일이 있습니다: \(name)")
         case SessionError.sizeMismatch:
-            String(localized: "받은 크기가 스위치가 알린 크기와 달라 저장하지 않았습니다.")
+            String(localized: "받은 파일의 크기가 스위치에서 알려 준 크기와 달라 저장하지 않았습니다.")
         case SessionError.cancelled, is CancellationError:
             String(localized: "취소했습니다.")
         case let FolderMatchError.unreadableFolder(folder):
@@ -32,16 +32,16 @@ enum AppErrorMessages {
 
     /// 디스크가 차거나 권한이 없을 때 케이블이 아니라 저장할 곳을 보게 합니다.
     private static var fileNotSaved: String {
-        String(localized: "Mac에 파일을 저장하지 못했습니다. 저장할 폴더가 있는지, 빈 공간과 쓰기 권한이 있는지 확인해 주세요.")
+        String(localized: "Mac에 파일을 저장하지 못했습니다. 저장할 폴더가 있는지, 저장 공간이 충분한지, 쓰기 권한이 있는지 확인해 주세요.")
     }
 
     private static func message(for error: ConsoleAccessError) -> String {
         switch error {
         // ptpcamerad는 미리보기, 이미지 캡처, 사진 앱이 띄우는 시스템 도우미라 앱 이름 대신 그 앱들을 알려 줍니다.
         case let .heldByAnotherApp(_, owner?) where owner != "ptpcamerad":
-            String(localized: "\(owner) 앱이 스위치를 쓰고 있습니다. 그 앱을 닫고 다시 시도해 주세요.")
+            String(localized: "\(owner) 앱이 스위치를 쓰고 있습니다. 그 앱을 종료하고 다시 시도해 주세요.")
         case .heldByAnotherApp:
-            String(localized: "다른 앱이 스위치를 쓰고 있습니다. 미리보기, 이미지 캡처, 사진 앱을 닫고 다시 시도해 주세요.")
+            String(localized: "다른 앱이 스위치를 쓰고 있습니다. 미리보기, 이미지 캡처, 사진 앱을 종료하고 다시 시도해 주세요.")
         case .noStillImageInterface, .missingEndpoints:
             String(localized: "스위치의 사진 전송 기능을 찾지 못했습니다. 본체에서 PC로 복사 모드가 켜져 있는지 확인해 주세요.")
         case let .other(code):

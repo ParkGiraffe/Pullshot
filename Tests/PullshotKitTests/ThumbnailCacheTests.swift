@@ -6,7 +6,7 @@ import Testing
 struct ThumbnailCacheTests {
     let cache = ThumbnailCache(directory: temporaryFolderFixture())
 
-    @Test func `저장한 썸네일을 같은 열쇠로 다시 읽는다`() {
+    @Test func `저장한 썸네일을 같은 키로 다시 읽는다`() {
         let key = CaptureKey(captureFixture("a.jpg"), serialNumber: "S1")
         cache.store(Data([1, 2, 3]), for: key)
         #expect(cache.data(for: key) == Data([1, 2, 3]))

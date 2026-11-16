@@ -4,7 +4,7 @@ import PullshotKit
 
 struct Export: ParsableCommand {
     static let configuration = CommandConfiguration(
-        abstract: "고른 캡처를 기준 폴더로 내보냅니다. 기본으로 그 아래 게임 이름 폴더를 만들고 옮긴 기록을 남깁니다."
+        abstract: "고른 캡처를 기준 폴더로 내보내고 옮긴 기록을 남깁니다. 기본으로 기준 폴더 아래에 게임 이름 폴더를 만듭니다."
     )
 
     @OptionGroup var selection: SelectionOptions
