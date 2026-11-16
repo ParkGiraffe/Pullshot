@@ -72,6 +72,8 @@ final class LibraryModel {
     @ObservationIgnored private var deviceTask: Task<Void, Never>?
     /// 기기가 빠져도 취소하지 않습니다. 끊긴 연결로 끝나야 결과에 받지 못한 수가 남습니다.
     @ObservationIgnored private var transferTask: Task<Void, Never>?
+    /// 미리보기 원본을 받는 일입니다. 떠난 기기의 미리보기가 뒤늦게 뜨지 않도록 기기를 떠날 때 취소합니다.
+    @ObservationIgnored private var previewTask: Task<Void, Never>?
 
     init(worker: DeviceWorker, settings: AppSettings) {
         // 앞 실행이 끝내기 전에 멈췄으면 미리보기 원본이 남아 있습니다.
@@ -117,16 +119,41 @@ final class LibraryModel {
         transferRun.map { !$0.isFinished } ?? false
     }
 
-    /// 기준 캡처의 원본을 받아 Quick Look으로 엽니다. 데모 캡처는 기기에 없으므로 하지 않습니다.
-    func preview() async {
+    /// 열었거나 여는 중인 세션이 있는지입니다. 기기가 빠졌어도 옮기기가 끝나기 전에는 세션을 쥐고 있습니다.
+    /// 데모는 기기를 열지 않습니다.
+    var hasOpenSession: Bool {
+        !isDemo && (connection.console != nil || isTransferring)
+    }
+
+    /// 기준 캡처의 원본을 받아 Quick Look으로 엽니다. 앞서 받던 미리보기는 취소합니다.
+    /// 데모 캡처는 기기에 없으므로 하지 않습니다.
+    func preview() {
         guard !isDemo, let anchor = selection.anchor, let capture = captures.first(where: { $0.id == anchor }) else {
             return
         }
-        do {
-            previewURL = try await worker.preview(capture)
-        } catch {
-            worker.log.write("미리보기를 받지 못함: \(FileLog.describe(error))")
+        previewTask?.cancel()
+        previewTask = Task {
+            do {
+                let file = try await worker.preview(capture)
+                guard !Task.isCancelled else { return }
+                previewURL = file
+            } catch {
+                guard !Task.isCancelled else { return }
+                worker.log.write("미리보기를 받지 못함: \(FileLog.describe(error))")
+            }
         }
+    }
+
+    /// 하던 일(연결과 훑기, 옮기기, 미리보기)을 취소하고 끝나길 기다린 뒤 세션을 닫고 미리보기 원본을 지웁니다.
+    /// 세션이 남으면 다음 연결이 USB 장치 리셋까지 갑니다.
+    func shutdown() async {
+        let tasks = [deviceTask, transferTask, previewTask].compactMap(\.self)
+        tasks.forEach { $0.cancel() }
+        for task in tasks {
+            await task.value
+        }
+        await worker.close()
+        try? FileManager.default.removeItem(at: DeviceWorker.previewFolder)
     }
 
     /// 꽂힌 기기를 한 번 살피고, 그 뒤로는 기기가 꽂히거나 빠질 때마다 다시 살핍니다. 데모에서는 감시하지 않습니다.
@@ -224,6 +251,7 @@ final class LibraryModel {
     /// 하던 일을 취소하고 연 기기의 캡처, 고른 것, 질문을 치웁니다. 옮기기 결과는 안내 화면에 보이도록 남깁니다.
     private func leaveConsole() {
         deviceTask?.cancel()
+        previewTask?.cancel()
         captures = []
         selection.clear()
         serialNumber = nil

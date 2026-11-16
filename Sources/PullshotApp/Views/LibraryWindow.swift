@@ -93,7 +93,7 @@ struct LibraryWindow: View {
             ) { capture in
                 model.serialNumber.map { !model.index.isTransferred(capture, serialNumber: $0) } ?? false
             } preview: {
-                Task { await model.preview() }
+                model.preview()
             }
             .id(model.scope)
         }
