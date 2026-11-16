@@ -13,7 +13,7 @@ public enum FirstConnectAnswer: Equatable, Sendable {
 /// 기록이 빈 기기를 처음 연결하면 모든 캡처가 새 항목이 됩니다. 그래서 지금까지 받아 둔 캡처를 기록에 넣을지 한 번만 묻습니다.
 public extension TransferLedger {
     func needsFirstConnectQuestion(serialNumber: String) -> Bool {
-        !answeredSerialNumbers.contains(serialNumber) && !hasRecords(for: serialNumber)
+        !answeredSerialNumbers.contains(serialNumber) && !index.hasRecords(for: serialNumber)
     }
 
     /// 기록에 넣은 캡처 수를 돌려줍니다. 취소하면 아무것도 남기지 않아 다음 연결에서 다시 묻습니다.

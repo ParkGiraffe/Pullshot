@@ -22,12 +22,12 @@ public struct TransferProgress: Equatable, Sendable {
     public var bytes: UInt64
 }
 
-public struct TransferFailure {
+public struct TransferFailure: Sendable {
     public var capture: Capture
     public var error: any Error
 }
 
-public struct TransferSummary {
+public struct TransferSummary: Sendable {
     public var saved: [URL] = []
     /// 같은 이름과 크기의 파일이 이미 있어 받지 않고 기록만 남긴 수입니다.
     public var skipped = 0
@@ -81,7 +81,7 @@ public struct Transfer {
             switch decision {
             case .skip:
                 summary.skipped += 1
-                if !ledger.isTransferred(item.capture, serialNumber: serialNumber) {
+                if !ledger.index.isTransferred(item.capture, serialNumber: serialNumber) {
                     try ledger.record([item.capture], serialNumber: serialNumber, as: .foundInFolder)
                 }
             case let .write(destination):

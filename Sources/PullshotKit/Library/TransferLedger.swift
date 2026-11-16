@@ -20,12 +20,6 @@ public struct LedgerEntry: Codable, Equatable, Sendable {
     public var date: Date
 }
 
-/// 지난번 옮긴 날(그날 0시)과 그날 옮긴 캡처 수입니다.
-public struct LastTransfer: Equatable, Sendable {
-    public var day: Date
-    public var count: Int
-}
-
 /// Mac으로 옮긴 캡처의 기록입니다. 기록에 없는 캡처가 새 항목입니다.
 /// `transfers.jsonl`에 한 줄씩 덧붙여 쓰고, 열 때 한 번 읽어 색인을 만듭니다.
 /// 기록에는 일련번호와 파일 이름이 들어 있어 통합 로그에 남기지 않습니다.
@@ -36,11 +30,10 @@ public final class TransferLedger {
 
     private let file: URL
     private let answeredFile: URL
-    private var recorded: Set<CaptureKey> = []
     /// 처음 연결 질문에 답한 기기입니다. "모두 새 항목으로"는 기록을 남기지 않아 따로 둡니다.
     private(set) var answeredSerialNumbers: Set<String> = []
-    /// 가져오기나 내보내기로 마지막으로 옮긴 때입니다.
-    private var lastTransferDates: [CaptureKey: Date] = [:]
+    /// 기록을 읽어 쌓은 색인입니다. 값이라 꺼내 간 뒤의 기록은 보이지 않습니다.
+    public private(set) var index = LedgerIndex()
     /// 앞서 꺼진 앱이 줄을 쓰다 말았으면 다음 줄을 새 줄에서 시작해야 합니다.
     private var endsWithNewline = true
 
@@ -61,7 +54,7 @@ public final class TransferLedger {
                 unreadable += 1
                 continue
             }
-            index(entry)
+            index.insert(entry)
         }
         if unreadable > 0 {
             Log.library.error("옮긴 기록에서 읽지 못한 줄 \(unreadable, privacy: .public)개를 건너뜁니다")
@@ -85,48 +78,13 @@ public final class TransferLedger {
         }
         try append(lines)
         endsWithNewline = true
-        entries.forEach(index)
-    }
-
-    public func isTransferred(_ capture: Capture, serialNumber: String) -> Bool {
-        recorded.contains(CaptureKey(capture, serialNumber: serialNumber))
-    }
-
-    public func newCaptures(_ captures: [Capture], serialNumber: String) -> [Capture] {
-        captures.filter { !isTransferred($0, serialNumber: serialNumber) }
-    }
-
-    /// 가져오기나 내보내기로 마지막으로 옮긴 때입니다. 처음 연결 답으로만 기록된 캡처는 nil입니다.
-    public func transferredAt(_ capture: Capture, serialNumber: String) -> Date? {
-        lastTransferDates[CaptureKey(capture, serialNumber: serialNumber)]
-    }
-
-    /// 주어진 캡처 가운데 가장 늦게 옮긴 날과, 그날 옮긴 캡처 수입니다.
-    public func lastTransfer(
-        of captures: [Capture],
-        serialNumber: String,
-        calendar: Calendar = .current
-    ) -> LastTransfer? {
-        let dates = captures.compactMap { transferredAt($0, serialNumber: serialNumber) }
-        guard let latest = dates.max() else { return nil }
-        let day = calendar.startOfDay(for: latest)
-        return LastTransfer(day: day, count: dates.count { calendar.isDate($0, inSameDayAs: day) })
-    }
-
-    func hasRecords(for serialNumber: String) -> Bool {
-        recorded.contains { $0.serialNumber == serialNumber }
+        entries.forEach { index.insert($0) }
     }
 
     func markAnswered(_ serialNumber: String) throws {
         let answered = answeredSerialNumbers.union([serialNumber])
         try JSONEncoder().encode(answered.sorted()).write(to: answeredFile, options: .atomic)
         answeredSerialNumbers = answered
-    }
-
-    private func index(_ entry: LedgerEntry) {
-        recorded.insert(entry.key)
-        guard entry.kind.isActualTransfer else { return }
-        lastTransferDates[entry.key] = max(entry.date, lastTransferDates[entry.key] ?? entry.date)
     }
 
     /// 앱과 CLI가 함께 써도 줄이 섞이지 않도록 O_APPEND로 열어 한 번에 씁니다.

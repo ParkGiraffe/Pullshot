@@ -52,7 +52,7 @@ struct Export: ParsableCommand {
             let scan = try AlbumScanner(source: connection.session).scan(isCancelled: { Terminal.isInterrupted })
             let selection = CaptureSelection(names: names, game: game, isAll: all, isNewOnly: isNewOnly)
             let (chosen, missing) = selection.choose(from: scan.captures) {
-                !ledger.isTransferred($0, serialNumber: serialNumber)
+                !ledger.index.isTransferred($0, serialNumber: serialNumber)
             }
             missing.forEach { Terminal.error("찾지 못한 캡처: \($0)") }
             let base = URL(filePath: (out as NSString).expandingTildeInPath)

@@ -11,8 +11,32 @@ struct TransferLedgerTests {
             try ledger.record([captureFixture("a.jpg")], serialNumber: "S1", as: .exported)
             let candidates = [captureFixture("a.jpg"), captureFixture("a.jpg", size: 6), captureFixture("b.jpg")]
 
-            #expect(ledger.newCaptures(candidates, serialNumber: "S1").map(\.size) == [6, 5])
-            #expect(ledger.newCaptures([captureFixture("a.jpg")], serialNumber: "S2").count == 1)
+            #expect(ledger.index.newCaptures(candidates, serialNumber: "S1").map(\.size) == [6, 5])
+            #expect(ledger.index.newCaptures([captureFixture("a.jpg")], serialNumber: "S2").count == 1)
+        }
+    }
+
+    @Suite("색인")
+    struct Index {
+        @Test func `최근 옮긴 항목은 기준 시각 뒤에 가져오거나 내보낸 캡처다`() throws {
+            let ledger = try TransferLedger(directory: temporaryFolderFixture())
+            let (old, recent, found) = (captureFixture("a.jpg"), captureFixture("b.jpg"), captureFixture("c.jpg"))
+            try ledger.record([old], serialNumber: "S1", as: .imported, at: dateFixture("2026-10-16 23:59:59"))
+            try ledger.record([recent], serialNumber: "S1", as: .exported, at: dateFixture("2026-10-17 00:00:00"))
+            try ledger.record([found], serialNumber: "S1", as: .foundInFolder, at: dateFixture("2026-11-10 12:00:00"))
+
+            let since = dateFixture("2026-10-17 00:00:00")
+            let recently = ledger.index.recentlyTransferred([old, recent, found], serialNumber: "S1", since: since)
+            #expect(recently.map(\.filename) == ["b.jpg"])
+        }
+
+        @Test func `꺼내 둔 색인은 뒤에 남긴 기록으로 바뀌지 않는다`() throws {
+            let ledger = try TransferLedger(directory: temporaryFolderFixture())
+            let before = ledger.index
+            try ledger.record([captureFixture("a.jpg")], serialNumber: "S1", as: .imported)
+
+            #expect(!before.isTransferred(captureFixture("a.jpg"), serialNumber: "S1"))
+            #expect(ledger.index.isTransferred(captureFixture("a.jpg"), serialNumber: "S1"))
         }
     }
 
@@ -22,7 +46,7 @@ struct TransferLedgerTests {
             let folder = temporaryFolderFixture()
             try TransferLedger(directory: folder).record([captureFixture()], serialNumber: "S1", as: .imported)
 
-            #expect(try TransferLedger(directory: folder).isTransferred(captureFixture(), serialNumber: "S1"))
+            #expect(try TransferLedger(directory: folder).index.isTransferred(captureFixture(), serialNumber: "S1"))
         }
 
         @Test func `끝 줄이 잘린 기록 파일도 앞 줄을 읽고 이어서 기록한다`() throws {
@@ -36,8 +60,8 @@ struct TransferLedgerTests {
             try TransferLedger(directory: folder).record([captureFixture("b.jpg")], serialNumber: "S1", as: .imported)
             let reopened = try TransferLedger(directory: folder)
 
-            #expect(reopened.isTransferred(captureFixture("a.jpg"), serialNumber: "S1"))
-            #expect(reopened.isTransferred(captureFixture("b.jpg"), serialNumber: "S1"))
+            #expect(reopened.index.isTransferred(captureFixture("a.jpg"), serialNumber: "S1"))
+            #expect(reopened.index.isTransferred(captureFixture("b.jpg"), serialNumber: "S1"))
         }
     }
 
@@ -52,11 +76,11 @@ struct TransferLedgerTests {
             var seoul = Calendar(identifier: .gregorian)
             seoul.timeZone = TimeZone(identifier: "Asia/Seoul") ?? .gmt
 
-            #expect(ledger.lastTransfer(of: [a, b, c], serialNumber: "S1", calendar: seoul)
+            #expect(ledger.index.lastTransfer(of: [a, b, c], serialNumber: "S1", calendar: seoul)
                 == LastTransfer(day: dateFixture("2026-11-09 00:00:00"), count: 1))
-            #expect(ledger.transferredAt(a, serialNumber: "S1") == dateFixture("2026-11-09 21:00:00"))
-            #expect(ledger.transferredAt(c, serialNumber: "S1") == nil)
-            #expect(ledger.isTransferred(c, serialNumber: "S1"))
+            #expect(ledger.index.transferredAt(a, serialNumber: "S1") == dateFixture("2026-11-09 21:00:00"))
+            #expect(ledger.index.transferredAt(c, serialNumber: "S1") == nil)
+            #expect(ledger.index.isTransferred(c, serialNumber: "S1"))
         }
     }
 }

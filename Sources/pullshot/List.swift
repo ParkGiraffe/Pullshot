@@ -24,7 +24,7 @@ struct List: ParsableCommand {
             ledger.hintIfFirstConnection(serialNumber: serialNumber)
 
             let scan = try AlbumScanner(source: connection.session).scan(isCancelled: { Terminal.isInterrupted })
-            let isNew = { (capture: Capture) in !ledger.isTransferred(capture, serialNumber: serialNumber) }
+            let isNew = { (capture: Capture) in !ledger.index.isTransferred(capture, serialNumber: serialNumber) }
             let selection = CaptureSelection(names: [], game: game, isAll: true, isNewOnly: isNewOnly)
             let chosen = selection.choose(from: scan.captures, isNew: isNew).chosen
             let shown = AlbumScan(captures: chosen, skipped: scan.skipped)

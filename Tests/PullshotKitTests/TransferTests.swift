@@ -45,7 +45,7 @@ struct TransferTests {
             let attributes = try FileManager.default.attributesOfItem(atPath: saved)
             #expect(attributes[.creationDate] as? Date == capture.capturedAt)
             #expect(attributes[.modificationDate] as? Date == capture.capturedAt)
-            #expect(setup.ledger.isTransferred(capture, serialNumber: "S1"))
+            #expect(setup.ledger.index.isTransferred(capture, serialNumber: "S1"))
         }
 
         @Test func `진행은 캡처를 시작할 때와 바이트를 받을 때 알린다`() throws {
@@ -83,7 +83,7 @@ struct TransferTests {
 
             #expect(setup.source.downloaded.isEmpty)
             #expect(summary.skipped == 1)
-            #expect(setup.ledger.isTransferred(capture, serialNumber: "S1"))
+            #expect(setup.ledger.index.isTransferred(capture, serialNumber: "S1"))
         }
 
         @Test func `이름만 같은 파일이 있으면 번호를 붙여 따로 받고 원래 파일은 그대로 둔다`() throws {
@@ -102,14 +102,14 @@ struct TransferTests {
             let setup = try Setup()
             let (a, b) = (captureFixture("a.jpg"), captureFixture("b.jpg"))
             _ = try setup.run([a])
-            let firstTransfer = setup.ledger.transferredAt(a, serialNumber: "S1")
+            let firstTransfer = setup.ledger.index.transferredAt(a, serialNumber: "S1")
             _ = try setup.place(Data(count: 5), named: "b.jpg")
 
             _ = try setup.run([a, b])
 
-            #expect(setup.ledger.transferredAt(a, serialNumber: "S1") == firstTransfer)
-            #expect(setup.ledger.isTransferred(b, serialNumber: "S1"))
-            #expect(setup.ledger.transferredAt(b, serialNumber: "S1") == nil)
+            #expect(setup.ledger.index.transferredAt(a, serialNumber: "S1") == firstTransfer)
+            #expect(setup.ledger.index.isTransferred(b, serialNumber: "S1"))
+            #expect(setup.ledger.index.transferredAt(b, serialNumber: "S1") == nil)
         }
     }
 
@@ -124,7 +124,7 @@ struct TransferTests {
             #expect(summary.failures.map(\.capture.handle) == [2])
             #expect(summary.notAttempted == 1)
             #expect(setup.source.downloaded == [1, 2])
-            #expect(setup.ledger.newCaptures(three, serialNumber: "S1").map(\.handle) == [2, 3])
+            #expect(setup.ledger.index.newCaptures(three, serialNumber: "S1").map(\.handle) == [2, 3])
         }
 
         @Test func `받는 중에 취소하면 남은 캡처를 받지 않고 받은 것만 기록한다`() throws {
@@ -136,7 +136,7 @@ struct TransferTests {
             #expect(summary.saved.count == 1)
             #expect(summary.failures.isEmpty)
             #expect(summary.notAttempted == 2)
-            #expect(setup.ledger.newCaptures(three, serialNumber: "S1").map(\.handle) == [2, 3])
+            #expect(setup.ledger.index.newCaptures(three, serialNumber: "S1").map(\.handle) == [2, 3])
         }
 
         @Test func `캡처 사이에서 취소를 알아채면 다음 캡처를 시작하지 않는다`() throws {

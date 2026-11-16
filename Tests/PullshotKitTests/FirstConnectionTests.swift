@@ -20,7 +20,7 @@ struct FirstConnectionTests {
             #expect(recorded == 0)
 
             #expect(try !TransferLedger(directory: folder).needsFirstConnectQuestion(serialNumber: "S1"))
-            #expect(ledger.newCaptures([captureFixture()], serialNumber: "S1").count == 1)
+            #expect(ledger.index.newCaptures([captureFixture()], serialNumber: "S1").count == 1)
         }
 
         @Test func `기록이 이미 있는 기기는 묻지 않는다`() throws {
@@ -38,7 +38,7 @@ struct FirstConnectionTests {
             let captures = [captureFixture("a.jpg"), captureFixture("b.jpg")]
 
             #expect(try ledger.answerFirstConnectQuestion(.markAll, captures: captures, serialNumber: "S1") == 2)
-            #expect(ledger.newCaptures(captures, serialNumber: "S1").isEmpty)
+            #expect(ledger.index.newCaptures(captures, serialNumber: "S1").isEmpty)
         }
 
         @Test func `찾기를 취소하면 아무것도 기록하지 않고 다시 묻는다`() throws {
@@ -77,7 +77,7 @@ struct FirstConnectionTests {
             )
 
             #expect(recorded == 1)
-            #expect(ledger.newCaptures(captures, serialNumber: "S1").map(\.filename) == ["b.jpg", "c.jpg"])
+            #expect(ledger.index.newCaptures(captures, serialNumber: "S1").map(\.filename) == ["b.jpg", "c.jpg"])
         }
 
         @Test func `없거나 읽을 수 없는 폴더를 주면 기록하지 않고 다시 묻는다`() throws {

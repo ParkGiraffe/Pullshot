@@ -8,7 +8,7 @@ public struct TransferItem: Equatable, Sendable {
     public var filename: String
 }
 
-public enum ExportNaming: Sendable {
+public enum ExportNaming: String, Sendable, CaseIterable {
     /// 기기의 원래 파일 이름 그대로입니다.
     case original
     /// 찍은 순서대로 번호를 붙입니다. 예: `001_20261114_211205.jpg`

@@ -11,4 +11,4 @@
 | 게임 | 캡처가 든 앨범 폴더입니다. 폴더 이름이 게임 이름입니다. | `Game`, `Capture.gameName` |
 | 기타 | 게임 폴더 밖에 있거나 스위치의 "기타" 폴더에 든 캡처의 묶음입니다. 기록의 열쇠에는 원래 폴더 값을 그대로 둡니다. | `Game.otherName` |
 | 옮김 | 가져오기나 내보내기로 캡처를 Mac에 저장한 일입니다. | `TransferLedger`, `TransferKind` |
-| 새 항목 | 아직 한 번도 옮기지 않은 캡처입니다. | `TransferLedger.newCaptures` |
+| 새 항목 | 아직 한 번도 옮기지 않은 캡처입니다. | `LedgerIndex.newCaptures` |
