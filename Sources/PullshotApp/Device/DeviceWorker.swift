@@ -25,6 +25,11 @@ actor DeviceWorker {
         ledger.index
     }
 
+    /// 연 세션을 아직 쓸 수 있는지입니다. 받는 중 Mac 쓰기 오류처럼 기기가 꽂힌 채 세션이 버려지면 거짓이 됩니다.
+    var hasUsableSession: Bool {
+        session?.isValid == true
+    }
+
     init(ledgerDirectory: URL, log: FileLog) throws {
         ledger = try TransferLedger(directory: ledgerDirectory)
         self.log = log

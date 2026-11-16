@@ -117,9 +117,9 @@ final class LibraryModel {
     }
 
     /// 기준 캡처의 원본을 받아 Quick Look으로 엽니다. 앞서 받던 미리보기는 취소합니다.
-    /// 데모 캡처는 기기에 없으므로 하지 않습니다.
+    /// 데모 캡처는 기기에 없으므로 하지 않습니다. 옮기는 중에는 옮기기 뒤로 줄을 서 끝난 뒤에야 뜨므로 하지 않습니다.
     func preview() {
-        guard !isDemo, !isShuttingDown, let anchor = selection.anchor,
+        guard !isDemo, !isShuttingDown, !isTransferring, let anchor = selection.anchor,
               let capture = captures.first(where: { $0.id == anchor })
         else {
             return
@@ -133,6 +133,7 @@ final class LibraryModel {
             } catch {
                 guard !Task.isCancelled else { return }
                 worker.log.write("미리보기를 받지 못함: \(FileLog.describe(error))")
+                await reopenIfSessionLost()
             }
         }
     }
@@ -223,6 +224,13 @@ final class LibraryModel {
         leaveConsole()
         connection = .connecting(console)
         deviceTask = Task { await load(console) }
+    }
+
+    /// 옮기기나 미리보기가 세션을 버렸으면 그 기기를 다시 엽니다. 받는 중 Mac 디스크가 차는 것처럼 기기가 꽂힌 채
+    /// 버려지면 감시 알림이 오지 않아, 다시 열지 않으면 버린 세션 위에서 연결됨으로 남습니다. 옮기기 결과는 남습니다.
+    private func reopenIfSessionLost() async {
+        guard await !worker.hasUsableSession, case let .ready(console, _) = connection else { return }
+        open(console)
     }
 
     /// 하던 일을 취소하고 연 기기의 캡처, 고른 것, 질문을 치웁니다. 옮기기 결과는 안내 화면에 보이도록 남깁니다.
@@ -347,6 +355,7 @@ extension LibraryModel {
                 transferRun?.errorMessage = AppErrorMessages.message(for: error)
             }
             index = await worker.index
+            await reopenIfSessionLost()
         }
     }
 
