@@ -3,9 +3,9 @@ import Testing
 @testable import PullshotKit
 
 @Suite("전송 기록과 재생 테스트")
-struct TransferLogTests {
+struct RecordingTransportTests {
     static func logFile() -> URL {
-        FileManager.default.temporaryDirectory.appending(path: "transfer-\(UUID()).jsonl")
+        FileManager.default.temporaryDirectory.appending(path: "transport-\(UUID()).jsonl")
     }
 
     @Test func `기록한 세션을 재생하면 같은 결과가 나온다`() throws {

@@ -2,7 +2,7 @@ import Foundation
 
 /// 전송 기록 한 줄입니다. JSON Lines로 한 줄에 하나씩 씁니다.
 /// `dir`은 out(쓰기), in(읽기), in-error(읽기 실패), reset(장치 리셋)입니다.
-struct TransferRecord: Codable, Equatable {
+struct TransportRecord: Codable, Equatable {
     var dir: String
     var hex: String?
     var error: String?
@@ -26,17 +26,17 @@ public final class RecordingTransport: Transport {
     }
 
     public func write(_ data: Data, timeout: TimeInterval) throws {
-        try append(TransferRecord(dir: "out", hex: data.hexString))
+        try append(TransportRecord(dir: "out", hex: data.hexString))
         try wrapped.write(data, timeout: timeout)
     }
 
     public func read(maxLength: Int, timeout: TimeInterval) throws -> Data {
         do {
             let data = try wrapped.read(maxLength: maxLength, timeout: timeout)
-            try append(TransferRecord(dir: "in", hex: data.hexString))
+            try append(TransportRecord(dir: "in", hex: data.hexString))
             return data
         } catch let error as TransportError {
-            try append(TransferRecord(dir: "in-error", error: error.recorded))
+            try append(TransportRecord(dir: "in-error", error: error.recorded))
             throw error
         }
     }
@@ -57,14 +57,14 @@ public final class RecordingTransport: Transport {
     private func reset(_ kind: String, _ body: () throws -> Void) throws {
         do {
             try body()
-            try append(TransferRecord(dir: "reset", kind: kind))
+            try append(TransportRecord(dir: "reset", kind: kind))
         } catch let error as TransportError {
-            try append(TransferRecord(dir: "reset", error: error.recorded, kind: kind))
+            try append(TransportRecord(dir: "reset", error: error.recorded, kind: kind))
             throw error
         }
     }
 
-    private func append(_ record: TransferRecord) throws {
+    private func append(_ record: TransportRecord) throws {
         try file.write(contentsOf: JSONEncoder().encode(record) + Data("\n".utf8))
     }
 }
@@ -78,13 +78,13 @@ public enum ReplayError: Error, Equatable {
 
 /// 기록을 순서대로 되풀이합니다. 쓰기는 기록과 바이트까지 같아야 하고, 읽기는 기록된 바이트나 오류를 돌려줍니다.
 public final class ReplayTransport: Transport {
-    private let records: [TransferRecord]
+    private let records: [TransportRecord]
     private var index = 0
 
     public init(contentsOf url: URL) throws {
         records = try String(contentsOf: url, encoding: .utf8)
             .split(separator: "\n")
-            .map { try JSONDecoder().decode(TransferRecord.self, from: Data($0.utf8)) }
+            .map { try JSONDecoder().decode(TransportRecord.self, from: Data($0.utf8)) }
     }
 
     public var isFinished: Bool {
@@ -126,7 +126,7 @@ public final class ReplayTransport: Transport {
         }
     }
 
-    private func next() throws -> (Int, TransferRecord) {
+    private func next() throws -> (Int, TransportRecord) {
         guard index < records.count else { throw ReplayError.exhausted }
         defer { index += 1 }
         return (index, records[index])
