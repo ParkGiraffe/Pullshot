@@ -1,6 +1,6 @@
 # 서드파티 라이선스
 
-Pullshot은 MIT 라이선스입니다([LICENSE](LICENSE)). CLI `pullshot`은 아래 오픈소스 패키지를 링크합니다. 라이선스 원문을 그대로 싣습니다.
+Pullshot은 MIT 라이선스로 배포합니다([LICENSE](LICENSE)). CLI `pullshot`은 아래 오픈소스 패키지를 링크합니다. 라이선스 원문을 그대로 싣습니다.
 
 ## swift-argument-parser
 
