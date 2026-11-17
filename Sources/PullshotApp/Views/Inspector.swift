@@ -1,8 +1,8 @@
 import PullshotKit
 import SwiftUI
 
-/// 오른쪽 칸입니다. 고른 것이 없으면 보는 범위의 정보와 가져오기, 고르면 고른 캡처의 정보와 내보내기 설정을 둡니다.
-/// 저장 위치는 두 상태가 같은 설정을 씁니다.
+/// 오른쪽 칸입니다. 고른 것이 없으면 보는 범위의 정보와 새 항목, 모두 가져오기를, 고르면 고른 캡처의 정보와
+/// 가져오기 설정을 둡니다. 저장 위치는 두 상태가 같은 설정을 씁니다.
 struct Inspector: View {
     let model: LibraryModel
     /// 격자에 보이는 캡처입니다.
@@ -26,7 +26,7 @@ struct Inspector: View {
 
     @ViewBuilder private var scopeInfo: some View {
         let summary = CaptureSummary(captures)
-        let newCount = model.index.newCaptures(captures, serialNumber: model.serialNumber ?? "").count
+        let newCount = model.captures(in: .newItems).count
         if let latest = captures.min(by: Capture.newestFirst) {
             Thumbnail(capture: latest)
                 .aspectRatio(16 / 9, contentMode: .fit)
@@ -46,7 +46,7 @@ struct Inspector: View {
             TransferPanel(run: run, model: model)
         } else {
             Button {
-                model.importNew()
+                model.startImport(.newItems)
             } label: {
                 Label("새 항목 \(newCount)개 가져오기", systemImage: "square.and.arrow.down")
                     .frame(maxWidth: .infinity)
@@ -55,19 +55,13 @@ struct Inspector: View {
             .controlSize(.large)
             .disabled(newCount == 0 || model.isDemo)
             Button {
-                model.selection.selectAll(captures.map(\.id))
+                model.startImport(.all)
             } label: {
-                Group {
-                    if case .game = model.scope {
-                        Text("게임 전체 내보내기")
-                    } else {
-                        Text("모두 내보내기")
-                    }
-                }
-                .frame(maxWidth: .infinity)
+                Text("모두 가져오기")
+                    .frame(maxWidth: .infinity)
             }
             .controlSize(.large)
-            .disabled(captures.isEmpty)
+            .disabled(captures.isEmpty || model.isDemo)
         }
     }
 
@@ -86,13 +80,12 @@ struct Inspector: View {
         }
         Divider()
         importFolderButton
-        Toggle("게임 이름 폴더 만들기", isOn: $settings.makesGameFolder)
+        Toggle("폴더별로 나눠 저장", isOn: $settings.makesGameFolder)
         Picker("파일 이름", selection: $settings.exportNaming) {
             Text("원래 이름 그대로").tag(ExportNaming.original)
             Text("찍은 순서대로 번호 붙이기").tag(ExportNaming.numbered)
         }
-        let filenames = ExportPreview.lines(TransferItem.exports(selected, options: model.exportOptions))
-        Text(verbatim: filenames.joined(separator: "\n"))
+        Text(verbatim: ExportPreview.lines(model.importItems(.selected)).joined(separator: "\n"))
             .font(.caption.monospaced())
             .foregroundStyle(.secondary)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -103,9 +96,9 @@ struct Inspector: View {
             TransferPanel(run: run, model: model)
         } else {
             Button {
-                model.export()
+                model.startImport(.selected)
             } label: {
-                Label("내보내기", systemImage: "square.and.arrow.up")
+                Label("\(selected.count)개 가져오기", systemImage: "square.and.arrow.down")
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)

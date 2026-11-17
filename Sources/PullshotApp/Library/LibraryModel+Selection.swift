@@ -3,7 +3,7 @@ import PullshotKit
 
 /// 격자에서 고르기입니다. 미리보기 패널이 열려 있으면 기준 캡처를 따라가게 합니다.
 extension LibraryModel {
-    /// 격자나 미리보기 패널에서 고른 것을 바꿉니다. 끝난 옮기기 결과는 앞서 고른 것의 결과라 닫아, 결과 칸이 내보내기
+    /// 격자나 미리보기 패널에서 고른 것을 바꿉니다. 끝난 옮기기 결과는 앞서 고른 것의 결과라 닫아, 결과 칸이 가져오기
     /// 단추 자리를 차지하지 않게 합니다. 기기가 빠져 고른 것을 지울 때는 여기를 거치지 않아 결과가 안내 화면에 남습니다.
     func select(_ selection: GridSelection) {
         guard selection != self.selection else { return }

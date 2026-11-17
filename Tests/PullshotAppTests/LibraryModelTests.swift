@@ -64,11 +64,11 @@ struct LibraryModelTests {
     }
 }
 
-/// 기기 없이 내보내기를 눌러, 열린 세션이 없어 멈춘 결과가 남은 모델입니다.
+/// 기기 없이 가져오기를 눌러, 열린 세션이 없어 멈춘 결과가 남은 모델입니다.
 @MainActor
 private func finishedTransferModelFixture() async throws -> LibraryModel {
     let model = try libraryModelFixture()
-    model.export()
+    model.startImport(.selected)
     while model.isTransferring {
         try await Task.sleep(for: .milliseconds(10))
     }

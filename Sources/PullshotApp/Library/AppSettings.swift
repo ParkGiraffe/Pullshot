@@ -8,15 +8,18 @@ import PullshotKit
 /// 실행 인자(`-makesGameFolder NO`)는 문자열로 들어오므로 참거짓은 `bool(forKey:)`로 읽습니다.
 @MainActor @Observable
 final class AppSettings {
-    /// 저장 위치입니다. 앞 버전의 가져올 곳 설정을 이어 쓰려고 키는 그대로 둡니다.
+    /// 저장 위치입니다. 가져오기는 모두 이 폴더 아래에 둡니다. 앞 버전의 가져올 곳 설정을 이어 쓰려고 키는 그대로 둡니다.
     var importFolder: URL {
         didSet { defaults.set(importFolder.path(percentEncoded: false), forKey: SettingsKey.importFolder.rawValue) }
     }
 
+    /// 고른 것을 가져올 때 저장 위치 아래에 게임 이름 폴더를 만들어 나눠 둡니다("폴더별로 나눠 저장").
     var makesGameFolder: Bool {
         didSet { defaults.set(makesGameFolder, forKey: SettingsKey.makesGameFolder.rawValue) }
     }
 
+    /// 고른 것을 가져올 때의 파일 이름 규칙입니다. 이름은 Kit의 `ExportNaming`을 따르고, 키는 앞 버전 설정을 이어 쓰려고
+    /// 그대로 둡니다.
     var exportNaming: ExportNaming {
         didSet { defaults.set(exportNaming.rawValue, forKey: SettingsKey.exportNaming.rawValue) }
     }

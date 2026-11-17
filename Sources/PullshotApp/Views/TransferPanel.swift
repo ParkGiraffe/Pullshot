@@ -22,15 +22,9 @@ struct TransferPanel: View {
     @ViewBuilder private var progress: some View {
         if let current = run.progress {
             let fileFraction = fileFraction(of: current)
-            Group {
-                if run.kind == .imported {
-                    Text("가져오는 중 \(current.index + 1)/\(current.total)")
-                } else {
-                    Text("내보내는 중 \(current.index + 1)/\(current.total)")
-                }
-            }
-            .font(.headline)
-            .monospacedDigit()
+            Text("가져오는 중 \(current.index + 1)/\(current.total)")
+                .font(.headline)
+                .monospacedDigit()
             Text(verbatim: current.capture.filename)
                 .font(.caption)
                 .foregroundStyle(.secondary)

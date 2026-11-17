@@ -27,9 +27,8 @@ final class LibraryModel {
         }
     }
 
-    /// 가져오기나 내보내기 한 번입니다. 끝난 뒤에도 사용자가 닫거나 다른 것을 고를 때까지 결과를 남겨 둡니다.
+    /// 가져오기 한 번입니다. 끝난 뒤에도 사용자가 닫거나 다른 것을 고를 때까지 결과를 남겨 둡니다.
     struct TransferRun {
-        var kind: TransferKind
         /// 시작할 때의 저장 위치입니다.
         var folder: URL
         var progress: TransferProgress?
@@ -306,15 +305,15 @@ final class LibraryModel {
     }
 }
 
-/// 가져오기와 내보내기입니다. 옮기는 동안 기기가 빠져도 결과를 남겨 안내 화면에 보입니다.
+/// 가져오기입니다. 옮기는 동안 기기가 빠져도 결과를 남겨 안내 화면에 보입니다.
 extension LibraryModel {
     /// 저장 위치입니다. 설정에서 고르지 않았으면 `~/Pictures/Pullshot`입니다.
     var importFolder: URL {
         settings.importFolder
     }
 
-    /// 저장 위치와, 내보낼 때 게임 이름 폴더를 만들지와 파일 이름 규칙입니다.
-    var exportOptions: ExportOptions {
+    /// 저장 위치와, 고른 것을 가져올 때 폴더별로 나눌지와 파일 이름 규칙입니다.
+    var importOptions: ExportOptions {
         ExportOptions(
             baseFolder: importFolder,
             makesGameFolder: settings.makesGameFolder,
@@ -322,21 +321,26 @@ extension LibraryModel {
         )
     }
 
-    /// 옮기는 동안은 가져오기, 내보내기, 기기 전환을 끕니다.
+    /// 옮기는 동안은 가져오기와 기기 전환을 끕니다.
     var isTransferring: Bool {
         transferRun.map { !$0.isFinished } ?? false
     }
 
-    /// 보이는 캡처 가운데 새 항목을 저장 위치에 가져옵니다.
-    func importNew() {
-        guard let serialNumber else { return }
-        let captures = index.newCaptures(visibleCaptures, serialNumber: serialNumber)
-        transfer(TransferItem.imports(captures, into: importFolder), as: .imported)
+    /// 가져올 대상에 든 캡처입니다. 새 항목과 모두는 보이는 캡처에서, 고른 것은 고른 캡처에서 고릅니다.
+    func captures(in target: ImportTarget) -> [Capture] {
+        switch target {
+        case .newItems:
+            index.newCaptures(visibleCaptures, serialNumber: serialNumber ?? "")
+        case .all:
+            visibleCaptures
+        case .selected:
+            selectedCaptures
+        }
     }
 
-    /// 고른 캡처를 저장 위치로 내보냅니다.
-    func export() {
-        transfer(TransferItem.exports(selectedCaptures, options: exportOptions), as: .exported)
+    /// 가져올 대상을 저장 위치에 둘 자리입니다. 오른쪽 칸의 이름 미리보기도 이 자리를 보입니다.
+    func importItems(_ target: ImportTarget) -> [TransferItem] {
+        target.items(captures(in: target), options: importOptions)
     }
 
     /// Kit이 받던 파일의 남은 데이터를 끝까지 읽어 버리고 멈춥니다. 결과에 취소했다고 남습니다.
@@ -357,14 +361,15 @@ extension LibraryModel {
         NSWorkspace.shared.activateFileViewerSelecting(folders.count == 1 ? saved : [run.folder])
     }
 
-    /// 옮기기를 시작합니다. 끝나면 결과와 옮긴 기록 색인을 맞춥니다.
-    private func transfer(_ items: [TransferItem], as kind: TransferKind) {
+    /// 가져올 대상을 저장 위치로 옮깁니다. 끝나면 결과와 옮긴 기록 색인을 맞춥니다.
+    func startImport(_ target: ImportTarget) {
         guard !isShuttingDown, !isTransferring else { return }
+        let items = importItems(target)
         stopPreview()
-        transferRun = TransferRun(kind: kind, folder: importFolder)
+        transferRun = TransferRun(folder: importFolder)
         transferTask = Task {
             do {
-                let summary = try await worker.transfer(items, as: kind) { progress in
+                let summary = try await worker.transfer(items, as: target.kind) { progress in
                     Task { @MainActor in self.showTransferProgress(progress) }
                 }
                 transferRun?.summary = summary
