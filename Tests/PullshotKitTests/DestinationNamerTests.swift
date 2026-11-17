@@ -5,7 +5,7 @@ import Testing
 @Suite("DestinationNamer 테스트")
 struct DestinationNamerTests {
     static func emptyFolder() throws -> URL {
-        let folder = FileManager.default.temporaryDirectory.appending(path: "namer-\(UUID())")
+        let folder = temporaryFolderFixture()
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
         return folder
     }

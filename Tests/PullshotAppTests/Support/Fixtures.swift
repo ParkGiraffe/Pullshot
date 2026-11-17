@@ -59,9 +59,17 @@ func captureFixture(
     )
 }
 
-/// 임시 폴더 아래 새 경로입니다. 만들지는 않습니다.
+/// 이 테스트 프로세스가 처음 쓸 때 한 번 비우고 다시 만드는 임시 뿌리 폴더입니다. 전 실행이 남긴 것을 치웁니다.
+private let temporaryRoot: URL = {
+    let root = FileManager.default.temporaryDirectory.appending(path: "PullshotTests/App")
+    try? FileManager.default.removeItem(at: root)
+    try? FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+    return root
+}()
+
+/// 임시 뿌리 폴더 아래 새 경로입니다. 만들지는 않습니다.
 func temporaryFolderFixture() -> URL {
-    FileManager.default.temporaryDirectory.appending(path: "pullshot-\(UUID())")
+    temporaryRoot.appending(path: "\(UUID())")
 }
 
 /// 테스트마다 따로 쓰는 설정 저장소입니다. suite 이름에 절대 경로를 주면 `~/Library/Preferences`가 아니라

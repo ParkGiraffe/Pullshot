@@ -7,7 +7,7 @@ struct SessionDownloadTests {
     static let payload = Data((0 ..< 1500).map { UInt8($0 % 251) })
 
     static func emptyFolder() throws -> URL {
-        let folder = FileManager.default.temporaryDirectory.appending(path: "pullshot-\(UUID())")
+        let folder = temporaryFolderFixture()
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
         return folder
     }

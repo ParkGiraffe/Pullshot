@@ -5,7 +5,7 @@ import Testing
 @Suite("전송 기록과 재생 테스트")
 struct RecordingTransportTests {
     static func logFile() -> URL {
-        FileManager.default.temporaryDirectory.appending(path: "transport-\(UUID()).jsonl")
+        temporaryFolderFixture().appendingPathExtension("jsonl")
     }
 
     @Suite("기록과 재생")
