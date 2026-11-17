@@ -29,7 +29,9 @@ struct DeviceSwitcher: View {
                         .padding(.horizontal, 6)
                         .padding(.vertical, 1)
                         .background(.quaternary, in: .capsule)
-                        .help("실기기로 시험하지 못한 기기입니다. 문제가 있으면 설정에서 자세한 로그 남기기를 켜고 다시 해 본 뒤, 로그 파일과 함께 GitHub 이슈로 알려 주세요.")
+                        .help(
+                            "실제 본체로 시험하지 못한 기기입니다. 문제가 있으면 설정에서 자세한 로그 남기기를 켜고 다시 해 본 뒤, 로그 파일과 함께 GitHub 이슈로 알려 주세요."
+                        )
                 }
             }
             .lineLimit(1)

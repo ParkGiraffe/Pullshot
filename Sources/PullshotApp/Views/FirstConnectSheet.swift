@@ -9,12 +9,12 @@ struct FirstConnectSheet: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("이미 받아 둔 캡처가 있나요?")
+            Text("이미 받아 둔 사진과 동영상이 있나요?")
                 .font(.title3.bold())
-            Text("처음 연결한 스위치입니다. 이미 Mac에 받아 둔 캡처를 옮긴 기록에 넣으면, 그 캡처는 새 항목에 나오지 않습니다.")
+            Text("처음 연결한 스위치입니다. 이미 Mac에 받아 둔 사진과 동영상을 옮긴 기록에 넣으면, 새 항목에 나오지 않습니다.")
                 .fixedSize(horizontal: false, vertical: true)
             if let count = model.firstConnectRecordedCount {
-                Text("기록에 넣은 캡처 \(count)개")
+                Text("기록에 넣은 사진과 동영상 \(count)개")
                     .font(.headline)
                 HStack {
                     Spacer()
@@ -62,7 +62,7 @@ struct FirstConnectSheet: View {
             Button {
                 model.answerFirstConnect(.markAll)
             } label: {
-                Text("지금 있는 캡처를 모두 옮긴 것으로 표시")
+                Text("스위치에 있는 사진과 동영상을 모두 옮긴 것으로 표시")
                     .frame(maxWidth: .infinity)
             }
             Button {

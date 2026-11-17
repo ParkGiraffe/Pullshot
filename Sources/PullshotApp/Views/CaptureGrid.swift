@@ -162,7 +162,7 @@ struct CaptureGrid: View {
     private func countText(_ summary: CaptureSummary) -> String {
         [
             summary.photoCount > 0 ? String(localized: "사진 \(summary.photoCount)") : nil,
-            summary.videoCount > 0 ? String(localized: "영상 \(summary.videoCount)") : nil,
+            summary.videoCount > 0 ? String(localized: "동영상 \(summary.videoCount)") : nil,
         ]
         .compactMap(\.self)
         .joined(separator: " · ")

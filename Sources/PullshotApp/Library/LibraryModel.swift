@@ -99,10 +99,19 @@ final class LibraryModel {
         connection = .ready(DemoAlbum.console, DemoAlbum.info)
     }
 
-    /// 사이드바 범위와 종류 필터를 거쳐 격자에 보일 캡처입니다.
-    var visibleCaptures: [Capture] {
+    /// 사이드바 범위와 필터입니다.
+    var query: CaptureQuery {
         CaptureQuery(scope: scope, kind: kind)
-            .captures(in: captures, index: index, serialNumber: serialNumber ?? "", now: .now)
+    }
+
+    /// 사이드바 범위와 필터를 거쳐 격자에 보일 캡처입니다.
+    var visibleCaptures: [Capture] {
+        query.captures(in: captures, index: index, serialNumber: serialNumber ?? "", now: .now)
+    }
+
+    /// 격자가 비었을 때 그 까닭입니다.
+    var emptyReason: EmptyReason? {
+        query.emptyReason(in: captures, index: index, serialNumber: serialNumber ?? "", now: .now)
     }
 
     /// 고른 캡처를 격자에 보이는 순서(최신순)로 둡니다. 보이지 않게 된 캡처는 넣지 않습니다.

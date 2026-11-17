@@ -37,7 +37,7 @@ struct Inspector: View {
         }
         field(model.scope.title)
         properties("정보") {
-            row("항목", Text("\(captures.count) (사진 \(summary.photoCount), 영상 \(summary.videoCount))"))
+            row("항목", Text("\(captures.count) (사진 \(summary.photoCount), 동영상 \(summary.videoCount))"))
             row("크기", size(summary))
             if let first = summary.first, let last = summary.last {
                 row("처음 찍은 날", Text(first, format: Date.FormatStyle(date: .numeric)))
@@ -118,7 +118,7 @@ struct Inspector: View {
         stack(Array(selected.prefix(3)))
         field(Text("\(selected.count)개 고름"))
         properties("고른 항목") {
-            row("사진, 영상", Text("사진 \(summary.photoCount), 영상 \(summary.videoCount)"))
+            row("사진, 동영상", Text("사진 \(summary.photoCount), 동영상 \(summary.videoCount)"))
             row("크기", size(summary))
             if let first = summary.first, let last = summary.last {
                 row("찍은 때", Text(CaptureTimeText.current.span(first, last)))

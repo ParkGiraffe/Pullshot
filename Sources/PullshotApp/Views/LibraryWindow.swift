@@ -53,17 +53,17 @@ struct LibraryWindow: View {
                         }
                         ToolbarItem {
                             Menu {
-                                Picker("종류", selection: $model.kind) {
-                                    Text("사진과 영상").tag(KindFilter.all)
+                                Picker("필터", selection: $model.kind) {
+                                    Text("사진과 동영상").tag(KindFilter.all)
                                     Text("사진").tag(KindFilter.photos)
-                                    Text("영상").tag(KindFilter.videos)
+                                    Text("동영상").tag(KindFilter.videos)
                                 }
                                 .pickerStyle(.inline)
                             } label: {
                                 Image(systemName: "line.3.horizontal.decrease.circle")
                             }
                             // 이름이 없으면 접근성 이름이 펼침 화살표 이미지 이름(chevron.pulldown)이 됩니다(2026-11-17, macOS 27).
-                            .accessibilityLabel("종류")
+                            .accessibilityLabel("필터")
                         }
                     }
                     .onChange(of: captures.map(\.id)) { _, visible in model.selection.keep(visible) }
@@ -119,19 +119,28 @@ struct LibraryWindow: View {
         }
     }
 
-    @ViewBuilder private var emptyState: some View {
-        if model.scope == .new {
-            ContentUnavailableView("새 항목이 없습니다", systemImage: "tray", description: Text("모든 캡처를 Mac으로 옮겼습니다."))
-        } else {
-            ContentUnavailableView(
-                "캡처가 없습니다",
-                systemImage: "photo.on.rectangle",
-                description: Text("사이드바에서 다른 게임이나 목록을 고르거나 종류를 바꿔 주세요.")
-            )
+    /// 제목은 보고 있는 종류를, 둘째 줄은 빈 까닭을 알립니다.
+    private var emptyState: some View {
+        let title: LocalizedStringKey = switch model.query.shownKind {
+        case .all: "사진 또는 동영상이 없습니다"
+        case .photos: "사진이 없습니다"
+        case .videos: "동영상이 없습니다"
         }
+        let reason: Text? = switch model.emptyReason {
+        case .allTransferred: Text("새로 찍은 사진과 동영상을 모두 Mac으로 옮겼습니다.")
+        case .noRecentTransfer: Text("최근 30일 동안 옮긴 사진과 동영상이 없습니다.")
+        case .onlyPhotosShown: Text("필터에서 사진과 동영상을 고르면 동영상을 볼 수 있습니다.")
+        case .onlyVideosShown: Text("필터에서 사진과 동영상을 고르면 사진을 볼 수 있습니다.")
+        case nil: nil
+        }
+        return ContentUnavailableView(
+            title,
+            systemImage: model.scope == .new ? "tray" : "photo.on.rectangle",
+            description: reason
+        )
     }
 
-    /// "11월 1일~14일 · 사진 80 · 영상 6"처럼 보이는 캡처의 기간과 수입니다. 없는 칸은 뺍니다.
+    /// "11월 1일~14일 · 사진 80 · 동영상 6"처럼 보이는 캡처의 기간과 수입니다. 없는 칸은 뺍니다.
     private func subtitle(of captures: [Capture]) -> String {
         let summary = CaptureSummary(captures)
         var parts: [String] = []
@@ -142,7 +151,7 @@ struct LibraryWindow: View {
             parts.append(String(localized: "사진 \(summary.photoCount)"))
         }
         if summary.videoCount > 0 {
-            parts.append(String(localized: "영상 \(summary.videoCount)"))
+            parts.append(String(localized: "동영상 \(summary.videoCount)"))
         }
         return parts.joined(separator: " · ")
     }
