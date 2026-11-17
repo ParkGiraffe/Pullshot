@@ -59,7 +59,7 @@ final class LibraryModel {
     @ObservationIgnored private var deviceTask: Task<Void, Never>?
     @ObservationIgnored private var transferTask: Task<Void, Never>?
     @ObservationIgnored let previewPanel = PreviewPanelController()
-    @ObservationIgnored var gridColumns = 1
+    @ObservationIgnored var gridRows: [[Capture.ID]] = []
     @ObservationIgnored var previewCapture: Capture?
     @ObservationIgnored var previewOriginals: [Capture.ID: URL] = [:]
     @ObservationIgnored var previewThumbnails: [Capture.ID: URL] = [:]

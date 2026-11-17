@@ -102,7 +102,7 @@ struct LibraryWindow: View {
                 viewMode: viewMode,
                 cellWidth: thumbnailSize,
                 selection: Binding(get: { model.selection }, set: { model.select($0) }),
-                columns: $model.gridColumns
+                gridRows: $model.gridRows
             ) { capture in
                 model.serialNumber.map { !model.index.isTransferred(capture, serialNumber: $0) } ?? false
             } preview: {

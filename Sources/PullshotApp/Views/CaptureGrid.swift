@@ -12,22 +12,35 @@ struct CaptureGrid: View {
     let viewMode: ViewMode
     let cellWidth: CGFloat
     @Binding var selection: GridSelection
-    @Binding var columns: Int
+    @Binding var gridRows: [[Capture.ID]]
     let isNew: (Capture) -> Bool
     let preview: () -> Void
     let togglePreview: () -> Void
     @FocusState private var isFocused: Bool
     @State private var gridWidth: CGFloat = 0
 
-    private static let margin: CGFloat = 12
     private static let gap: CGFloat = 3
 
-    private var columnCount: Int {
-        GridSelection.columns(width: gridWidth, minimum: cellWidth, spacing: Self.gap)
+    private var screenRows: [[Capture.ID]] {
+        let columnCount = max(1, Int((gridWidth + Self.gap) / (cellWidth + Self.gap)))
+        let groups: [[Capture]]
+        switch viewMode {
+        case .newest:
+            groups = [captures]
+        case .byDate:
+            let sections = DateSections(captures)
+            groups = sections.months.flatMap { $0.days.map(\.captures) } + [sections.undated]
+        }
+        return groups.flatMap { group in
+            stride(from: 0, to: group.count, by: columnCount).map {
+                group[$0 ..< min($0 + columnCount, group.count)].map(\.id)
+            }
+        }
     }
 
     var body: some View {
-        let order = captures.map(\.id)
+        let rows = screenRows
+        let order = rows.flatMap(\.self)
         GeometryReader { viewport in
             ScrollViewReader { scroller in
                 ScrollView {
@@ -38,7 +51,7 @@ struct CaptureGrid: View {
                         }
                     }
                     .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { gridWidth = $0 }
-                    .padding(Self.margin)
+                    .padding(12)
                     .frame(minHeight: viewport.size.height, alignment: .top)
                     .contentShape(.rect)
                     .onTapGesture {
@@ -49,10 +62,10 @@ struct CaptureGrid: View {
                 .focusable()
                 .focusEffectDisabled()
                 .focused($isFocused)
-                .onKeyPress(.leftArrow) { move(.left, in: order) }
-                .onKeyPress(.rightArrow) { move(.right, in: order) }
-                .onKeyPress(.upArrow) { move(.up, in: order) }
-                .onKeyPress(.downArrow) { move(.down, in: order) }
+                .onKeyPress(.leftArrow) { move(.left, in: rows) }
+                .onKeyPress(.rightArrow) { move(.right, in: rows) }
+                .onKeyPress(.upArrow) { move(.up, in: rows) }
+                .onKeyPress(.downArrow) { move(.down, in: rows) }
                 .onKeyPress(.space) {
                     togglePreview()
                     return .handled
@@ -70,7 +83,7 @@ struct CaptureGrid: View {
                         scroller.scrollTo(anchor)
                     }
                 }
-                .onChange(of: columnCount, initial: true) { columns = columnCount }
+                .onChange(of: rows, initial: true) { gridRows = rows }
             }
         }
     }
@@ -127,8 +140,8 @@ struct CaptureGrid: View {
         }
     }
 
-    private func move(_ move: GridSelection.Move, in order: [Capture.ID]) -> KeyPress.Result {
-        selection.move(move, columns: columnCount, in: order)
+    private func move(_ move: GridSelection.Move, in rows: [[Capture.ID]]) -> KeyPress.Result {
+        selection.move(move, in: rows)
         return .handled
     }
 

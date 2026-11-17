@@ -34,20 +34,25 @@ struct GridSelection: Equatable {
         }
     }
 
-    mutating func move(_ move: Move, columns: Int, in order: [Capture.ID]) {
-        guard let anchor, let current = order.firstIndex(of: anchor) else {
+    mutating func move(_ move: Move, in rows: [[Capture.ID]]) {
+        let order = rows.flatMap(\.self)
+        guard let anchor,
+              let row = rows.firstIndex(where: { $0.contains(anchor) }),
+              let column = rows[row].firstIndex(of: anchor),
+              let current = order.firstIndex(of: anchor)
+        else {
             if let first = order.first {
                 click(first, .only, in: order)
             }
             return
         }
-        let step = switch move {
-        case .left: -1
-        case .right: 1
-        case .up: -columns
-        case .down: columns
+        let target = switch move {
+        case .left: order[max(current - 1, 0)]
+        case .right: order[min(current + 1, order.count - 1)]
+        case .up: Self.cell(in: rows[max(row - 1, 0)], column: column)
+        case .down: Self.cell(in: rows[min(row + 1, rows.count - 1)], column: column)
         }
-        click(order[min(max(current + step, 0), order.count - 1)], .only, in: order)
+        click(target, .only, in: order)
     }
 
     mutating func selectAll(_ order: [Capture.ID]) {
@@ -73,7 +78,7 @@ struct GridSelection: Equatable {
         return ([current] + neighbors).map { order[$0] }
     }
 
-    static func columns(width: CGFloat, minimum: CGFloat, spacing: CGFloat) -> Int {
-        max(1, Int((width + spacing) / (minimum + spacing)))
+    private static func cell(in row: [Capture.ID], column: Int) -> Capture.ID {
+        row[min(column, row.count - 1)]
     }
 }

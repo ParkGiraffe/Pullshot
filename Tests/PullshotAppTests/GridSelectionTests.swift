@@ -31,22 +31,32 @@ struct GridSelectionTests {
     }
 
     @Test func `화살표는 기준에서 한 칸이나 한 줄 옮겨 하나만 고른다`() {
-        let order = (0 ..< 10).map(String.init)
+        let rows = [["0", "1", "2", "3"], ["4", "5", "6", "7"], ["8", "9"]]
         var selection = GridSelection()
-        selection.click("5", .only, in: order)
-        selection.move(.right, columns: 4, in: order)
+        selection.click("5", .only, in: rows.flatMap(\.self))
+        selection.move(.right, in: rows)
         #expect(selection.selected == ["6"])
-        selection.move(.down, columns: 4, in: order)
+        selection.move(.down, in: rows)
         #expect(selection.selected == ["9"])
-        selection.move(.down, columns: 4, in: order)
+        selection.move(.down, in: rows)
         #expect(selection.selected == ["9"])
-        selection.move(.up, columns: 4, in: order)
+        selection.move(.up, in: rows)
         #expect(selection.selected == ["5"])
+    }
+
+    @Test func `날짜로 나뉜 줄에서도 위아래 화살표는 바로 윗줄과 아랫줄로 옮긴다`() {
+        let rows = [["a", "b"], ["c", "d", "e", "f"], ["g"]]
+        var selection = GridSelection()
+        selection.click("b", .only, in: rows.flatMap(\.self))
+        selection.move(.down, in: rows)
+        #expect(selection.selected == ["d"])
+        selection.move(.down, in: rows)
+        #expect(selection.selected == ["g"])
     }
 
     @Test func `고른 것이 없을 때 화살표는 첫 캡처를 고른다`() {
         var selection = GridSelection()
-        selection.move(.down, columns: 4, in: order)
+        selection.move(.down, in: [order])
         #expect(selection.selected == ["a"])
     }
 

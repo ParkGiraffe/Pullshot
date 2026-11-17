@@ -36,7 +36,7 @@ extension LibraryModel {
 
     func movePreview(_ move: GridSelection.Move) {
         var moved = selection
-        moved.move(move, columns: gridColumns, in: visibleCaptures.map(\.id))
+        moved.move(move, in: gridRows)
         select(moved)
     }
 
