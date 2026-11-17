@@ -1,5 +1,4 @@
 import PullshotKit
-import QuickLook
 import SwiftUI
 
 struct LibraryWindow: View {
@@ -66,7 +65,7 @@ struct LibraryWindow: View {
                             .accessibilityLabel("필터")
                         }
                     }
-                    .onChange(of: captures.map(\.id)) { _, visible in model.selection.keep(visible) }
+                    .onChange(of: captures.map(\.id)) { _, visible in model.keepVisible(visible) }
             } else {
                 ConnectionGuide(model: model)
             }
@@ -92,7 +91,6 @@ struct LibraryWindow: View {
             }
         }
         .onGeometryChange(for: Bool.self) { $0.size.width < 980 } action: { isNarrow = $0 }
-        .quickLookPreview($model.previewURL)
         .sheet(isPresented: $model.isAskingFirstConnect) {
             FirstConnectSheet(model: model)
         }
@@ -108,11 +106,14 @@ struct LibraryWindow: View {
                 captures: captures,
                 viewMode: viewMode,
                 cellWidth: thumbnailSize,
-                selection: Binding(get: { model.selection }, set: { model.select($0) })
+                selection: Binding(get: { model.selection }, set: { model.select($0) }),
+                columns: $model.gridColumns
             ) { capture in
                 model.serialNumber.map { !model.index.isTransferred(capture, serialNumber: $0) } ?? false
             } preview: {
                 model.preview()
+            } togglePreview: {
+                model.togglePreview()
             }
             // 범위나 필터가 바뀌면 처음부터 보입니다. 스크롤 위치가 남으면 짧아진 격자 밖을 가리켜 빈 화면이 됩니다.
             // 보기 방식은 같은 캡처를 다르게 놓을 뿐이라 위치를 둡니다.

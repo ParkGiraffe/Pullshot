@@ -63,8 +63,6 @@ final class LibraryModel {
     var kind = KindFilter.all
     var gameSearch = ""
     var selection = GridSelection()
-    /// Quick Look으로 보는 원본입니다. Quick Look을 닫으면 nil이 됩니다.
-    var previewURL: URL?
     /// 사용자가 툴바 단추로 둔 오른쪽 칸 상태입니다. 창이 좁아 접힐 때도 바꾸지 않습니다.
     var isInspectorShown = true
     let worker: DeviceWorker
@@ -75,13 +73,24 @@ final class LibraryModel {
     @ObservationIgnored private var monitor: ConsoleMonitor?
     /// 끝내기가 기다리는 동안 감시 알림이나 단추가 새 기기 일을 시작하지 않게 합니다.
     /// 끝내기가 모은 작업 밖에서 세션이 열리면 닫지 못한 채 앱이 끝납니다.
-    @ObservationIgnored private var isShuttingDown = false
+    @ObservationIgnored private(set) var isShuttingDown = false
     /// 연 기기에서 하는 일입니다. 기기를 바꾸거나 기기가 빠지면 취소합니다.
     @ObservationIgnored private var deviceTask: Task<Void, Never>?
     /// 기기가 빠져도 취소하지 않습니다. 끊긴 연결로 끝나야 결과에 받지 못한 수가 남습니다.
     @ObservationIgnored private var transferTask: Task<Void, Never>?
-    /// 미리보기 원본을 받는 일입니다. 떠난 기기의 미리보기가 뒤늦게 뜨지 않도록 기기를 떠날 때 취소합니다.
-    @ObservationIgnored private var previewTask: Task<Void, Never>?
+    /// 미리보기 패널(Quick Look)입니다. 기준 캡처를 보이고, 패널에서 누른 화살표를 모델에 넘깁니다.
+    @ObservationIgnored let previewPanel = PreviewPanelController()
+    /// 격자가 놓은 열 수입니다. 미리보기 패널의 위아래 화살표도 격자처럼 한 줄을 옮기도록 격자가 알려 줍니다.
+    @ObservationIgnored var gridColumns = 1
+    /// 미리보기 패널이 보이는 캡처입니다. 패널을 닫으면 nil입니다.
+    /// 미리보기 상태는 `LibraryModel+Selection.swift`가 바꿉니다.
+    @ObservationIgnored var previewCapture: Capture?
+    /// 미리보기로 받은 원본과, 원본을 받기 전에 보일 썸네일 파일입니다. 기기를 떠날 때 비웁니다.
+    @ObservationIgnored var previewOriginals: [Capture.ID: URL] = [:]
+    @ObservationIgnored var previewThumbnails: [Capture.ID: URL] = [:]
+    /// 미리보기 파일을 받는 일입니다. 기준 캡처와 앞뒤 한 장만 받고, 멀어진 캡처의 받기는 취소합니다.
+    /// 떠난 기기의 미리보기가 뒤늦게 뜨지 않도록 기기를 떠날 때와 끝낼 때도 취소합니다.
+    @ObservationIgnored var previewTasks: [Capture.ID: Task<Void, Never>] = [:]
 
     init(worker: DeviceWorker, settings: AppSettings) {
         // 앞 실행이 끝내기 전에 멈췄으면 미리보기 원본이 남아 있습니다.
@@ -90,6 +99,7 @@ final class LibraryModel {
         self.settings = settings
         thumbnails = ThumbnailStore(worker: worker)
         isDemo = UserDefaults.standard.bool(forKey: SettingsKey.demoAlbum.rawValue)
+        previewPanel.model = self
         guard isDemo else { return }
         consoles = [DemoAlbum.console]
         captures = DemoAlbum.captures(now: .now)
@@ -116,7 +126,7 @@ final class LibraryModel {
 
     /// 고른 캡처를 격자에 보이는 순서(최신순)로 둡니다. 보이지 않게 된 캡처는 넣지 않습니다.
     var selectedCaptures: [Capture] {
-        visibleCaptures.filter { selection.selected.contains($0.id) }.sorted(by: Capture.newestFirst)
+        visibleCaptures.filter { selection.selected.contains($0.id) }
     }
 
     /// 열었거나 여는 중인 세션이 있는지입니다. 기기가 빠졌어도 옮기기가 끝나기 전에는 세션을 쥐고 있습니다.
@@ -125,34 +135,12 @@ final class LibraryModel {
         !isDemo && (connection.console != nil || isTransferring)
     }
 
-    /// 기준 캡처의 원본을 받아 Quick Look으로 엽니다. 앞서 받던 미리보기는 취소합니다.
-    /// 데모 캡처는 기기에 없으므로 하지 않습니다. 옮기는 중에는 옮기기 뒤로 줄을 서 끝난 뒤에야 뜨므로 하지 않습니다.
-    func preview() {
-        guard !isDemo, !isShuttingDown, !isTransferring, let anchor = selection.anchor,
-              let capture = captures.first(where: { $0.id == anchor })
-        else {
-            return
-        }
-        previewTask?.cancel()
-        previewTask = Task {
-            do {
-                let file = try await worker.preview(capture)
-                guard !Task.isCancelled else { return }
-                previewURL = file
-            } catch {
-                guard !Task.isCancelled else { return }
-                worker.log.write("미리보기를 받지 못함: \(FileLog.describe(error))")
-                await reopenIfSessionLost()
-            }
-        }
-    }
-
     /// 하던 일(연결과 훑기, 옮기기, 미리보기, 처음 연결 질문의 답)을 취소하고 끝나길 기다린 뒤 세션을 닫고 미리보기 원본을 지웁니다.
     /// 세션이 남으면 다음 연결이 USB 장치 리셋까지 갑니다.
     func shutdown() async {
         isShuttingDown = true
         monitor = nil
-        let tasks = [deviceTask, transferTask, previewTask, firstConnectTask].compactMap(\.self)
+        let tasks = [deviceTask, transferTask, firstConnectTask].compactMap(\.self) + previewTasks.values
         tasks.forEach { $0.cancel() }
         for task in tasks {
             await task.value
@@ -176,6 +164,15 @@ final class LibraryModel {
     func choose(_ console: AttachedConsole) {
         guard console != connection.console, !isTransferring else { return }
         open(console)
+    }
+
+    /// 사이드바에서 고른 범위를 봅니다. 고른 것과 끝난 옮기기 결과는 앞 범위의 것이라 치우고 미리보기 패널도 닫습니다.
+    func show(_ scope: LibraryScope) {
+        guard scope != self.scope else { return }
+        self.scope = scope
+        selection.clear()
+        dismissTransferResult()
+        previewPanel.close()
     }
 
     var isAnsweringFirstConnect: Bool {
@@ -237,7 +234,7 @@ final class LibraryModel {
 
     /// 옮기기나 미리보기가 세션을 버렸으면 그 기기를 다시 엽니다. 받는 중 Mac 디스크가 차는 것처럼 기기가 꽂힌 채
     /// 버려지면 감시 알림이 오지 않아, 다시 열지 않으면 버린 세션 위에서 연결됨으로 남습니다. 옮기기 결과는 남습니다.
-    private func reopenIfSessionLost() async {
+    func reopenIfSessionLost() async {
         guard await !worker.hasUsableSession, case let .ready(console, _) = connection else { return }
         open(console)
     }
@@ -245,8 +242,11 @@ final class LibraryModel {
     /// 하던 일을 취소하고 연 기기의 캡처, 고른 것, 질문을 치웁니다. 옮기기 결과는 안내 화면에 보이도록 남깁니다.
     private func leaveConsole() {
         deviceTask?.cancel()
-        previewTask?.cancel()
         firstConnectTask?.cancel()
+        // 다른 기기에도 같은 게임 폴더와 파일 이름의 캡처가 있을 수 있어, 받아 둔 미리보기 파일을 잊습니다.
+        stopPreview()
+        previewOriginals = [:]
+        previewThumbnails = [:]
         captures = []
         selection.clear()
         serialNumber = nil
@@ -341,22 +341,6 @@ extension LibraryModel {
         transferRun = nil
     }
 
-    /// 사이드바에서 고른 범위를 봅니다. 고른 것과 끝난 옮기기 결과는 앞 범위의 것이라 치웁니다.
-    func show(_ scope: LibraryScope) {
-        guard scope != self.scope else { return }
-        self.scope = scope
-        selection.clear()
-        dismissTransferResult()
-    }
-
-    /// 격자에서 고른 것을 바꿉니다. 끝난 옮기기 결과는 앞서 고른 것의 결과라 닫아, 결과 칸이 내보내기 단추 자리를
-    /// 차지하지 않게 합니다. 기기가 빠져 고른 것을 지울 때는 여기를 거치지 않아 결과가 안내 화면에 남습니다.
-    func select(_ selection: GridSelection) {
-        guard selection != self.selection else { return }
-        self.selection = selection
-        dismissTransferResult()
-    }
-
     /// 저장한 파일이 한 폴더에 있으면 그 파일들을, 여러 폴더에 있거나 저장한 파일이 없으면 기준 폴더를 Finder에서 보입니다.
     func revealInFinder() {
         guard let run = transferRun else { return }
@@ -368,6 +352,7 @@ extension LibraryModel {
     /// 옮기기를 시작합니다. 끝나면 결과와 옮긴 기록 색인을 맞춥니다.
     private func transfer(_ items: [TransferItem], as kind: TransferKind, folder: URL) {
         guard !isShuttingDown, !isTransferring else { return }
+        stopPreview()
         transferRun = TransferRun(kind: kind, folder: folder)
         transferTask = Task {
             do {

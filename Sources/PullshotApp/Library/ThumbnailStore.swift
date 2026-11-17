@@ -2,6 +2,7 @@ import AppKit
 import ImageIO
 import Observation
 import PullshotKit
+import UniformTypeIdentifiers
 
 /// 격자 칸이 쓰는 썸네일 창구입니다. 메모리, 디스크, 기기 순으로 찾고 기기에서 받은 것은 디스크에 둡니다.
 @MainActor @Observable
@@ -43,6 +44,52 @@ final class ThumbnailStore {
         guard let image, serialNumber == requestedSerial else { return nil }
         memory.setObject(image, forKey: capture.id as NSString)
         return image
+    }
+
+    /// 미리보기 패널이 원본을 받기 전에 보일 썸네일 파일입니다. 받아 둔 썸네일이 없으면 기기에서 받고, 받지 못하면
+    /// nil입니다. 미리보기 폴더 안에 두어 앱을 시작할 때와 끝낼 때 함께 지웁니다.
+    func previewFile(for capture: Capture) async -> URL? {
+        guard let serialNumber, Capture.isSafeFilename(serialNumber) else { return nil }
+        let file = DeviceWorker.previewFolder.appending(path: ".thumbnails").appending(path: serialNumber)
+            .appending(path: capture.gameName).appending(path: "\(capture.filename).jpg")
+        if FileManager.default.fileExists(atPath: file.path(percentEncoded: false)) {
+            return file
+        }
+        guard let image = await image(for: capture)?.cgImage(forProposedRect: nil, context: nil, hints: nil),
+              await Self.writePreview(image, to: file)
+        else { return nil }
+        return file
+    }
+
+    /// 썸네일을 원본 폭(1920)으로 키워 씁니다. 패널은 그림 크기에 맞춰 커지므로, 원본이 와도 패널 크기가 그대로입니다.
+    @concurrent private static func writePreview(_ image: CGImage, to file: URL) async -> Bool {
+        let width = 1920
+        let height = width * image.height / max(image.width, 1)
+        guard let context = CGContext(
+            data: nil,
+            width: width,
+            height: height,
+            bitsPerComponent: 8,
+            bytesPerRow: 0,
+            space: CGColorSpaceCreateDeviceRGB(),
+            bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue
+        ) else { return false }
+        context.interpolationQuality = .high
+        context.draw(image, in: CGRect(x: 0, y: 0, width: width, height: height))
+        try? FileManager.default.createDirectory(
+            at: file.deletingLastPathComponent(),
+            withIntermediateDirectories: true
+        )
+        guard let scaled = context.makeImage(),
+              let destination = CGImageDestinationCreateWithURL(
+                  file as CFURL,
+                  UTType.jpeg.identifier as CFString,
+                  1,
+                  nil
+              )
+        else { return false }
+        CGImageDestinationAddImage(destination, scaled, nil)
+        return CGImageDestinationFinalize(destination)
     }
 
     /// 디스크 읽기, 디코딩, 디스크 쓰기는 메인 액터 밖에서 하고, 다 만든 그림만 돌려받습니다.

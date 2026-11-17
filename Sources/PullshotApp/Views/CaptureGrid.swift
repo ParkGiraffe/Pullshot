@@ -7,14 +7,20 @@ enum ViewMode: String {
     case byDate
 }
 
-/// 캡처 격자입니다. 누르기와 키보드로 캡처를 고르고, 스페이스나 두 번 누르기로 기준 캡처를 크게 봅니다.
+/// 캡처 격자입니다. 누르기와 키보드로 캡처를 고르고, 스페이스나 두 번 누르기로 기준 캡처를 미리보기 패널로 봅니다.
 struct CaptureGrid: View {
+    /// 격자에 놓는 순서(최신순)입니다. 날짜 보기도 칸이 이 순서로 놓여, 고르기와 화살표가 이 순서를 씁니다.
     let captures: [Capture]
     let viewMode: ViewMode
     let cellWidth: CGFloat
     @Binding var selection: GridSelection
+    /// 격자가 놓은 열 수를 밖에 알립니다. 미리보기 패널의 위아래 화살표도 이 수만큼 옮깁니다.
+    @Binding var columns: Int
     let isNew: (Capture) -> Bool
+    /// 두 번 누르면 미리보기 패널을 엽니다.
     let preview: () -> Void
+    /// 스페이스는 미리보기 패널을 열고 닫습니다(Finder와 같음).
+    let togglePreview: () -> Void
     @FocusState private var isFocused: Bool
     /// 격자가 실제로 놓이는 폭입니다. 스크롤 막대가 늘 보이는 설정에서는 그 폭만큼 좁아집니다.
     @State private var gridWidth: CGFloat = 0
@@ -22,17 +28,20 @@ struct CaptureGrid: View {
     private static let margin: CGFloat = 12
     private static let gap: CGFloat = 3
 
+    /// 한 줄의 칸 수입니다. 격자가 놓이는 폭과 간격으로 셉니다.
+    private var columnCount: Int {
+        GridSelection.columns(width: gridWidth, minimum: cellWidth, spacing: Self.gap)
+    }
+
     var body: some View {
-        // 날짜 보기도 달, 날, 날 안의 캡처가 모두 최신순이라 두 보기의 칸 순서가 같습니다. 고르기와 화살표는 이 순서를 씁니다.
-        let ordered = captures.sorted(by: Capture.newestFirst)
-        let order = ordered.map(\.id)
+        let order = captures.map(\.id)
         GeometryReader { viewport in
             ScrollViewReader { scroller in
                 ScrollView {
                     Group {
                         switch viewMode {
-                        case .newest: grid(ordered, order: order)
-                        case .byDate: byDate(ordered, order: order)
+                        case .newest: grid(captures, order: order)
+                        case .byDate: byDate(captures, order: order)
                         }
                     }
                     .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { gridWidth = $0 }
@@ -48,12 +57,12 @@ struct CaptureGrid: View {
                 .focusable()
                 .focusEffectDisabled()
                 .focused($isFocused)
-                .onKeyPress(.leftArrow) { move(.left, in: order, scroller: scroller) }
-                .onKeyPress(.rightArrow) { move(.right, in: order, scroller: scroller) }
-                .onKeyPress(.upArrow) { move(.up, in: order, scroller: scroller) }
-                .onKeyPress(.downArrow) { move(.down, in: order, scroller: scroller) }
+                .onKeyPress(.leftArrow) { move(.left, in: order) }
+                .onKeyPress(.rightArrow) { move(.right, in: order) }
+                .onKeyPress(.upArrow) { move(.up, in: order) }
+                .onKeyPress(.downArrow) { move(.down, in: order) }
                 .onKeyPress(.space) {
-                    preview()
+                    togglePreview()
                     return .handled
                 }
                 .onKeyPress(.escape) {
@@ -65,6 +74,13 @@ struct CaptureGrid: View {
                     #selector(NSResponder.selectAll(_:)),
                     perform: isFocused ? { selection.selectAll(order) } : nil
                 )
+                // 화살표나 미리보기 패널로 옮긴 칸이 화면 밖으로 나가면 따라 스크롤합니다.
+                .onChange(of: selection.anchor) { _, anchor in
+                    if let anchor {
+                        scroller.scrollTo(anchor)
+                    }
+                }
+                .onChange(of: columnCount, initial: true) { columns = columnCount }
             }
         }
     }
@@ -122,17 +138,8 @@ struct CaptureGrid: View {
         }
     }
 
-    /// 한 줄은 격자가 놓이는 폭과 간격으로 센 열 수입니다. 고른 칸이 화면 밖으로 나가면 따라 스크롤합니다.
-    private func move(
-        _ move: GridSelection.Move,
-        in order: [Capture.ID],
-        scroller: ScrollViewProxy
-    ) -> KeyPress.Result {
-        let columns = GridSelection.columns(width: gridWidth, minimum: cellWidth, spacing: Self.gap)
-        selection.move(move, columns: columns, in: order)
-        if let anchor = selection.anchor {
-            scroller.scrollTo(anchor)
-        }
+    private func move(_ move: GridSelection.Move, in order: [Capture.ID]) -> KeyPress.Result {
+        selection.move(move, columns: columnCount, in: order)
         return .handled
     }
 

@@ -48,6 +48,23 @@ struct CaptureQueryTests {
             == ["a.jpg", "b.jpg"])
     }
 
+    /// 고르기, 화살표, 미리보기 패널이 이 순서로 움직이므로, 날짜 보기에서 화면에 놓이는 순서와 같아야 합니다.
+    @Test func `보일 캡처는 날짜 보기에 놓이는 칸 순서와 같다`() {
+        let captures = [
+            captureFixture("a.jpg", at: "2026-10-31 23:00:00"),
+            captureFixture("b.jpg", at: nil),
+            captureFixture("c.jpg", at: "2026-11-01 09:00:00"),
+            captureFixture("e.jpg", at: "2026-11-01 08:00:00"),
+            captureFixture("d.jpg", at: "2026-11-01 08:00:00"),
+        ]
+        let shown = CaptureQuery(scope: .all, kind: .all)
+            .captures(in: captures, index: LedgerIndex(), serialNumber: "S1", now: .now)
+        let sections = DateSections(captures, calendar: calendarFixture())
+        let screen = sections.months.flatMap { $0.days.flatMap(\.captures) } + sections.undated
+        #expect(shown.map(\.filename) == ["c.jpg", "d.jpg", "e.jpg", "a.jpg", "b.jpg"])
+        #expect(screen.map(\.filename) == shown.map(\.filename))
+    }
+
     @Test func `필터가 모두일 때 동영상 범위는 동영상을 보인다고 한다`() {
         #expect(CaptureQuery(scope: .videos, kind: .all).shownKind == .videos)
         #expect(CaptureQuery(scope: .new, kind: .all).shownKind == .all)

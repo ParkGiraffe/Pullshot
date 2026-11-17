@@ -58,6 +58,26 @@ struct GridSelectionTests {
         #expect(selection.anchor == nil)
     }
 
+    @Test func `미리보기는 기준 캡처를 먼저 받고 다음과 앞 캡처를 받아 둔다`() {
+        var selection = GridSelection()
+        selection.click("c", .only, in: order)
+        #expect(selection.previewTargets(in: order) == ["c", "d", "b"])
+    }
+
+    @Test func `끝에 있는 기준 캡처는 한쪽 이웃만 받아 둔다`() {
+        var selection = GridSelection()
+        selection.click("a", .only, in: order)
+        #expect(selection.previewTargets(in: order) == ["a", "b"])
+        selection.click("e", .only, in: order)
+        #expect(selection.previewTargets(in: order) == ["e", "d"])
+    }
+
+    @Test func `기준 캡처가 보이지 않으면 미리보기로 받을 것이 없다`() {
+        var selection = GridSelection()
+        selection.click("e", .only, in: order)
+        #expect(selection.previewTargets(in: ["a", "b"]).isEmpty)
+    }
+
     @Test func `열 수는 칸 최소 폭과 간격으로 정한다`() {
         #expect(GridSelection.columns(width: 900, minimum: 180, spacing: 3) == 4)
         #expect(GridSelection.columns(width: 100, minimum: 180, spacing: 3) == 1)

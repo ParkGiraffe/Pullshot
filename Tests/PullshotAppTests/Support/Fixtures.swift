@@ -42,6 +42,13 @@ func dateFixture(_ text: String) -> Date {
     return date
 }
 
+/// 그레고리력, 서울 시간대입니다. 날짜 묶기가 실행하는 곳의 시간대에 기대지 않게 합니다.
+func calendarFixture() -> Calendar {
+    var calendar = Calendar(identifier: .gregorian)
+    calendar.timeZone = TimeZone(identifier: "Asia/Seoul") ?? .gmt
+    return calendar
+}
+
 /// 훑기를 거친 캡처입니다. 찍은 시각은 서울 시각 글로 받습니다.
 func captureFixture(
     _ filename: String = "2026111421120500_s.jpg",

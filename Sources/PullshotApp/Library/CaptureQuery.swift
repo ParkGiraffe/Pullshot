@@ -37,7 +37,8 @@ struct CaptureQuery: Hashable {
         kind == .all && scope == .videos ? .videos : kind
     }
 
-    /// 입력 순서를 지킵니다.
+    /// 격자에 놓이는 순서(최신순)로 돌려줍니다. 날짜 보기도 달, 날, 날 안의 캡처가 모두 최신순이라 칸이 같은 순서로
+    /// 놓이므로, 고르기, 화살표, 미리보기 패널이 이 순서를 씁니다.
     func captures(in captures: [Capture], index: LedgerIndex, serialNumber: String, now: Date) -> [Capture] {
         let inScope = switch scope {
         case .all:
@@ -55,11 +56,12 @@ struct CaptureQuery: Hashable {
         case let .game(name):
             captures.filter { $0.gameName == name }
         }
-        return switch kind {
+        let shown = switch kind {
         case .all: inScope
         case .photos: inScope.filter { $0.kind == .photo }
         case .videos: inScope.filter { $0.kind == .video }
         }
+        return shown.sorted(by: Capture.newestFirst)
     }
 
     /// 보일 캡처가 없을 때 그 까닭입니다. 필터를 빼도 비었으면 사이드바에서 고른 범위 때문이고, 아니면 필터 때문입니다.
