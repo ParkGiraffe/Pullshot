@@ -115,7 +115,9 @@ struct LibraryWindow: View {
             } preview: {
                 model.preview()
             }
-            .id(model.scope)
+            // 범위나 필터가 바뀌면 처음부터 보입니다. 스크롤 위치가 남으면 짧아진 격자 밖을 가리켜 빈 화면이 됩니다.
+            // 보기 방식은 같은 캡처를 다르게 놓을 뿐이라 위치를 둡니다.
+            .id(model.query)
         }
     }
 
