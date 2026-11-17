@@ -30,6 +30,11 @@ final class AppSettings {
         didSet { defaults.set(isVerboseLog, forKey: SettingsKey.isVerboseLog.rawValue) }
     }
 
+    /// Dock에 보일 앱 아이콘입니다. 앱을 열 때(`AppDelegate`)와 설정 창에서 고를 때 Dock에 반영합니다.
+    var appIcon: AppIcon {
+        didSet { defaults.set(appIcon.rawValue, forKey: SettingsKey.appIcon.rawValue) }
+    }
+
     @ObservationIgnored private let defaults: UserDefaults
 
     init(defaults: UserDefaults = .standard) {
@@ -44,5 +49,6 @@ final class AppSettings {
         exportNaming = defaults.string(forKey: SettingsKey.exportNaming.rawValue)
             .flatMap(ExportNaming.init) ?? .original
         isVerboseLog = defaults.bool(forKey: SettingsKey.isVerboseLog.rawValue)
+        appIcon = defaults.string(forKey: SettingsKey.appIcon.rawValue).flatMap(AppIcon.init) ?? .red
     }
 }

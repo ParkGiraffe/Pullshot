@@ -55,6 +55,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// 옮긴 기록을 열지 못하면 nil이고, 그때는 기기를 열지 않습니다.
     private(set) lazy var model = Self.makeModel(ledgerDirectory: ledgerDirectory, settings: settings)
 
+    /// Dock은 번들 기본 아이콘으로 앱을 열므로, 설정에서 고른 아이콘으로 바꿉니다.
+    func applicationDidFinishLaunching(_: Notification) {
+        settings.appIcon.showInDock()
+    }
+
     func applicationShouldTerminateAfterLastWindowClosed(_: NSApplication) -> Bool {
         true
     }

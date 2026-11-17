@@ -8,5 +8,6 @@ enum SettingsKey: String {
     case thumbnailSize
     case viewMode
     case isVerboseLog
+    case appIcon
     case demoAlbum
 }

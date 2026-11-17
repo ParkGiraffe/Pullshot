@@ -81,6 +81,11 @@
 "바꾸기…" = "Change…";
 "자세한 로그 남기기" = "Detailed logging";
 "스위치와 주고받은 내용을 로그 파일에 한 줄씩 남깁니다. 문제를 알릴 때만 켜 주세요." = "Writes each exchange with the Switch to the log file, one line at a time. Turn this on only when reporting a problem.";
+"앱 아이콘" = "App Icon";
+"앱이 열려 있는 동안 Dock에 보이는 아이콘만 바뀌고, Finder에 보이는 앱 아이콘은 그대로입니다." = "Changes only the icon shown in the Dock while the app is open. The app icon in Finder stays the same.";
+"빨강" = "Red";
+"보라" = "Purple";
+"셔터 프레임" = "Shutter Frame";
 "저장 %lld개" = "Saved: %lld";
 "건너뜀 %lld개" = "Skipped: %lld";
 "실패 %lld개" = "Failed: %lld";

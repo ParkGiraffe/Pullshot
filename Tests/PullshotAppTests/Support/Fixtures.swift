@@ -7,13 +7,15 @@ enum StringsTableError: Error {
     case unreadable(String)
 }
 
-/// 리포 뿌리의 `App` 폴더입니다. 테스트 파일 위치에서 찾습니다.
-private let appFolder = URL(filePath: #filePath)
+/// 리포 뿌리입니다. 테스트 파일 위치에서 찾습니다.
+private let repositoryFolder = URL(filePath: #filePath)
     .deletingLastPathComponent()
     .deletingLastPathComponent()
     .deletingLastPathComponent()
     .deletingLastPathComponent()
-    .appending(path: "App")
+private let appFolder = repositoryFolder.appending(path: "App")
+/// 앱 아이콘 그림이 있는 폴더입니다. `make app`이 여기 그림으로 `.icns`를 만듭니다.
+let appIconDesignFolder = repositoryFolder.appending(path: "design/app-icon")
 
 func stringsTable(_ language: String, table: String = "Localizable") throws -> [String: String] {
     let data = try Data(contentsOf: appFolder.appending(path: "\(language).lproj/\(table).strings"))
