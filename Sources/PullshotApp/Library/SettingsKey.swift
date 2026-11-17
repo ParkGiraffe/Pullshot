@@ -2,7 +2,6 @@
 enum SettingsKey: String {
     case ledgerFolder
     case importFolder
-    case exportFolder
     case makesGameFolder
     case exportNaming
     case thumbnailSize

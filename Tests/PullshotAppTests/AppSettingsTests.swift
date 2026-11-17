@@ -17,7 +17,6 @@ struct AppSettingsTests {
     @Test func `고른 적 없는 설정은 기본값으로 읽는다`() {
         let settings = AppSettings(defaults: defaults)
         #expect(settings.importFolder == TransferItem.defaultImportFolder)
-        #expect(settings.exportFolder == nil)
         #expect(settings.makesGameFolder)
         #expect(settings.exportNaming == .original)
         #expect(settings.isVerboseLog == false)
@@ -38,7 +37,6 @@ struct AppSettingsTests {
     @Test func `바꾼 설정은 다시 읽어도 남는다`() {
         let settings = AppSettings(defaults: defaults)
         settings.importFolder = URL(filePath: "/tmp/스위치")
-        settings.exportFolder = URL(filePath: "/tmp/블로그")
         settings.makesGameFolder = false
         settings.exportNaming = .numbered
         settings.isVerboseLog = true
@@ -46,7 +44,6 @@ struct AppSettingsTests {
 
         let reread = AppSettings(defaults: defaults)
         #expect(reread.importFolder == URL(filePath: "/tmp/스위치"))
-        #expect(reread.exportFolder == URL(filePath: "/tmp/블로그"))
         #expect(reread.makesGameFolder == false)
         #expect(reread.exportNaming == .numbered)
         #expect(reread.isVerboseLog)

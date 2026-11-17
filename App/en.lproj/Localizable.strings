@@ -55,15 +55,13 @@
 "항목" = "Items";
 "크기" = "Size";
 "%lld개" = "%lld";
-"가져올 곳" = "Import to";
+"저장 위치" = "Save Location";
 "새 항목 %lld개 가져오기" = "Import New Items (%lld)";
 "게임 전체 내보내기" = "Export Entire Game";
 "모두 내보내기" = "Export All";
 "%lld개 고름" = "Selected: %lld";
 "고른 항목" = "Selection";
 "찍은 때" = "Captured";
-"내보낼 곳" = "Export to";
-"고르기…" = "Choose…";
 "게임 이름 폴더 만들기" = "Create a folder for each game";
 "파일 이름" = "File names";
 "원래 이름 그대로" = "Keep original names";

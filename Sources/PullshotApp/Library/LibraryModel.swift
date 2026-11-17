@@ -30,7 +30,7 @@ final class LibraryModel {
     /// 가져오기나 내보내기 한 번입니다. 끝난 뒤에도 사용자가 닫거나 다른 것을 고를 때까지 결과를 남겨 둡니다.
     struct TransferRun {
         var kind: TransferKind
-        /// 가져올 곳이나 내보낼 기준 폴더입니다.
+        /// 시작할 때의 저장 위치입니다.
         var folder: URL
         var progress: TransferProgress?
         var summary: TransferSummary?
@@ -308,16 +308,18 @@ final class LibraryModel {
 
 /// 가져오기와 내보내기입니다. 옮기는 동안 기기가 빠져도 결과를 남겨 안내 화면에 보입니다.
 extension LibraryModel {
-    /// 가져올 곳입니다. 설정에서 고르지 않았으면 `~/Pictures/Pullshot`입니다.
+    /// 저장 위치입니다. 설정에서 고르지 않았으면 `~/Pictures/Pullshot`입니다.
     var importFolder: URL {
         settings.importFolder
     }
 
-    /// 내보낼 기준 폴더와 규칙입니다. 기준 폴더를 고르기 전에는 nil입니다.
-    var exportOptions: ExportOptions? {
-        settings.exportFolder.map {
-            ExportOptions(baseFolder: $0, makesGameFolder: settings.makesGameFolder, naming: settings.exportNaming)
-        }
+    /// 저장 위치와, 내보낼 때 게임 이름 폴더를 만들지와 파일 이름 규칙입니다.
+    var exportOptions: ExportOptions {
+        ExportOptions(
+            baseFolder: importFolder,
+            makesGameFolder: settings.makesGameFolder,
+            naming: settings.exportNaming
+        )
     }
 
     /// 옮기는 동안은 가져오기, 내보내기, 기기 전환을 끕니다.
@@ -325,21 +327,16 @@ extension LibraryModel {
         transferRun.map { !$0.isFinished } ?? false
     }
 
-    /// 보이는 캡처 가운데 새 항목을 가져올 곳에 가져옵니다.
+    /// 보이는 캡처 가운데 새 항목을 저장 위치에 가져옵니다.
     func importNew() {
         guard let serialNumber else { return }
         let captures = index.newCaptures(visibleCaptures, serialNumber: serialNumber)
-        transfer(TransferItem.imports(captures, into: importFolder), as: .imported, folder: importFolder)
+        transfer(TransferItem.imports(captures, into: importFolder), as: .imported)
     }
 
-    /// 고른 캡처를 기준 폴더로 내보냅니다. 기준 폴더를 고르기 전에는 하지 않습니다.
+    /// 고른 캡처를 저장 위치로 내보냅니다.
     func export() {
-        guard let exportOptions else { return }
-        transfer(
-            TransferItem.exports(selectedCaptures, options: exportOptions),
-            as: .exported,
-            folder: exportOptions.baseFolder
-        )
+        transfer(TransferItem.exports(selectedCaptures, options: exportOptions), as: .exported)
     }
 
     /// Kit이 받던 파일의 남은 데이터를 끝까지 읽어 버리고 멈춥니다. 결과에 취소했다고 남습니다.
@@ -352,7 +349,7 @@ extension LibraryModel {
         transferRun = nil
     }
 
-    /// 저장한 파일이 한 폴더에 있으면 그 파일들을, 여러 폴더에 있거나 저장한 파일이 없으면 기준 폴더를 Finder에서 보입니다.
+    /// 저장한 파일이 한 폴더에 있으면 그 파일들을, 여러 폴더에 있거나 저장한 파일이 없으면 저장 위치를 Finder에서 보입니다.
     func revealInFinder() {
         guard let run = transferRun else { return }
         let saved = run.summary?.saved ?? []
@@ -361,10 +358,10 @@ extension LibraryModel {
     }
 
     /// 옮기기를 시작합니다. 끝나면 결과와 옮긴 기록 색인을 맞춥니다.
-    private func transfer(_ items: [TransferItem], as kind: TransferKind, folder: URL) {
+    private func transfer(_ items: [TransferItem], as kind: TransferKind) {
         guard !isShuttingDown, !isTransferring else { return }
         stopPreview()
-        transferRun = TransferRun(kind: kind, folder: folder)
+        transferRun = TransferRun(kind: kind, folder: importFolder)
         transferTask = Task {
             do {
                 let summary = try await worker.transfer(items, as: kind) { progress in

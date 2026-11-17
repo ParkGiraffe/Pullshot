@@ -68,7 +68,6 @@ struct LibraryModelTests {
 @MainActor
 private func finishedTransferModelFixture() async throws -> LibraryModel {
     let model = try libraryModelFixture()
-    model.settings.exportFolder = temporaryFolderFixture()
     model.export()
     while model.isTransferring {
         try await Task.sleep(for: .milliseconds(10))

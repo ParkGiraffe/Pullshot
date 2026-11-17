@@ -1,13 +1,13 @@
 import SwiftUI
 
-/// 설정 창입니다. 가져올 곳, 앱 아이콘, 자세한 로그를 둡니다. 자세한 로그는 다음 연결부터 씁니다.
+/// 설정 창입니다. 저장 위치, 앱 아이콘, 자세한 로그를 둡니다. 자세한 로그는 다음 연결부터 씁니다.
 struct SettingsView: View {
     @Bindable var settings: AppSettings
     @State private var isChoosingImportFolder = false
 
     var body: some View {
         Form {
-            LabeledContent("가져올 곳") {
+            LabeledContent("저장 위치") {
                 HStack {
                     Text(verbatim: settings.importFolder.abbreviatedPath)
                         .lineLimit(1)

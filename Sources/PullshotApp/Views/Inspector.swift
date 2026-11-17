@@ -2,14 +2,12 @@ import PullshotKit
 import SwiftUI
 
 /// 오른쪽 칸입니다. 고른 것이 없으면 보는 범위의 정보와 가져오기, 고르면 고른 캡처의 정보와 내보내기 설정을 둡니다.
+/// 저장 위치는 두 상태가 같은 설정을 씁니다.
 struct Inspector: View {
     let model: LibraryModel
     /// 격자에 보이는 캡처입니다.
     let captures: [Capture]
     @State private var isChoosingImportFolder = false
-    @State private var isChoosingExportFolder = false
-    /// 기준 폴더 없이 내보내기를 눌러 폴더를 고르면, 고른 직후 내보냅니다.
-    @State private var shouldExportAfterChoosingFolder = false
 
     var body: some View {
         let selected = model.selectedCaptures
@@ -43,14 +41,7 @@ struct Inspector: View {
             row("새 항목", Text("\(newCount)개"))
         }
         Divider()
-        folderButton("가져올 곳", path: Text(verbatim: importFolder.abbreviatedPath)) {
-            isChoosingImportFolder = true
-        }
-        .fileImporter(isPresented: $isChoosingImportFolder, allowedContentTypes: [.folder]) { result in
-            if case let .success(folder) = result {
-                model.settings.importFolder = folder
-            }
-        }
+        importFolderButton
         if let run = model.transferRun {
             TransferPanel(run: run, model: model)
         } else {
@@ -80,21 +71,9 @@ struct Inspector: View {
         }
     }
 
-    /// 게임을 보면 그 게임 폴더까지 보입니다. 다른 범위는 게임마다 폴더가 갈리므로 기준 폴더만 보입니다.
-    private var importFolder: URL {
-        guard case let .game(name) = model.scope else { return model.importFolder }
-        return model.importFolder.appending(path: name)
-    }
-
     @ViewBuilder private func selectionInfo(_ selected: [Capture]) -> some View {
         @Bindable var settings = model.settings
         let summary = CaptureSummary(selected)
-        // 미리보기는 기준 폴더 이름을 보이지 않으므로, 기준 폴더를 고르기 전에도 아무 폴더로 만들어 봅니다.
-        let options = ExportOptions(
-            baseFolder: .temporaryDirectory,
-            makesGameFolder: settings.makesGameFolder,
-            naming: settings.exportNaming
-        )
         stack(Array(selected.prefix(3)))
         field(Text("\(selected.count)개 고름"))
         properties("고른 항목") {
@@ -106,27 +85,14 @@ struct Inspector: View {
             }
         }
         Divider()
-        folderButton(
-            "내보낼 곳",
-            path: settings.exportFolder.map { Text(verbatim: $0.abbreviatedPath) } ?? Text("고르기…")
-        ) {
-            shouldExportAfterChoosingFolder = false
-            isChoosingExportFolder = true
-        }
-        .fileImporter(isPresented: $isChoosingExportFolder, allowedContentTypes: [.folder]) { result in
-            if case let .success(folder) = result {
-                settings.exportFolder = folder
-                if shouldExportAfterChoosingFolder {
-                    model.export()
-                }
-            }
-        }
+        importFolderButton
         Toggle("게임 이름 폴더 만들기", isOn: $settings.makesGameFolder)
         Picker("파일 이름", selection: $settings.exportNaming) {
             Text("원래 이름 그대로").tag(ExportNaming.original)
             Text("찍은 순서대로 번호 붙이기").tag(ExportNaming.numbered)
         }
-        Text(verbatim: ExportPreview.lines(TransferItem.exports(selected, options: options)).joined(separator: "\n"))
+        let filenames = ExportPreview.lines(TransferItem.exports(selected, options: model.exportOptions))
+        Text(verbatim: filenames.joined(separator: "\n"))
             .font(.caption.monospaced())
             .foregroundStyle(.secondary)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -137,12 +103,7 @@ struct Inspector: View {
             TransferPanel(run: run, model: model)
         } else {
             Button {
-                if model.exportOptions == nil {
-                    shouldExportAfterChoosingFolder = true
-                    isChoosingExportFolder = true
-                } else {
-                    model.export()
-                }
+                model.export()
             } label: {
                 Label("내보내기", systemImage: "square.and.arrow.up")
                     .frame(maxWidth: .infinity)
@@ -150,6 +111,37 @@ struct Inspector: View {
             .buttonStyle(.borderedProminent)
             .controlSize(.large)
             .disabled(model.isDemo)
+        }
+    }
+
+    /// 저장 위치입니다. 누르면 폴더를 골라 바로 바꿉니다.
+    private var importFolderButton: some View {
+        Button {
+            isChoosingImportFolder = true
+        } label: {
+            HStack {
+                VStack(alignment: .leading, spacing: 1) {
+                    Text("저장 위치")
+                        .font(.caption2)
+                        .foregroundStyle(.tertiary)
+                    Text(verbatim: model.importFolder.abbreviatedPath)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+                }
+                Spacer(minLength: 0)
+                Image(systemName: "folder")
+                    .foregroundStyle(.secondary)
+            }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .background(.quaternary, in: .rect(cornerRadius: 8))
+            .contentShape(.rect)
+        }
+        .buttonStyle(.plain)
+        .fileImporter(isPresented: $isChoosingImportFolder, allowedContentTypes: [.folder]) { result in
+            if case let .success(folder) = result {
+                model.settings.importFolder = folder
+            }
         }
     }
 
@@ -211,29 +203,6 @@ struct Inspector: View {
     /// 크기를 아는 캡처만 더한 값을 1000 단위로 씁니다.
     private func size(_ summary: CaptureSummary) -> Text {
         Text(verbatim: ByteCountFormatter.string(fromByteCount: Int64(summary.totalSize), countStyle: .decimal))
-    }
-
-    private func folderButton(_ title: LocalizedStringKey, path: Text, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            HStack {
-                VStack(alignment: .leading, spacing: 1) {
-                    Text(title)
-                        .font(.caption2)
-                        .foregroundStyle(.tertiary)
-                    path
-                        .lineLimit(1)
-                        .truncationMode(.middle)
-                }
-                Spacer(minLength: 0)
-                Image(systemName: "folder")
-                    .foregroundStyle(.secondary)
-            }
-            .padding(.horizontal, 10)
-            .padding(.vertical, 6)
-            .background(.quaternary, in: .rect(cornerRadius: 8))
-            .contentShape(.rect)
-        }
-        .buttonStyle(.plain)
     }
 }
 
