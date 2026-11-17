@@ -257,13 +257,9 @@ final class LibraryModel {
 }
 
 extension LibraryModel {
-    var importFolder: URL {
-        settings.importFolder
-    }
-
     var importOptions: ExportOptions {
         ExportOptions(
-            baseFolder: importFolder,
+            baseFolder: settings.importFolder,
             makesGameFolder: settings.makesGameFolder,
             naming: settings.exportNaming
         )
@@ -308,7 +304,7 @@ extension LibraryModel {
         guard !isShuttingDown, !isTransferring else { return }
         let items = importItems(target)
         stopPreview()
-        transferRun = TransferRun(folder: importFolder)
+        transferRun = TransferRun(folder: settings.importFolder)
         transferTask = Task {
             do {
                 let summary = try await worker.transfer(items, as: target.kind) { progress in

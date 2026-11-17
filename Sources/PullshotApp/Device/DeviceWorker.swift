@@ -31,7 +31,7 @@ actor DeviceWorker {
     func open(_ console: AttachedConsole, isVerbose: Bool) throws -> DeviceInfo {
         close()
         let trace: ((String) -> Void)? = isVerbose ? { [log] in log.write($0) } : nil
-        let transport = try openTransport(console, trace: trace)
+        let transport = try HostTransport.open(console, trace: trace, waitingUpTo: 5, isCancelled: { Task.isCancelled })
         let session = Session(transport: transport, trace: trace)
         let info: DeviceInfo
         do {
@@ -126,17 +126,5 @@ actor DeviceWorker {
     private func requireSession() throws -> Session {
         guard let session else { throw SessionError.invalidated }
         return session
-    }
-
-    private func openTransport(_ console: AttachedConsole, trace: ((String) -> Void)?) throws -> HostTransport {
-        let deadline = Date().addingTimeInterval(5)
-        while true {
-            try Task.checkCancellation()
-            do {
-                return try HostTransport(console: console, trace: trace)
-            } catch ConsoleAccessError.noStillImageInterface where Date() < deadline {
-                Thread.sleep(forTimeInterval: 0.5)
-            }
-        }
     }
 }

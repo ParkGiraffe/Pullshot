@@ -24,7 +24,7 @@ enum ListFormatter {
         }
 
         return Game.games(in: scan.captures).flatMap { game in
-            ["\(game.isOther ? "기타" : game.name) (\(game.captures.count))"] + game.captures.map(line)
+            ["\(game.name) (\(game.captures.count))"] + game.captures.map(line)
         }
     }
 

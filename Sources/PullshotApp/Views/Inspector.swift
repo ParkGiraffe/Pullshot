@@ -113,7 +113,7 @@ struct Inspector: View {
                     Text("저장 위치")
                         .font(.caption2)
                         .foregroundStyle(.tertiary)
-                    Text(verbatim: model.importFolder.abbreviatedPath)
+                    Text(verbatim: model.settings.importFolder.abbreviatedPath)
                         .lineLimit(1)
                         .truncationMode(.middle)
                 }
@@ -178,14 +178,10 @@ struct Inspector: View {
 
     private func row(_ title: LocalizedStringKey, _ value: Text) -> some View {
         GridRow {
-            label(title)
+            Text(title)
+                .foregroundStyle(.secondary)
             value
         }
-    }
-
-    private func label(_ title: LocalizedStringKey) -> some View {
-        Text(title)
-            .foregroundStyle(.secondary)
     }
 
     private func size(_ summary: CaptureSummary) -> Text {

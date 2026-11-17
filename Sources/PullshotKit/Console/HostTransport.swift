@@ -157,6 +157,25 @@ public final class HostTransport: Transport {
     }
 }
 
+public extension HostTransport {
+    static func open(
+        _ console: AttachedConsole,
+        trace: ((String) -> Void)?,
+        waitingUpTo wait: TimeInterval,
+        isCancelled: () -> Bool
+    ) throws -> HostTransport {
+        let deadline = Date().addingTimeInterval(wait)
+        while true {
+            guard !isCancelled() else { throw SessionError.cancelled }
+            do {
+                return try HostTransport(console: console, trace: trace)
+            } catch ConsoleAccessError.noStillImageInterface where Date() < deadline {
+                Thread.sleep(forTimeInterval: 0.5)
+            }
+        }
+    }
+}
+
 extension TransportError {
     init(ioReturn: Int) {
         let code = UInt32(truncatingIfNeeded: ioReturn)

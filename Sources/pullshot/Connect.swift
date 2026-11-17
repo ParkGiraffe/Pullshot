@@ -24,7 +24,12 @@ struct Connection {
             if console.model.isExperimental, attempt == 1 {
                 Terminal.error("\(console.model.name) 지원은 실험 단계입니다. 문제가 있으면 --verbose 출력과 함께 GitHub 이슈로 알려 주세요.")
             }
-            let host = try openTransport(console, trace: trace, isReattached: attempt > 1)
+            let host = try HostTransport.open(
+                console,
+                trace: trace,
+                waitingUpTo: attempt > 1 ? 5 : 0,
+                isCancelled: { Terminal.isInterrupted }
+            )
             let transport: Transport = try record.map { try RecordingTransport(wrapping: host, to: $0) } ?? host
             let session = Session(transport: transport, trace: trace)
             do {
@@ -45,21 +50,6 @@ struct Connection {
 
     func scanAlbum() throws -> AlbumScan {
         try AlbumScanner(source: session).scan(isCancelled: { Terminal.isInterrupted })
-    }
-
-    private static func openTransport(
-        _ console: AttachedConsole,
-        trace: ((String) -> Void)?,
-        isReattached: Bool
-    ) throws -> HostTransport {
-        let deadline = Date().addingTimeInterval(isReattached ? 5 : 0)
-        while true {
-            do {
-                return try HostTransport(console: console, trace: trace)
-            } catch ConsoleAccessError.noStillImageInterface where Date() < deadline {
-                Thread.sleep(forTimeInterval: 0.5)
-            }
-        }
     }
 
     private static func waitForReattach() throws {
