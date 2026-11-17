@@ -154,10 +154,12 @@ final class LibraryModel {
         firstConnectErrorMessage = nil
         firstConnectTask = Task {
             do {
-                firstConnectRecordedCount = try await worker.answerFirstConnectQuestion(answer, captures: captures)
+                let recordedCount = try await worker.answerFirstConnectQuestion(answer, captures: captures)
+                guard !Task.isCancelled else { return }
+                firstConnectRecordedCount = recordedCount
                 index = await worker.index
-            } catch is CancellationError {
             } catch {
+                guard !Task.isCancelled else { return }
                 worker.log.write("처음 연결 질문에 답하지 못함: \(FileLog.describe(error))")
                 firstConnectErrorMessage = AppErrorMessages.message(for: error)
             }
@@ -167,6 +169,7 @@ final class LibraryModel {
 
     func cancelFirstConnectAnswer() {
         firstConnectTask?.cancel()
+        firstConnectTask = nil
     }
 
     func retry() {
@@ -204,7 +207,7 @@ final class LibraryModel {
 
     private func leaveConsole() {
         deviceTask?.cancel()
-        firstConnectTask?.cancel()
+        cancelFirstConnectAnswer()
         stopPreview()
         previewOriginals = [:]
         previewThumbnails = [:]
