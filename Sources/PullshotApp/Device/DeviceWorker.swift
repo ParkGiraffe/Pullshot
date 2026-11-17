@@ -114,14 +114,19 @@ actor DeviceWorker {
         let session = try requireSession()
         let folder = Self.previewFolder.appending(path: capture.gameName)
         let file = folder.appending(path: capture.filename)
-        let attributes = try? FileManager.default.attributesOfItem(atPath: file.path(percentEncoded: false))
-        if let size = capture.size, (attributes?[.size] as? NSNumber)?.uint64Value == size {
+        if Self.hasPreview(of: capture, at: file) {
             return file
         }
         try? FileManager.default.removeItem(at: file)
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
         try session.download(capture.handle, expectedSize: capture.size, to: file, isCancelled: { Task.isCancelled })
         return file
+    }
+
+    /// 그 캡처의 미리보기 원본이 그 자리에 다 받아져 있는지입니다. 크기를 모르는 캡처는 다 받았는지 알 수 없어 거짓입니다.
+    static func hasPreview(of capture: Capture, at file: URL) -> Bool {
+        let attributes = try? FileManager.default.attributesOfItem(atPath: file.path(percentEncoded: false))
+        return capture.size != nil && (attributes?[.size] as? NSNumber)?.uint64Value == capture.size
     }
 
     /// 세션을 닫고 인터페이스를 놓습니다. 기기에 세션이 남으면 다음 연결이 USB 장치 리셋까지 갑니다.

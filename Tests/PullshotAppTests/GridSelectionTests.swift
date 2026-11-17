@@ -1,3 +1,4 @@
+import PullshotKit
 import Testing
 @testable import PullshotApp
 
@@ -58,28 +59,44 @@ struct GridSelectionTests {
         #expect(selection.anchor == nil)
     }
 
-    @Test func `미리보기는 기준 캡처를 먼저 받고 다음과 앞 캡처를 받아 둔다`() {
-        var selection = GridSelection()
-        selection.click("c", .only, in: order)
-        #expect(selection.previewTargets(in: order) == ["c", "d", "b"])
+    @Test func `미리보기는 기준 캡처를 먼저 받고 다음과 앞 사진을 받아 둔다`() {
+        let captures = capturesFixture(["a.jpg", "b.jpg", "c.jpg", "d.jpg", "e.jpg"])
+        #expect(previewTargets(anchor: "c.jpg", in: captures) == ["c.jpg", "d.jpg", "b.jpg"])
     }
 
     @Test func `끝에 있는 기준 캡처는 한쪽 이웃만 받아 둔다`() {
-        var selection = GridSelection()
-        selection.click("a", .only, in: order)
-        #expect(selection.previewTargets(in: order) == ["a", "b"])
-        selection.click("e", .only, in: order)
-        #expect(selection.previewTargets(in: order) == ["e", "d"])
+        let captures = capturesFixture(["a.jpg", "b.jpg", "c.jpg"])
+        #expect(previewTargets(anchor: "a.jpg", in: captures) == ["a.jpg", "b.jpg"])
+        #expect(previewTargets(anchor: "c.jpg", in: captures) == ["c.jpg", "b.jpg"])
+    }
+
+    @Test func `동영상 이웃은 받아 두지 않고 기준 캡처는 동영상도 받는다`() {
+        let captures = capturesFixture(["a.mp4", "b.mp4", "c.jpg"])
+        #expect(previewTargets(anchor: "b.mp4", in: captures) == ["b.mp4", "c.jpg"])
     }
 
     @Test func `기준 캡처가 보이지 않으면 미리보기로 받을 것이 없다`() {
+        let captures = capturesFixture(["a.jpg", "b.jpg", "c.jpg"])
         var selection = GridSelection()
-        selection.click("e", .only, in: order)
-        #expect(selection.previewTargets(in: ["a", "b"]).isEmpty)
+        selection.click(captures[2].id, .only, in: captures.map(\.id))
+        #expect(selection.previewTargets(in: Array(captures.prefix(2))).isEmpty)
     }
 
     @Test func `열 수는 칸 최소 폭과 간격으로 정한다`() {
         #expect(GridSelection.columns(width: 900, minimum: 180, spacing: 3) == 4)
         #expect(GridSelection.columns(width: 100, minimum: 180, spacing: 3) == 1)
     }
+}
+
+/// 파일 이름으로 만든 캡처입니다. `.mp4`로 끝나면 동영상입니다.
+private func capturesFixture(_ filenames: [String]) -> [Capture] {
+    filenames.map { captureFixture($0, kind: $0.hasSuffix(".mp4") ? .video : .photo) }
+}
+
+/// `anchor`를 그냥 눌러 고른 뒤 미리보기로 받을 캡처의 파일 이름입니다.
+private func previewTargets(anchor: String, in captures: [Capture]) -> [String] {
+    var selection = GridSelection()
+    let anchorID = captures.first { $0.filename == anchor }?.id ?? ""
+    selection.click(anchorID, .only, in: captures.map(\.id))
+    return selection.previewTargets(in: captures).map(\.filename)
 }

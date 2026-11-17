@@ -75,11 +75,13 @@ struct GridSelection: Equatable {
         }
     }
 
-    /// 미리보기가 받아 둘 캡처입니다. 기준 캡처를 먼저 받고, 넘길 때 바로 보이도록 다음과 앞 캡처를 받습니다.
-    /// 기준이 없거나 보이는 순서에 없으면 비어 있습니다.
-    func previewTargets(in order: [Capture.ID]) -> [Capture.ID] {
-        guard let anchor, let current = order.firstIndex(of: anchor) else { return [] }
-        return [current, current + 1, current - 1].filter(order.indices.contains).map { order[$0] }
+    /// 미리보기가 받을 캡처입니다. 기준 캡처가 먼저이고, 넘길 때 바로 보이도록 다음과 앞의 사진을 받아 둡니다.
+    /// 동영상은 받아 두지 않습니다. Kit은 받기 시작한 파일을 중간에 끊지 못해, 큰 동영상을 받는 동안 옮겨 간 기준
+    /// 캡처가 그만큼 늦게 뜨기 때문입니다. 기준이 없거나 보이는 순서에 없으면 비어 있습니다.
+    func previewTargets(in order: [Capture]) -> [Capture] {
+        guard let anchor, let current = order.firstIndex(where: { $0.id == anchor }) else { return [] }
+        let neighbors = [current + 1, current - 1].filter { order.indices.contains($0) && order[$0].kind == .photo }
+        return ([current] + neighbors).map { order[$0] }
     }
 
     /// `LazyVGrid`의 `.adaptive(minimum:)`이 놓는 열 수와 같은 식입니다.

@@ -52,7 +52,7 @@ struct LibraryWindow: View {
                         }
                         ToolbarItem {
                             Menu {
-                                Picker("필터", selection: $model.kind) {
+                                Picker("필터", selection: Binding(get: { model.kind }, set: { model.filter($0) })) {
                                     Text("사진과 동영상").tag(KindFilter.all)
                                     Text("사진").tag(KindFilter.photos)
                                     Text("동영상").tag(KindFilter.videos)

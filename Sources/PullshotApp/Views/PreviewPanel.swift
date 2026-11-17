@@ -52,9 +52,12 @@ final class PreviewPanelController: NSResponder {
         }
     }
 
-    override nonisolated func endPreviewPanelControl(_: QLPreviewPanel!) {
+    /// 패널은 앱에 하나뿐이라, 맡기를 끝내면 데이터 소스와 델리게이트를 비워 다음에 패널을 맡는 쪽이 이 컨트롤러에 묻지 않게 합니다.
+    override nonisolated func endPreviewPanelControl(_ panel: QLPreviewPanel!) {
         MainActor.assumeIsolated {
-            panel = nil
+            panel.dataSource = nil
+            panel.delegate = nil
+            self.panel = nil
             model?.previewClosed()
         }
     }

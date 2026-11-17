@@ -60,7 +60,7 @@ final class LibraryModel {
     /// 옮기는 중이거나 사용자가 닫지 않은 옮기기 결과입니다. 기기가 빠져도 남겨 안내 화면에 보입니다.
     private(set) var transferRun: TransferRun?
     private(set) var scope = LibraryScope.all
-    var kind = KindFilter.all
+    private(set) var kind = KindFilter.all
     var gameSearch = ""
     var selection = GridSelection()
     /// 사용자가 툴바 단추로 둔 오른쪽 칸 상태입니다. 창이 좁아 접힐 때도 바꾸지 않습니다.
@@ -88,7 +88,7 @@ final class LibraryModel {
     /// 미리보기로 받은 원본과, 원본을 받기 전에 보일 썸네일 파일입니다. 기기를 떠날 때 비웁니다.
     @ObservationIgnored var previewOriginals: [Capture.ID: URL] = [:]
     @ObservationIgnored var previewThumbnails: [Capture.ID: URL] = [:]
-    /// 미리보기 파일을 받는 일입니다. 기준 캡처와 앞뒤 한 장만 받고, 멀어진 캡처의 받기는 취소합니다.
+    /// 미리보기 파일을 받는 일입니다. 기준 캡처와 앞뒤 사진만 받고, 멀어진 캡처의 받기는 취소합니다.
     /// 떠난 기기의 미리보기가 뒤늦게 뜨지 않도록 기기를 떠날 때와 끝낼 때도 취소합니다.
     @ObservationIgnored var previewTasks: [Capture.ID: Task<Void, Never>] = [:]
 
@@ -135,12 +135,13 @@ final class LibraryModel {
         !isDemo && (connection.console != nil || isTransferring)
     }
 
-    /// 하던 일(연결과 훑기, 옮기기, 미리보기, 처음 연결 질문의 답)을 취소하고 끝나길 기다린 뒤 세션을 닫고 미리보기 원본을 지웁니다.
-    /// 세션이 남으면 다음 연결이 USB 장치 리셋까지 갑니다.
+    /// 하던 일(연결과 훑기, 옮기기, 미리보기, 처음 연결 질문의 답)을 취소하고 미리보기 패널을 닫은 뒤, 일이 끝나길 기다려
+    /// 세션을 닫고 미리보기 원본을 지웁니다. 세션이 남으면 다음 연결이 USB 장치 리셋까지 갑니다.
     func shutdown() async {
         isShuttingDown = true
         monitor = nil
         let tasks = [deviceTask, transferTask, firstConnectTask].compactMap(\.self) + previewTasks.values
+        stopPreview()
         tasks.forEach { $0.cancel() }
         for task in tasks {
             await task.value
@@ -173,6 +174,16 @@ final class LibraryModel {
         selection.clear()
         dismissTransferResult()
         previewPanel.close()
+    }
+
+    /// 사진과 동영상 필터를 바꿉니다. 보이지 않게 된 캡처를 고른 것에서 빼고, 그래서 고른 것이 바뀌면 사이드바 범위를
+    /// 바꿀 때처럼 끝난 옮기기 결과를 닫습니다.
+    func filter(_ kind: KindFilter) {
+        guard kind != self.kind else { return }
+        self.kind = kind
+        var kept = selection
+        kept.keep(visibleCaptures.map(\.id))
+        select(kept)
     }
 
     var isAnsweringFirstConnect: Bool {

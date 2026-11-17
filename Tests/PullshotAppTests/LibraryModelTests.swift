@@ -45,6 +45,22 @@ struct LibraryModelTests {
             model.show(.all)
             #expect(model.transferRun?.isFinished == true)
         }
+
+        @Test func `필터를 바꿔 고른 것이 빠지면 결과를 닫는다`() async throws {
+            let model = try await finishedTransferModelFixture()
+            // 결과를 남긴 채 고른 상태를 만들려고 `select`를 거치지 않고 넣습니다.
+            model.selection.click("젤다무쌍 봉인전기/a.jpg", .only, in: ["젤다무쌍 봉인전기/a.jpg"])
+            model.filter(.videos)
+            #expect(model.selection.selected.isEmpty)
+            #expect(model.transferRun == nil)
+        }
+
+        @Test func `필터를 바꿔도 고른 것이 그대로면 결과를 남긴다`() async throws {
+            let model = try await finishedTransferModelFixture()
+            model.filter(.videos)
+            #expect(model.kind == .videos)
+            #expect(model.transferRun?.isFinished == true)
+        }
     }
 }
 
