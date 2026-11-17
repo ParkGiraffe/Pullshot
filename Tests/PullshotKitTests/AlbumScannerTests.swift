@@ -94,7 +94,7 @@ struct AlbumScannerTests {
             #expect(scan.skipped.allSatisfy { $0.reason == "unsafe filename" })
         }
 
-        @Test func `사진이나 영상이 아닌 파일은 건너뛴다`() throws {
+        @Test func `사진이나 동영상이 아닌 파일은 건너뛴다`() throws {
             let source = FakeAlbumSource.tree([.file(0x11, "readme.txt", format: .undefined)])
 
             let skipped = try AlbumScanner(source: source).scan().skipped

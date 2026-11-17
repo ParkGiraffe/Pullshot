@@ -4,7 +4,7 @@ import Testing
 
 @Suite("CaptureSummary 테스트")
 struct CaptureSummaryTests {
-    @Test func `사진과 영상 수, 아는 크기의 합, 처음과 마지막 찍은 때를 센다`() {
+    @Test func `사진과 동영상 수, 아는 크기의 합, 처음과 마지막 찍은 때를 센다`() {
         let summary = CaptureSummary([
             captureFixture("a.jpg", at: "2026-11-01 09:00:00", size: 100),
             captureFixture("b.mp4", at: "2026-11-14 23:40:00", size: 300, kind: .video),

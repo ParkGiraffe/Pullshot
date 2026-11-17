@@ -60,11 +60,10 @@
 "모두 가져오기" = "Import All";
 "%lld개 고름" = "Selected: %lld";
 "고른 항목" = "Selection";
-"찍은 때" = "Captured";
 "폴더별로 나눠 저장" = "Save in separate folders";
 "파일 이름" = "File names";
 "원래 이름 그대로" = "Keep original names";
-"찍은 순서대로 번호 붙이기" = "Number in capture order";
+"찍은 순서대로 번호 붙이기" = "Number in order taken";
 "%lld개 가져오기" = "Import %lld Selected";
 "바꾸기…" = "Change…";
 "자세한 로그 남기기" = "Detailed logging";
@@ -83,7 +82,7 @@
 "실패한 항목" = "Failed Items";
 "Finder에서 보기" = "Show in Finder";
 "닫기" = "Close";
-"연결이 끊겨 남은 사진과 동영상을 받지 못했습니다. 받지 못한 항목은 옮긴 기록에 넣지 않았으므로, 다시 연결하면 이어서 받을 수 있습니다." = "The connection was lost before the remaining photos and videos were received. They weren't added to the transfer history, so you can get them after reconnecting.";
+"연결이 끊겨 남은 사진과 동영상을 받지 못했습니다. 다시 연결하면 이어서 받을 수 있습니다." = "The connection was lost before the remaining photos and videos were received. Reconnect to continue.";
 "이미 받아 둔 사진과 동영상이 있나요?" = "Already have photos and videos on your Mac?";
 "처음 연결한 스위치입니다. 이미 Mac에 받아 둔 사진과 동영상을 옮긴 기록에 넣으면, 새 항목에 나오지 않습니다." = "This Switch hasn't been connected before. If you add the photos and videos already on your Mac to the transfer history, they won't show up as new items.";
 "폴더에서 찾기…" = "Find in Folder…";

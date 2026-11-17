@@ -58,7 +58,7 @@ struct ConnectionGuide: View {
                 .font(.headline)
                 .monospacedDigit()
             if summary.notAttempted > 0, !summary.isCancelled {
-                Text("연결이 끊겨 남은 사진과 동영상을 받지 못했습니다. 받지 못한 항목은 옮긴 기록에 넣지 않았으므로, 다시 연결하면 이어서 받을 수 있습니다.")
+                Text("연결이 끊겨 남은 사진과 동영상을 받지 못했습니다. 다시 연결하면 이어서 받을 수 있습니다.")
                     .foregroundStyle(.secondary)
             }
         }

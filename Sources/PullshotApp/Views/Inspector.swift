@@ -71,9 +71,6 @@ struct Inspector: View {
             row("사진", Text("\(summary.photoCount)개"))
             row("동영상", Text("\(summary.videoCount)개"))
             row("크기", size(summary))
-            if let first = summary.first, let last = summary.last {
-                row("찍은 때", Text(CaptureTimeText.current.span(first, last)))
-            }
         }
         Divider()
         importFolderButton

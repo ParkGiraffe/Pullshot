@@ -27,7 +27,7 @@ struct CaptureQueryTests {
             .captures(in: [a, b], index: ledger.index, serialNumber: "S1", now: now).map(\.filename) == ["b.jpg"])
     }
 
-    @Test func `게임 범위에 영상 필터를 더하면 그 게임의 영상만 보인다`() {
+    @Test func `게임 범위에 동영상 필터를 더하면 그 게임의 동영상만 보인다`() {
         let captures = [
             captureFixture("a.mp4", kind: .video),
             captureFixture("b.jpg"),

@@ -1,6 +1,6 @@
 # Pullshot
 
-Nintendo Switch 2와 Nintendo Switch에서 찍은 스크린샷과 영상(캡처)을 USB 케이블로 Mac에 옮기는 앱입니다. 캡처를 게임별로 묶어 보여 주고, 필요한 것만 골라 가져올 수 있습니다. Nintendo Switch 지원은 실험 단계입니다.
+Nintendo Switch 2와 Nintendo Switch에서 찍은 스크린샷과 동영상(캡처)을 USB 케이블로 Mac에 옮기는 앱입니다. 캡처를 게임별로 묶어 보여 주고, 필요한 것만 골라 가져올 수 있습니다. Nintendo Switch 지원은 실험 단계입니다.
 
 ## 진행 상황
 
