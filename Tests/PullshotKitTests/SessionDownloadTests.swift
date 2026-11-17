@@ -32,7 +32,7 @@ struct SessionDownloadTests {
             let target = folder.appending(path: "20261114211205_1.jpg")
             var reported: [UInt64] = []
 
-            try Session.openedForTesting(transport: ScriptedTransport(chunkedObject()))
+            try openedSessionFixture(ScriptedTransport(chunkedObject()))
                 .download(1, expectedSize: 1500, to: target, progress: { reported.append($0) })
 
             #expect(try Data(contentsOf: target) == payload)
@@ -51,7 +51,7 @@ struct SessionDownloadTests {
             let transport = ScriptedTransport([])
 
             #expect(throws: SessionError.destinationExists("a.jpg")) {
-                try Session.openedForTesting(transport: transport).download(1, expectedSize: 1, to: target)
+                try openedSessionFixture(transport).download(1, expectedSize: 1, to: target)
             }
             #expect(transport.written.isEmpty)
             #expect(try Data(contentsOf: target) == Data([1]))
@@ -60,7 +60,7 @@ struct SessionDownloadTests {
         @Test func `받는 중 연결이 끊기면 아무 파일도 남기지 않고 세션을 버린다`() throws {
             let folder = try emptyFolder()
             let whole = dataContainerFixture(.getObject, tid: 1, payload)
-            let session = Session.openedForTesting(transport: ScriptedTransport([
+            let session = openedSessionFixture(ScriptedTransport([
                 .expectWrite(nil), .read(whole.prefix(700)), .readError(.disconnected),
             ]))
 
@@ -74,7 +74,7 @@ struct SessionDownloadTests {
         @Test func `받는 중에 취소하면 남은 데이터와 응답까지 읽어 버리고 파일 없이 세션을 유지한다`() throws {
             let folder = try emptyFolder()
             let transport = ScriptedTransport(chunkedObject())
-            let session = Session.openedForTesting(transport: transport)
+            let session = openedSessionFixture(transport)
             var checks = 0
 
             #expect(throws: SessionError.cancelled) {
@@ -92,7 +92,7 @@ struct SessionDownloadTests {
             let folder = try emptyFolder()
 
             #expect(throws: SessionError.sizeMismatch(expected: 2000, actual: 1500)) {
-                try Session.openedForTesting(transport: ScriptedTransport(chunkedObject()))
+                try openedSessionFixture(ScriptedTransport(chunkedObject()))
                     .download(1, expectedSize: 2000, to: folder.appending(path: "s.jpg"))
             }
             #expect(try contents(of: folder).isEmpty)
@@ -103,7 +103,7 @@ struct SessionDownloadTests {
     struct Unusual {
         @Test func `데이터 없이 바로 온 오류 응답은 던지되 세션은 유지한다`() throws {
             let folder = try emptyFolder()
-            let session = Session.openedForTesting(transport: ScriptedTransport([
+            let session = openedSessionFixture(ScriptedTransport([
                 .expectWrite(nil), .read(responseFixture(0x2009, tid: 1)),
             ]))
 
@@ -118,7 +118,7 @@ struct SessionDownloadTests {
             let folder = try emptyFolder()
             let target = folder.appending(path: "e.jpg")
             let event = Container(kind: .event, code: 0x4002, transactionID: 0, payload: Data()).encoded()
-            try Session.openedForTesting(transport: ScriptedTransport([
+            try openedSessionFixture(ScriptedTransport([
                 .expectWrite(nil), .read(event),
                 .read(dataContainerFixture(.getObject, tid: 1, Data([1, 2, 3]))),
                 .read(responseFixture(0x2001, tid: 1)),

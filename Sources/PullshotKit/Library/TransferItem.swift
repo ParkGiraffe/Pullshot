@@ -6,7 +6,7 @@ public struct TransferItem: Equatable, Sendable {
     public var filename: String
 }
 
-public enum ExportNaming: String, Sendable, CaseIterable {
+public enum ExportNaming: String, Sendable {
     case original
     case numbered
 }

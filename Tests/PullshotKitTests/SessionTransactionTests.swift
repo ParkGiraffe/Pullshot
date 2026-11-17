@@ -15,7 +15,7 @@ struct SessionTransactionTests {
                 .read(responseFixture(0x2001, tid: 1)),
             ])
 
-            #expect(try Session.openedForTesting(transport: transport).storageIDs() == [0x0001_0001])
+            #expect(try openedSessionFixture(transport).storageIDs() == [0x0001_0001])
             #expect(transport.isFinished)
         }
 
@@ -31,7 +31,7 @@ struct SessionTransactionTests {
                 .read(dataContainerFixture(.getObjectHandles, tid: 1, handles.data)),
                 .read(responseFixture(0x2001, tid: 1)),
             ])
-            let session = Session.openedForTesting(transport: transport)
+            let session = openedSessionFixture(transport)
 
             #expect(try session.objectHandles(storage: 0x0001_0001, parent: PTP.rootParent) == [0x10, 0x11])
         }
@@ -46,7 +46,7 @@ struct SessionTransactionTests {
                 .read(responseFixture(0x2001, tid: 1)),
             ])
 
-            #expect(try Session.openedForTesting(transport: transport).storageIDs() == [])
+            #expect(try openedSessionFixture(transport).storageIDs() == [])
         }
     }
 
@@ -54,7 +54,7 @@ struct SessionTransactionTests {
     struct Failure {
         @Test func `OK가 아닌 응답은 오류로 던지되 세션은 계속 쓸 수 있다`() throws {
             let transport = ScriptedTransport([.expectWrite(nil), .read(responseFixture(0x2009, tid: 1))])
-            let session = Session.openedForTesting(transport: transport)
+            let session = openedSessionFixture(transport)
 
             #expect(throws: SessionError.response(.invalidObjectHandle, operation: .getObjectInfo)) {
                 try session.objectInfo(0x42)
@@ -64,7 +64,7 @@ struct SessionTransactionTests {
 
         @Test func `응답의 트랜잭션 ID가 다르면 세션을 버린다`() throws {
             let transport = ScriptedTransport([.expectWrite(nil), .read(responseFixture(0x2001, tid: 7))])
-            let session = Session.openedForTesting(transport: transport)
+            let session = openedSessionFixture(transport)
 
             #expect(throws: SessionError.transactionMismatch(expected: 1, got: 7)) { try session.storageIDs() }
             #expect(!session.isValid)
@@ -73,7 +73,7 @@ struct SessionTransactionTests {
 
         @Test func `전송이 끊기면 세션을 버린다`() throws {
             let transport = ScriptedTransport([.expectWrite(nil), .readError(.disconnected)])
-            let session = Session.openedForTesting(transport: transport)
+            let session = openedSessionFixture(transport)
 
             #expect(throws: SessionError.transport(.disconnected)) { try session.storageIDs() }
             #expect(!session.isValid)
@@ -84,7 +84,7 @@ struct SessionTransactionTests {
     struct Misbehaving {
         @Test func `빈 읽기만 끝없이 오면 시간 초과로 보고 세션을 버린다`() {
             let transport = ScriptedTransport([.expectWrite(nil)] + Array(repeating: .read(Data()), count: 65))
-            let session = Session.openedForTesting(transport: transport)
+            let session = openedSessionFixture(transport)
 
             #expect(throws: SessionError.transport(.timedOut)) { try session.storageIDs() }
             #expect(!session.isValid)

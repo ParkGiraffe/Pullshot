@@ -5,7 +5,7 @@ func deviceInfoFixture(
     model: String = "Nintendo Switch 2",
     serial: String = "TEST0001",
     version: String = "23.0.1",
-    operations: [UInt16] = PTP.Operation.baseline.map(\.rawValue)
+    operations: [UInt16] = Array(0x1001 ... 0x100A)
 ) -> Data {
     var writer = ByteWriter()
     writer.u16(100)
@@ -108,4 +108,11 @@ private let temporaryRoot: URL = {
 
 func temporaryFolderFixture() -> URL {
     temporaryRoot.appending(path: "\(UUID())")
+}
+
+func openedSessionFixture(_ transport: Transport) -> Session {
+    let session = Session(transport: transport)
+    session.isOpen = true
+    session.nextTransactionID = 1
+    return session
 }

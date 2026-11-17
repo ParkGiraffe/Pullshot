@@ -1,10 +1,5 @@
 import Foundation
 
-public struct LastTransfer: Equatable, Sendable {
-    public var day: Date
-    public var count: Int
-}
-
 public struct LedgerIndex: Equatable, Sendable {
     private var recorded: Set<CaptureKey> = []
     private var lastTransferDates: [CaptureKey: Date] = [:]
@@ -19,19 +14,8 @@ public struct LedgerIndex: Equatable, Sendable {
         captures.filter { !isTransferred($0, serialNumber: serialNumber) }
     }
 
-    public func transferredAt(_ capture: Capture, serialNumber: String) -> Date? {
+    func transferredAt(_ capture: Capture, serialNumber: String) -> Date? {
         lastTransferDates[CaptureKey(capture, serialNumber: serialNumber)]
-    }
-
-    public func lastTransfer(
-        of captures: [Capture],
-        serialNumber: String,
-        calendar: Calendar = .current
-    ) -> LastTransfer? {
-        let dates = captures.compactMap { transferredAt($0, serialNumber: serialNumber) }
-        guard let latest = dates.max() else { return nil }
-        let day = calendar.startOfDay(for: latest)
-        return LastTransfer(day: day, count: dates.count { calendar.isDate($0, inSameDayAs: day) })
     }
 
     public func recentlyTransferred(_ captures: [Capture], serialNumber: String, since: Date) -> [Capture] {

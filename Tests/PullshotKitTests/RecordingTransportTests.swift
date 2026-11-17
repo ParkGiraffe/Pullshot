@@ -19,11 +19,11 @@ struct RecordingTransportTests {
                 .read(dataContainerFixture(.getStorageIDs, tid: 1, ids.data)),
                 .read(responseFixture(0x2001, tid: 1)),
             ])
-            let recorded = try Session.openedForTesting(transport: RecordingTransport(wrapping: live, to: file))
+            let recorded = try openedSessionFixture(RecordingTransport(wrapping: live, to: file))
                 .storageIDs()
             let replay = try ReplayTransport(contentsOf: file)
 
-            #expect(try Session.openedForTesting(transport: replay).storageIDs() == recorded)
+            #expect(try openedSessionFixture(replay).storageIDs() == recorded)
             #expect(replay.isFinished)
         }
 

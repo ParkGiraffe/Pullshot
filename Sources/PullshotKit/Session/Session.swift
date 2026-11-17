@@ -21,13 +21,6 @@ public final class Session {
         self.trace = trace
     }
 
-    static func openedForTesting(transport: Transport) -> Session {
-        let session = Session(transport: transport)
-        session.isOpen = true
-        session.nextTransactionID = 1
-        return session
-    }
-
     public func storageIDs() throws -> [UInt32] {
         var reader = try ByteReader(transact(.getStorageIDs).data)
         return try reader.u32Array()

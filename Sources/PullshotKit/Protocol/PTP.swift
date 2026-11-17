@@ -26,11 +26,6 @@ public enum PTP {
         public static let getObjectInfo = Self(rawValue: 0x1008)
         public static let getObject = Self(rawValue: 0x1009)
         public static let getThumb = Self(rawValue: 0x100A)
-
-        public static let baseline: [Self] = [
-            .getDeviceInfo, .openSession, .closeSession, .getStorageIDs, .getStorageInfo,
-            .getNumObjects, .getObjectHandles, .getObjectInfo, .getObject, .getThumb,
-        ]
     }
 
     public struct Response: RawRepresentable, Hashable, Sendable {

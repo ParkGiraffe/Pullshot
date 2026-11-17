@@ -45,9 +45,4 @@ public struct Container: Equatable, Sendable {
         writer.bytes(payload)
         return writer.data
     }
-
-    public var parameters: [UInt32] {
-        var reader = ByteReader(payload)
-        return (0 ..< payload.count / 4).compactMap { _ in try? reader.u32() }
-    }
 }

@@ -56,17 +56,15 @@ struct TransferLedgerTests {
         }
     }
 
-    @Suite("지난번 옮김")
-    struct LastTransfers {
-        @Test func `지난번 옮긴 날은 가져오기와 내보내기만 보고 그날 옮긴 수를 센다`() throws {
+    @Suite("옮긴 때")
+    struct TransferDates {
+        @Test func `옮긴 때는 가져오기와 내보내기만 보고 마지막으로 옮긴 때를 남긴다`() throws {
             let ledger = try TransferLedger(directory: temporaryFolderFixture())
-            let (a, b, c) = (captureFixture("a.jpg"), captureFixture("b.jpg"), captureFixture("c.jpg"))
-            try ledger.record([a, b], serialNumber: "S1", as: .imported, at: dateFixture("2026-11-08 10:00:00"))
+            let (a, c) = (captureFixture("a.jpg"), captureFixture("c.jpg"))
+            try ledger.record([a], serialNumber: "S1", as: .imported, at: dateFixture("2026-11-08 10:00:00"))
             try ledger.record([a], serialNumber: "S1", as: .exported, at: dateFixture("2026-11-09 21:00:00"))
             try ledger.record([c], serialNumber: "S1", as: .markedAll, at: dateFixture("2026-11-10 09:00:00"))
 
-            #expect(ledger.index.lastTransfer(of: [a, b, c], serialNumber: "S1", calendar: calendarFixture())
-                == LastTransfer(day: dateFixture("2026-11-09 00:00:00"), count: 1))
             #expect(ledger.index.transferredAt(a, serialNumber: "S1") == dateFixture("2026-11-09 21:00:00"))
             #expect(ledger.index.transferredAt(c, serialNumber: "S1") == nil)
             #expect(ledger.index.isTransferred(c, serialNumber: "S1"))
