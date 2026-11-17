@@ -1,7 +1,7 @@
 import PullshotKit
 import SwiftUI
 
-/// 오른쪽 칸 아래 단추 자리에 두는 옮기기 진행과 결과입니다. 결과는 닫을 때까지 남깁니다.
+/// 오른쪽 칸 아래 단추 자리에 두는 옮기기 진행과 결과입니다. 결과는 닫거나 다른 것을 고르거나 다른 범위를 볼 때까지 남깁니다.
 struct TransferPanel: View {
     let run: LibraryModel.TransferRun
     let model: LibraryModel

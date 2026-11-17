@@ -67,7 +67,6 @@ struct LibraryWindow: View {
                         }
                     }
                     .onChange(of: captures.map(\.id)) { _, visible in model.selection.keep(visible) }
-                    .onChange(of: model.scope) { model.selection.clear() }
             } else {
                 ConnectionGuide(model: model)
             }
@@ -109,7 +108,7 @@ struct LibraryWindow: View {
                 captures: captures,
                 viewMode: viewMode,
                 cellWidth: thumbnailSize,
-                selection: $model.selection
+                selection: Binding(get: { model.selection }, set: { model.select($0) })
             ) { capture in
                 model.serialNumber.map { !model.index.isTransferred(capture, serialNumber: $0) } ?? false
             } preview: {

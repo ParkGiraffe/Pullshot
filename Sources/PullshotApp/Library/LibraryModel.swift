@@ -27,7 +27,7 @@ final class LibraryModel {
         }
     }
 
-    /// 가져오기나 내보내기 한 번입니다. 끝난 뒤에도 사용자가 닫을 때까지 결과를 남겨 둡니다.
+    /// 가져오기나 내보내기 한 번입니다. 끝난 뒤에도 사용자가 닫거나 다른 것을 고를 때까지 결과를 남겨 둡니다.
     struct TransferRun {
         var kind: TransferKind
         /// 가져올 곳이나 내보낼 기준 폴더입니다.
@@ -59,7 +59,7 @@ final class LibraryModel {
     private var firstConnectTask: Task<Void, Never>?
     /// 옮기는 중이거나 사용자가 닫지 않은 옮기기 결과입니다. 기기가 빠져도 남겨 안내 화면에 보입니다.
     private(set) var transferRun: TransferRun?
-    var scope = LibraryScope.all
+    private(set) var scope = LibraryScope.all
     var kind = KindFilter.all
     var gameSearch = ""
     var selection = GridSelection()
@@ -339,6 +339,22 @@ extension LibraryModel {
     func dismissTransferResult() {
         guard transferRun?.isFinished == true else { return }
         transferRun = nil
+    }
+
+    /// 사이드바에서 고른 범위를 봅니다. 고른 것과 끝난 옮기기 결과는 앞 범위의 것이라 치웁니다.
+    func show(_ scope: LibraryScope) {
+        guard scope != self.scope else { return }
+        self.scope = scope
+        selection.clear()
+        dismissTransferResult()
+    }
+
+    /// 격자에서 고른 것을 바꿉니다. 끝난 옮기기 결과는 앞서 고른 것의 결과라 닫아, 결과 칸이 내보내기 단추 자리를
+    /// 차지하지 않게 합니다. 기기가 빠져 고른 것을 지울 때는 여기를 거치지 않아 결과가 안내 화면에 남습니다.
+    func select(_ selection: GridSelection) {
+        guard selection != self.selection else { return }
+        self.selection = selection
+        dismissTransferResult()
     }
 
     /// 저장한 파일이 한 폴더에 있으면 그 파일들을, 여러 폴더에 있거나 저장한 파일이 없으면 기준 폴더를 Finder에서 보입니다.

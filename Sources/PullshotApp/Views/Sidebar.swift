@@ -46,7 +46,7 @@ struct Sidebar: View {
             CaptureQuery(scope: scope, kind: .all)
                 .captures(in: model.captures, index: model.index, serialNumber: serialNumber, now: .now).count
         }
-        return List(selection: Binding(get: { model.scope }, set: { model.scope = $0 ?? .all })) {
+        return List(selection: Binding(get: { model.scope }, set: { model.show($0 ?? .all) })) {
             pinnedRow("모든 항목", icon: "square.grid.2x2", scope: .all, count: model.captures.count)
             pinnedRow("새 항목", icon: "tray.and.arrow.down", scope: .new, count: newIDs.count)
             pinnedRow("동영상", icon: "video", scope: .videos, count: count(.videos))
