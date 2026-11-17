@@ -29,6 +29,15 @@ struct Sidebar: View {
                 .padding(.horizontal, 10)
             if case .ready = model.connection {
                 list
+                HStack(spacing: 6) {
+                    Image(systemName: "line.3.horizontal.decrease")
+                        .foregroundStyle(.secondary)
+                    TextField("폴더 이름으로 찾기", text: $model.gameSearch)
+                        .textFieldStyle(.plain)
+                }
+                .padding(8)
+                .background(.quaternary, in: .rect(cornerRadius: 7))
+                .padding(10)
             } else {
                 Spacer(minLength: 0)
             }
@@ -60,17 +69,6 @@ struct Sidebar: View {
                         .foregroundStyle(.secondary)
                 }
             }
-        }
-        .safeAreaInset(edge: .bottom) {
-            HStack(spacing: 6) {
-                Image(systemName: "line.3.horizontal.decrease")
-                    .foregroundStyle(.secondary)
-                TextField("폴더 이름으로 찾기", text: $model.gameSearch)
-                    .textFieldStyle(.plain)
-            }
-            .padding(8)
-            .background(.quaternary, in: .rect(cornerRadius: 7))
-            .padding(10)
         }
     }
 
