@@ -44,12 +44,11 @@ Apple 공증을 받지 않은 ad-hoc 서명 앱이라, 내려받은 DMG로 설�
 
 - `probe`: 기기 정보, 지원 명령, 저장소를 보여 줍니다.
 - `list [--new]`: 게임별 캡처 목록을 보여 줍니다. 새 항목에는 줄 끝에 "새"가 붙습니다.
-- `pull (--all | --new | <파일 이름>...)`: 캡처를 `~/Pictures/Pullshot/<게임 이름>/`에 원본 그대로 받습니다.
-- `export (--all | --new | <파일 이름>...) --out <폴더> [--numbered] [--no-game-folder] [--dry-run]`: 고른 캡처를 내보냅니다. `--numbered`를 주면 찍은 순서대로 `001_20261114_211205.jpg`처럼 번호를 붙입니다.
+- `pull (--all | --new | <파일 이름>...) [--out <폴더>] [--numbered] [--no-game-folder] [--dry-run]`: 고른 캡처를 저장 위치(기본 `~/Pictures/Pullshot`)의 게임 이름 폴더에 원본 그대로 가져옵니다. `--numbered`를 주면 찍은 순서대로 `001_20261114_211205.jpg`처럼 번호를 붙입니다.
 - `ledger (--from-folder <폴더> | --mark-all | --leave-new)`: 이미 받아 둔 캡처를 옮긴 기록에 넣습니다.
 - `dump --out <폴더>`: 실기기 응답을 그대로 기록합니다. 기기 일련번호가 들어 있으므로 공개하지 않습니다.
 
-가져오기와 내보내기는 `~/Library/Application Support/Pullshot/`에 옮긴 기록을 남깁니다. 기록에 없는 캡처, 곧 아직 한 번도 Mac으로 옮기지 않은 캡처가 새 항목입니다.
+가져오기는 `~/Library/Application Support/Pullshot/`에 옮긴 기록을 남깁니다. 기록에 없는 캡처, 곧 아직 한 번도 Mac으로 옮기지 않은 캡처가 새 항목입니다.
 
 ## 개발
 
