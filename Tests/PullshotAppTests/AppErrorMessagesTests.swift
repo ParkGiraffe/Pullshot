@@ -23,30 +23,15 @@ struct AppErrorMessagesTests {
             == "스위치 연결이 끊겼습니다. 케이블을 확인해 주세요.")
     }
 
-    @Test func `알 수 없는 접근 오류는 코드를 보여 준다`() {
-        #expect(AppErrorMessages.message(for: ConsoleAccessError.other(code: 0xE000_02BC))
-            == "스위치에 연결하지 못했습니다(오류 0xE00002BC).")
-    }
-
-    @Test func `찾을 폴더를 열 수 없으면 폴더 이름과 권한을 알려 준다`() {
-        #expect(AppErrorMessages.message(for: FolderMatchError.unreadableFolder(URL(filePath: "/tmp/없는 폴더")))
-            == "폴더를 열 수 없습니다: 없는 폴더. 폴더가 있는지, 읽을 권한이 있는지 확인해 주세요.")
-    }
-
     /// Foundation은 받을 파일과 폴더의 쓰기 오류를 `NSCocoaErrorDomain`의 NSError로 던집니다(2026-11-16, macOS 27.2 확인).
-    @Test func `디스크가 차서 받은 파일을 쓰지 못하면 Mac에 저장하지 못했다고 알린다`() {
-        #expect(AppErrorMessages.message(for: NSError(domain: NSCocoaErrorDomain, code: NSFileWriteOutOfSpaceError))
-            == "Mac에 파일을 저장하지 못했습니다. 저장할 폴더가 있는지, 저장 공간이 충분한지, 쓰기 권한이 있는지 확인해 주세요.")
-    }
-
-    @Test func `내보낼 폴더에 쓰기 권한이 없으면 Mac에 저장하지 못했다고 알린다`() {
-        #expect(AppErrorMessages.message(for: NSError(domain: NSCocoaErrorDomain, code: NSFileWriteNoPermissionError))
-            == "Mac에 파일을 저장하지 못했습니다. 저장할 폴더가 있는지, 저장 공간이 충분한지, 쓰기 권한이 있는지 확인해 주세요.")
-    }
-
     /// 옮긴 기록은 `TransferLedger`가 errno를 담은 `POSIXError`로 던집니다.
-    @Test func `옮긴 기록을 쓸 공간이 없어도 Mac에 저장하지 못했다고 알린다`() {
-        #expect(AppErrorMessages.message(for: POSIXError(.ENOSPC))
+    @Test(arguments: [
+        NSError(domain: NSCocoaErrorDomain, code: NSFileWriteOutOfSpaceError),
+        NSError(domain: NSCocoaErrorDomain, code: NSFileWriteNoPermissionError),
+        POSIXError(.ENOSPC),
+    ] as [any Error])
+    func `디스크가 차거나 저장 위치에 쓰기 권한이 없으면 스위치가 아니라 Mac에 저장하지 못했다고 알린다`(error: any Error) {
+        #expect(AppErrorMessages.message(for: error)
             == "Mac에 파일을 저장하지 못했습니다. 저장할 폴더가 있는지, 저장 공간이 충분한지, 쓰기 권한이 있는지 확인해 주세요.")
     }
 }

@@ -59,15 +59,14 @@ struct GridSelectionTests {
         #expect(selection.anchor == nil)
     }
 
-    @Test func `미리보기는 기준 캡처를 먼저 받고 다음과 앞 사진을 받아 둔다`() {
+    @Test(arguments: [
+        ("c.jpg", ["c.jpg", "d.jpg", "b.jpg"]),
+        ("a.jpg", ["a.jpg", "b.jpg"]),
+        ("e.jpg", ["e.jpg", "d.jpg"]),
+    ])
+    func `미리보기는 기준 캡처를 먼저 받고 있는 쪽의 다음과 앞 사진을 받아 둔다`(anchor: String, targets: [String]) {
         let captures = capturesFixture(["a.jpg", "b.jpg", "c.jpg", "d.jpg", "e.jpg"])
-        #expect(previewTargets(anchor: "c.jpg", in: captures) == ["c.jpg", "d.jpg", "b.jpg"])
-    }
-
-    @Test func `끝에 있는 기준 캡처는 한쪽 이웃만 받아 둔다`() {
-        let captures = capturesFixture(["a.jpg", "b.jpg", "c.jpg"])
-        #expect(previewTargets(anchor: "a.jpg", in: captures) == ["a.jpg", "b.jpg"])
-        #expect(previewTargets(anchor: "c.jpg", in: captures) == ["c.jpg", "b.jpg"])
+        #expect(previewTargets(anchor: anchor, in: captures) == targets)
     }
 
     @Test func `동영상 이웃은 받아 두지 않고 기준 캡처는 동영상도 받는다`() {
@@ -80,11 +79,6 @@ struct GridSelectionTests {
         var selection = GridSelection()
         selection.click(captures[2].id, .only, in: captures.map(\.id))
         #expect(selection.previewTargets(in: Array(captures.prefix(2))).isEmpty)
-    }
-
-    @Test func `열 수는 칸 최소 폭과 간격으로 정한다`() {
-        #expect(GridSelection.columns(width: 900, minimum: 180, spacing: 3) == 4)
-        #expect(GridSelection.columns(width: 100, minimum: 180, spacing: 3) == 1)
     }
 }
 

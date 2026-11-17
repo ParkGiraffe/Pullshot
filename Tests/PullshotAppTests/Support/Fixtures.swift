@@ -14,24 +14,13 @@ private let repositoryFolder = URL(filePath: #filePath)
     .deletingLastPathComponent()
     .deletingLastPathComponent()
 private let appFolder = repositoryFolder.appending(path: "App")
-/// 앱 아이콘 그림이 있는 폴더입니다. `make app`이 여기 그림으로 `.icns`를 만듭니다.
-let appIconDesignFolder = repositoryFolder.appending(path: "design/app-icon")
 
-func stringsTable(_ language: String, table: String = "Localizable") throws -> [String: String] {
-    let data = try Data(contentsOf: appFolder.appending(path: "\(language).lproj/\(table).strings"))
+func stringsTable(_ language: String) throws -> [String: String] {
+    let data = try Data(contentsOf: appFolder.appending(path: "\(language).lproj/Localizable.strings"))
     guard let table = try PropertyListSerialization.propertyList(from: data, format: nil) as? [String: String],
           !table.isEmpty
     else { throw StringsTableError.unreadable(language) }
     return table
-}
-
-/// `App/Info.plist`를 읽습니다. 개발 언어인 한국어 값이 여기 있습니다.
-func infoPlist() throws -> [String: Any] {
-    let data = try Data(contentsOf: appFolder.appending(path: "Info.plist"))
-    guard let plist = try PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any] else {
-        throw StringsTableError.unreadable("Info.plist")
-    }
-    return plist
 }
 
 /// "yyyy-MM-dd HH:mm:ss"를 서울 시각으로 읽습니다.
@@ -57,11 +46,10 @@ func captureFixture(
     game: String? = "젤다무쌍 봉인전기",
     at capturedAt: String? = "2026-11-14 21:12:05",
     size: UInt64? = 5,
-    kind: Capture.Kind = .photo,
-    handle: UInt32 = 1
+    kind: Capture.Kind = .photo
 ) -> Capture {
     Capture(
-        handle: handle,
+        handle: 1,
         storageID: 0x0001_0001,
         filename: filename,
         size: size,
@@ -79,10 +67,26 @@ func temporaryFolderFixture() -> URL {
 /// 테스트마다 따로 쓰는 설정 저장소입니다. suite 이름에 절대 경로를 주면 `~/Library/Preferences`가 아니라
 /// 그 경로의 plist에 써서, 테스트가 사용자 설정 폴더에 파일을 남기지 않습니다(2026-11-16, macOS 27.2 확인).
 func defaultsFixture() -> UserDefaults {
-    guard let defaults = UserDefaults(suiteName: temporaryFolderFixture().path(percentEncoded: false)) else {
+    guard let defaults = TemporaryDefaults(suitePath: temporaryFolderFixture().path(percentEncoded: false)) else {
         preconditionFailure("설정 저장소를 만들지 못했습니다")
     }
     return defaults
+}
+
+/// 놓을 때 자기 plist를 지우는 설정 저장소입니다. 도메인만 지우면 plist가 임시 폴더에 남아, 파일까지 지웁니다
+/// (2026-11-17, macOS 27.2 확인). 모델이 쥐고 있으면 그 모델이 사라질 때 지워집니다.
+private final class TemporaryDefaults: UserDefaults {
+    private let suitePath: String
+
+    init?(suitePath: String) {
+        self.suitePath = suitePath
+        super.init(suiteName: suitePath)
+    }
+
+    deinit {
+        removePersistentDomain(forName: suitePath)
+        try? FileManager.default.removeItem(atPath: "\(suitePath).plist")
+    }
 }
 
 /// 기기를 열지 않은 모델입니다. 옮긴 기록, 로그, 설정은 테스트마다 따로 둡니다.

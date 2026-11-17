@@ -4,12 +4,9 @@ import Testing
 
 @Suite("PreviewKey 테스트")
 struct PreviewKeyTests {
-    @Test func `왼쪽과 오른쪽 화살표는 한 장 옮긴다`() throws {
+    @Test func `화살표는 그 방향으로 옮긴다`() throws {
         #expect(try PreviewKey(keyFixture(.leftArrow)) == .move(.left))
         #expect(try PreviewKey(keyFixture(.rightArrow)) == .move(.right))
-    }
-
-    @Test func `위와 아래 화살표는 한 줄 옮긴다`() throws {
         #expect(try PreviewKey(keyFixture(.upArrow)) == .move(.up))
         #expect(try PreviewKey(keyFixture(.downArrow)) == .move(.down))
     }
@@ -19,12 +16,9 @@ struct PreviewKeyTests {
         #expect(try PreviewKey(keyFixture("\u{1B}")) == .close)
     }
 
-    @Test func `⌘나 ⇧를 함께 누른 화살표는 패널에 맡긴다`() throws {
+    @Test func `⌘나 ⇧를 함께 누른 화살표와 다른 글자 키는 패널에 맡긴다`() throws {
         #expect(try PreviewKey(keyFixture(.rightArrow, modifiers: .command)) == nil)
         #expect(try PreviewKey(keyFixture(.downArrow, modifiers: .shift)) == nil)
-    }
-
-    @Test func `다른 글자 키는 패널에 맡긴다`() throws {
         #expect(try PreviewKey(keyFixture("a")) == nil)
     }
 }

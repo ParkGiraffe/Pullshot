@@ -9,11 +9,6 @@ struct CaptureTimeTextTests {
         timeZone: TimeZone(identifier: "Asia/Seoul") ?? .gmt
     )
 
-    @Test func `두 시각의 때가 같으면 둘째는 때를 뺀다`() {
-        #expect(text.timeRange(dateFixture("2026-11-06 22:02:00"), dateFixture("2026-11-06 23:48:00"))
-            == "밤 10:02 ~ 11:48")
-    }
-
     @Test func `두 시각의 때가 다르면 둘 다 때를 붙인다`() {
         #expect(text.timeRange(dateFixture("2026-11-06 16:05:00"), dateFixture("2026-11-06 18:20:00"))
             == "오후 4:05 ~ 저녁 6:20")

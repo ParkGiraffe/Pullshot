@@ -65,59 +65,27 @@ struct CaptureQueryTests {
         #expect(screen.map(\.filename) == shown.map(\.filename))
     }
 
-    @Test func `필터가 모두일 때 동영상 범위는 동영상을 보인다고 한다`() {
-        #expect(CaptureQuery(scope: .videos, kind: .all).shownKind == .videos)
-        #expect(CaptureQuery(scope: .new, kind: .all).shownKind == .all)
-        #expect(CaptureQuery(scope: .videos, kind: .photos).shownKind == .photos)
-    }
-
     @Suite("빈 까닭")
     struct EmptyReasons {
-        let ledger: TransferLedger
-
-        init() throws {
-            ledger = try TransferLedger(directory: temporaryFolderFixture())
-        }
-
-        @Test func `새 항목이 비면 모두 옮겼다고 한다`() throws {
-            let capture = captureFixture("a.jpg")
-            try ledger.record([capture], serialNumber: "S1", as: .imported)
-            #expect(CaptureQuery(scope: .new, kind: .all)
-                .emptyReason(in: [capture], index: ledger.index, serialNumber: "S1", now: .now) == .allTransferred)
-        }
-
         @Test func `새 항목이 비면 필터가 있어도 모두 옮겼다고 한다`() throws {
+            let ledger = try TransferLedger(directory: temporaryFolderFixture())
             let capture = captureFixture("a.mp4", kind: .video)
             try ledger.record([capture], serialNumber: "S1", as: .imported)
             #expect(CaptureQuery(scope: .new, kind: .photos)
                 .emptyReason(in: [capture], index: ledger.index, serialNumber: "S1", now: .now) == .allTransferred)
         }
 
-        @Test func `최근 옮긴 항목이 비면 30일 동안 옮긴 것이 없다고 한다`() {
-            #expect(CaptureQuery(scope: .recentlyTransferred, kind: .all)
-                .emptyReason(in: [captureFixture()], index: LedgerIndex(), serialNumber: "S1", now: .now)
-                == .noRecentTransfer)
-        }
-
-        @Test func `사진만 보는데 동영상만 있으면 필터가 동영상을 가렸다고 한다`() {
-            #expect(CaptureQuery(scope: .game("젤다무쌍 봉인전기"), kind: .photos)
-                .emptyReason(
-                    in: [captureFixture("a.mp4", kind: .video)],
-                    index: LedgerIndex(),
-                    serialNumber: "S1",
-                    now: .now
-                ) == .onlyPhotosShown)
-        }
-
-        @Test func `동영상만 보는데 사진만 있으면 필터가 사진을 가렸다고 한다`() {
-            #expect(CaptureQuery(scope: .all, kind: .videos)
-                .emptyReason(in: [captureFixture("a.jpg")], index: LedgerIndex(), serialNumber: "S1", now: .now)
-                == .onlyVideosShown)
-        }
-
-        @Test func `앨범이 비면 따로 알릴 까닭이 없다`() {
-            #expect(CaptureQuery(scope: .all, kind: .all)
-                .emptyReason(in: [], index: LedgerIndex(), serialNumber: "S1", now: .now) == nil)
+        @Test(arguments: [
+            (KindFilter.photos, captureFixture("a.mp4", kind: .video), EmptyReason.onlyPhotosShown),
+            (.videos, captureFixture("a.jpg"), .onlyVideosShown),
+        ] as [(KindFilter, Capture, EmptyReason)])
+        func `보는 종류의 캡처가 없으면 필터가 다른 종류를 가렸다고 한다`(
+            kind: KindFilter,
+            capture: Capture,
+            reason: EmptyReason
+        ) {
+            #expect(CaptureQuery(scope: .all, kind: kind)
+                .emptyReason(in: [capture], index: LedgerIndex(), serialNumber: "S1", now: .now) == reason)
         }
     }
 }

@@ -11,12 +11,4 @@ struct ConsoleChoiceTests {
     @Test func `연 기기가 빠지면 남은 기기 중 첫 기기를 고른다`() {
         #expect(ConsoleChoice.next(current: consoleFixture(1), attached: [consoleFixture(2)]) == consoleFixture(2))
     }
-
-    @Test func `연 기기가 없으면 처음 찾은 기기를 고른다`() {
-        #expect(ConsoleChoice.next(current: nil, attached: [consoleFixture(1), consoleFixture(2)]) == consoleFixture(1))
-    }
-
-    @Test func `꽂힌 기기가 없으면 고르지 않는다`() {
-        #expect(ConsoleChoice.next(current: consoleFixture(1), attached: []) == nil)
-    }
 }

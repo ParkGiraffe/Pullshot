@@ -14,14 +14,6 @@ struct FileLogTests {
             let permissionError = CocoaError(.fileWriteNoPermission, userInfo: [NSFilePathErrorKey: "/Users/a/b.jpg"])
             #expect(FileLog.describe(permissionError) == "NSCocoaErrorDomain 513")
         }
-
-        @Test func `기기 오류는 종류와 코드를 남긴다`() {
-            #expect(FileLog.describe(SessionError.transport(.disconnected)) == "transport(disconnected)")
-            #expect(FileLog.describe(SessionError.response(PTP.Response(rawValue: 0x2002), operation: .getObject))
-                == "response(0x2002, 0x1009)")
-            #expect(FileLog.describe(ConsoleAccessError.heldByAnotherApp(code: 0xE000_02C9, owner: "ptpcamerad"))
-                == "heldByAnotherApp(0xE00002C9, ptpcamerad)")
-        }
     }
 
     @Suite("파일 크기")

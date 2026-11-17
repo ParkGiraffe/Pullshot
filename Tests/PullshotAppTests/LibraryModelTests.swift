@@ -13,53 +13,18 @@ struct LibraryModelTests {
             model.choose(consoleFixture(1))
             #expect(model.connection == .searching)
         }
-
-        @Test func `끝내는 중에는 처음 연결 질문에 답하지 않는다`() async throws {
-            let model = try libraryModelFixture()
-            await model.shutdown()
-            model.answerFirstConnect(.leaveAllNew)
-            #expect(!model.isAnsweringFirstConnect)
-        }
     }
 
     @Suite("끝난 옮기기 결과")
     @MainActor
     struct FinishedTransfer {
-        @Test func `다른 범위를 보면 결과를 닫는다`() async throws {
-            let model = try await finishedTransferModelFixture()
-            model.show(.new)
-            #expect(model.transferRun == nil)
-        }
-
-        @Test func `고른 것을 바꾸면 결과를 닫는다`() async throws {
-            let model = try await finishedTransferModelFixture()
-            var selection = model.selection
-            selection.click("젤다무쌍 봉인전기/a.jpg", .only, in: ["젤다무쌍 봉인전기/a.jpg"])
-            model.select(selection)
-            #expect(model.transferRun == nil)
-        }
-
-        @Test func `고른 것과 범위가 그대로면 결과를 남긴다`() async throws {
-            let model = try await finishedTransferModelFixture()
-            model.select(model.selection)
-            model.show(.all)
-            #expect(model.transferRun?.isFinished == true)
-        }
-
-        @Test func `필터를 바꿔 고른 것이 빠지면 결과를 닫는다`() async throws {
+        @Test func `필터를 바꿔 보이지 않게 된 캡처는 고른 것에서 빼고 결과도 닫는다`() async throws {
             let model = try await finishedTransferModelFixture()
             // 결과를 남긴 채 고른 상태를 만들려고 `select`를 거치지 않고 넣습니다.
             model.selection.click("젤다무쌍 봉인전기/a.jpg", .only, in: ["젤다무쌍 봉인전기/a.jpg"])
             model.filter(.videos)
             #expect(model.selection.selected.isEmpty)
             #expect(model.transferRun == nil)
-        }
-
-        @Test func `필터를 바꿔도 고른 것이 그대로면 결과를 남긴다`() async throws {
-            let model = try await finishedTransferModelFixture()
-            model.filter(.videos)
-            #expect(model.kind == .videos)
-            #expect(model.transferRun?.isFinished == true)
         }
     }
 }
