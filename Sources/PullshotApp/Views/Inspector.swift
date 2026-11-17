@@ -50,16 +50,7 @@ struct Inspector: View {
             }
             GridRow {
                 label("새 항목")
-                HStack(spacing: 4) {
-                    Text("\(newCount)개")
-                    if newCount > 0 {
-                        Text("새")
-                            .font(.caption2.bold())
-                            .foregroundStyle(.white)
-                            .padding(.horizontal, 6)
-                            .background(Color.newCapture, in: .capsule)
-                    }
-                }
+                Text("\(newCount)개")
             }
         }
         Divider()

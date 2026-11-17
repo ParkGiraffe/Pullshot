@@ -83,16 +83,8 @@ struct Sidebar: View {
                     .foregroundStyle(Color.pullshotAccent)
             }
             Spacer()
-            if scope == .new, count > 0 {
-                Text(count, format: .number)
-                    .font(.caption.bold())
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 6)
-                    .background(Color.newCapture, in: .capsule)
-            } else {
-                Text(count, format: .number)
-                    .foregroundStyle(.secondary)
-            }
+            Text(count, format: .number)
+                .foregroundStyle(.secondary)
         }
         .tag(scope)
     }

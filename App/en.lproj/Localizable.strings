@@ -61,7 +61,6 @@
 "%@, %lld개" = "%@ · Items: %lld";
 "없음" = "None";
 "%lld개" = "%lld";
-"새" = "New";
 "가져올 곳" = "Import to";
 "새 항목 %lld개 가져오기" = "Import New Items (%lld)";
 "게임 전체 내보내기" = "Export Entire Game";
