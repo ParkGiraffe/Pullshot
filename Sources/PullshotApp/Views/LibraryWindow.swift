@@ -5,7 +5,6 @@ struct LibraryWindow: View {
     @Bindable var model: LibraryModel
     @AppStorage(SettingsKey.thumbnailSize.rawValue) private var thumbnailSize = 180.0
     @AppStorage(SettingsKey.viewMode.rawValue) private var viewMode = ViewMode.newest
-    @State private var isNarrow = false
 
     private var isReady: Bool {
         if case .ready = model.connection {
@@ -71,12 +70,8 @@ struct LibraryWindow: View {
             }
         }
         .inspector(isPresented: Binding(
-            get: { isReady && model.isInspectorShown && !isNarrow },
-            set: { isShown in
-                if !isNarrow {
-                    model.isInspectorShown = isShown
-                }
-            }
+            get: { isReady && model.isInspectorShown },
+            set: { model.isInspectorShown = $0 }
         )) {
             if isReady {
                 Inspector(model: model, captures: model.visibleCaptures)
@@ -88,7 +83,6 @@ struct LibraryWindow: View {
                     }
             }
         }
-        .onGeometryChange(for: Bool.self) { $0.size.width < 980 } action: { isNarrow = $0 }
         .environment(model.thumbnails)
         .task { await model.watchConsoles() }
     }

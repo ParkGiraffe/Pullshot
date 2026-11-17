@@ -22,6 +22,7 @@ struct PullshotApp: App {
             }
             .tint(.pullshotAccent)
         }
+        .defaultSize(width: 1200, height: 760)
         .commands {
             CommandGroup(replacing: .help) {
                 Button("로그 파일 보기", action: showLogFile)
