@@ -11,8 +11,9 @@
 | 항목 | 화면의 목록과 칸 이름(모든 항목, 새 항목, 고른 항목)에서 캡처를 부르는 말입니다. 화면 문장에서는 "사진과 동영상"이라고 쓰고, 코드와 문서의 문장에서는 캡처라고 씁니다. | |
 | 게임 | 캡처가 든 앨범 폴더입니다. 폴더 이름이 게임 이름입니다. | `Game`, `Capture.gameName` |
 | 기타 | 게임 폴더 밖에 있거나 스위치의 "기타" 폴더에 든 캡처의 묶음입니다. 옮긴 기록의 키에는 원래 폴더 이름을 그대로 둡니다. | `Game.isOther`, `Game.otherFolderName` |
-| 옮김 | 가져오기나 내보내기로 캡처를 Mac에 저장한 일입니다. | `Transfer`, `TransferKind` |
-| 가져오기 | 캡처를 가져올 곳의 게임 이름 폴더에 원래 이름 그대로 받는 일입니다. 앱은 새 항목만 가져옵니다. | `TransferKind.imported` |
-| 내보내기 | 고른 캡처를 내보낼 기준 폴더에 받는 일입니다. 게임 이름 폴더와 번호 붙이기를 고를 수 있습니다. | `TransferKind.exported`, `ExportOptions` |
+| 옮김 | 가져오기나 CLI의 `pull`, `export`로 캡처를 Mac에 저장한 일입니다. | `Transfer`, `TransferKind` |
+| 저장 위치 | 앱이 가져온 캡처를 두는 기준 폴더입니다. 기본값은 `~/Pictures/Pullshot`입니다. | `AppSettings.importFolder` |
+| 가져오기 | 캡처를 저장 위치에 받는 일입니다. 새 항목과 모두 가져오기는 게임 이름 폴더에 원래 이름 그대로 받고, 고른 것을 가져올 때는 폴더별로 나눠 저장할지와 번호 붙이기를 고를 수 있습니다. | `ImportTarget`, `TransferKind.imported` |
+| 내보내기 | CLI의 `export`가 고른 캡처를 `--out` 폴더에 받는 일입니다. 앱의 고른 것 가져오기도 같은 규칙으로 두고 옮긴 기록에 내보내기로 남깁니다. 앱 화면에는 쓰지 않습니다. | `TransferKind.exported`, `ExportOptions` |
 | 옮긴 기록 | 옮긴 캡처를 기기 일련번호와 함께 적어 둔 파일입니다. 새 항목은 이 기록으로 가립니다. | `TransferLedger`, `CaptureKey` |
 | 새 항목 | 아직 한 번도 옮기지 않은 캡처입니다. | `LedgerIndex.newCaptures` |
