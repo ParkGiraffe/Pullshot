@@ -56,7 +56,7 @@ struct Sidebar: View {
                     gameRow(game, hasNew: game.captures.contains { newIDs.contains($0.id) })
                 }
                 if shownGames.isEmpty {
-                    Text("찾는 게임이 없습니다")
+                    Text("찾는 폴더가 없습니다")
                         .foregroundStyle(.secondary)
                 }
             }
@@ -65,7 +65,7 @@ struct Sidebar: View {
             HStack(spacing: 6) {
                 Image(systemName: "line.3.horizontal.decrease")
                     .foregroundStyle(.secondary)
-                TextField("게임 이름으로 찾기", text: $model.gameSearch)
+                TextField("폴더 이름으로 찾기", text: $model.gameSearch)
                     .textFieldStyle(.plain)
             }
             .padding(8)

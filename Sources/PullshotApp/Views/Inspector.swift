@@ -29,7 +29,6 @@ struct Inspector: View {
     @ViewBuilder private var scopeInfo: some View {
         let summary = CaptureSummary(captures)
         let newCount = model.index.newCaptures(captures, serialNumber: model.serialNumber ?? "").count
-        let lastTransfer = model.index.lastTransfer(of: captures, serialNumber: model.serialNumber ?? "")
         if let latest = captures.min(by: Capture.newestFirst) {
             Thumbnail(capture: latest)
                 .aspectRatio(16 / 9, contentMode: .fit)
@@ -37,21 +36,11 @@ struct Inspector: View {
         }
         field(model.scope.title)
         properties("정보") {
-            row("항목", Text("\(captures.count) (사진 \(summary.photoCount), 동영상 \(summary.videoCount))"))
+            row("항목", Text("\(captures.count)개"))
+            row("사진", Text("\(summary.photoCount)개"))
+            row("동영상", Text("\(summary.videoCount)개"))
             row("크기", size(summary))
-            if let first = summary.first, let last = summary.last {
-                row("처음 찍은 날", Text(first, format: Date.FormatStyle(date: .numeric)))
-                row("마지막 찍은 날", Text(last, format: Date.FormatStyle(date: .numeric)))
-            }
-            if let lastTransfer {
-                row("지난번 옮긴 날", Text("\(lastTransfer.day, format: .dateTime.month().day()), \(lastTransfer.count)개"))
-            } else {
-                row("지난번 옮긴 날", Text("없음"))
-            }
-            GridRow {
-                label("새 항목")
-                Text("\(newCount)개")
-            }
+            row("새 항목", Text("\(newCount)개"))
         }
         Divider()
         folderButton("가져올 곳", path: Text(verbatim: importFolder.abbreviatedPath)) {
@@ -109,7 +98,8 @@ struct Inspector: View {
         stack(Array(selected.prefix(3)))
         field(Text("\(selected.count)개 고름"))
         properties("고른 항목") {
-            row("사진, 동영상", Text("사진 \(summary.photoCount), 동영상 \(summary.videoCount)"))
+            row("사진", Text("\(summary.photoCount)개"))
+            row("동영상", Text("\(summary.videoCount)개"))
             row("크기", size(summary))
             if let first = summary.first, let last = summary.last {
                 row("찍은 때", Text(CaptureTimeText.current.span(first, last)))

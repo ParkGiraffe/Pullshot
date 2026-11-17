@@ -38,8 +38,8 @@
 "동영상" = "Videos";
 "최근 옮긴 항목" = "Recently Transferred";
 "게임 (%lld)" = "Games: %lld";
-"찾는 게임이 없습니다" = "No matching games";
-"게임 이름으로 찾기" = "Search games";
+"찾는 폴더가 없습니다" = "No matching folders";
+"폴더 이름으로 찾기" = "Search folders";
 "필터" = "Filter";
 "사진과 동영상" = "Photos and Videos";
 "사진" = "Photos";
@@ -53,13 +53,7 @@
 "오른쪽 칸" = "Inspector";
 "정보" = "Info";
 "항목" = "Items";
-"%lld (사진 %lld, 동영상 %lld)" = "%lld (Photos: %lld, Videos: %lld)";
 "크기" = "Size";
-"처음 찍은 날" = "First captured";
-"마지막 찍은 날" = "Last captured";
-"지난번 옮긴 날" = "Last transferred";
-"%@, %lld개" = "%@ · Items: %lld";
-"없음" = "None";
 "%lld개" = "%lld";
 "가져올 곳" = "Import to";
 "새 항목 %lld개 가져오기" = "Import New Items (%lld)";
@@ -67,8 +61,6 @@
 "모두 내보내기" = "Export All";
 "%lld개 고름" = "Selected: %lld";
 "고른 항목" = "Selection";
-"사진, 동영상" = "Photos, Videos";
-"사진 %lld, 동영상 %lld" = "Photos: %lld, Videos: %lld";
 "찍은 때" = "Captured";
 "내보낼 곳" = "Export to";
 "고르기…" = "Choose…";
