@@ -51,7 +51,7 @@ struct Sidebar: View {
             pinnedRow("새 항목", icon: "tray.and.arrow.down", scope: .new, count: newIDs.count)
             pinnedRow("동영상", icon: "video", scope: .videos, count: count(.videos))
             pinnedRow("최근 옮긴 항목", icon: "clock", scope: .recentlyTransferred, count: count(.recentlyTransferred))
-            Section("게임 (\(allGames.count))") {
+            Section("폴더 (\(allGames.count))") {
                 ForEach(shownGames) { game in
                     gameRow(game, hasNew: game.captures.contains { newIDs.contains($0.id) })
                 }

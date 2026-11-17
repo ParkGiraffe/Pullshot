@@ -37,7 +37,7 @@
 "새 항목" = "New";
 "동영상" = "Videos";
 "최근 옮긴 항목" = "Recently Transferred";
-"게임 (%lld)" = "Games: %lld";
+"폴더 (%lld)" = "Folders: %lld";
 "찾는 폴더가 없습니다" = "No matching folders";
 "폴더 이름으로 찾기" = "Search folders";
 "필터" = "Filter";
