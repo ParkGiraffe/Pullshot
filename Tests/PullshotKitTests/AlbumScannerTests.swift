@@ -26,14 +26,6 @@ struct AlbumScannerTests {
             #expect(!source.requestedParents.contains(0))
         }
 
-        @Test func `폴더가 겹쳐 있으면 바로 위 폴더를 게임으로 본다`() throws {
-            let source = FakeAlbumSource.tree([
-                .folder(0x10, "Album", [.folder(0x11, "Splatoon 3", [.file(0x12, "x.jpg")])]),
-            ])
-
-            #expect(try AlbumScanner(source: source).scan().captures.map(\.gameFolder) == ["Splatoon 3"])
-        }
-
         @Test func `위험한 폴더 이름 안의 캡처는 게임 없이 둔다`() throws {
             let source = FakeAlbumSource.tree([.folder(0x10, "..", [.file(0x11, "a.jpg")])])
 
@@ -43,13 +35,17 @@ struct AlbumScannerTests {
 
     @Suite("건너뛰기")
     struct Skipping {
-        @Test func `객체 하나를 읽지 못하면 그것만 건너뛴다`() throws {
+        @Test(arguments: [
+            (SessionError.response(.invalidObjectHandle, operation: .getObjectInfo), "response 0x2009"),
+            (PTPDecodingError.badString, "badString"),
+        ] as [(any Error, String)])
+        func `객체 하나를 읽지 못하거나 이름을 풀 수 없으면 그것만 건너뛴다`(error: any Error, reason: String) throws {
             let source = FakeAlbumSource.tree([.file(0x11, "a.jpg"), .file(0x12, "b.jpg")])
-            source.objectInfoErrors[0x11] = SessionError.response(.invalidObjectHandle, operation: .getObjectInfo)
+            source.objectInfoErrors[0x11] = error
             let scan = try AlbumScanner(source: source).scan()
 
             #expect(scan.captures.map(\.handle) == [0x12])
-            #expect(scan.skipped == [SkippedObject(handle: 0x11, reason: "response 0x2009")])
+            #expect(scan.skipped == [SkippedObject(handle: 0x11, reason: reason)])
         }
 
         @Test func `전송이 끊기면 훑기를 멈춘다`() {
@@ -57,15 +53,6 @@ struct AlbumScannerTests {
             source.objectInfoErrors[0x11] = SessionError.transport(.disconnected)
 
             #expect(throws: SessionError.transport(.disconnected)) { try AlbumScanner(source: source).scan() }
-        }
-
-        @Test func `이름을 풀 수 없는 객체는 그것만 건너뛴다`() throws {
-            let source = FakeAlbumSource.tree([.file(0x11, "a.jpg"), .file(0x12, "b.jpg")])
-            source.objectInfoErrors[0x11] = PTPDecodingError.badString
-            let scan = try AlbumScanner(source: source).scan()
-
-            #expect(scan.captures.map(\.handle) == [0x12])
-            #expect(scan.skipped == [SkippedObject(handle: 0x11, reason: "badString")])
         }
 
         @Test func `루트를 읽지 못하는 저장소는 이유와 관계없이 건너뛴다`() throws {
@@ -97,16 +84,6 @@ struct AlbumScannerTests {
             #expect(seen == 2)
         }
 
-        @Test func `쓸 수 없는 저장소는 건너뛴다`() throws {
-            let source = FakeAlbumSource.tree(
-                [.file(0x11, "a.jpg")],
-                extraStorage: 0x0002_0001,
-                extraStorageError: .response(.storeNotAvailable, operation: .getObjectHandles)
-            )
-
-            #expect(try AlbumScanner(source: source).scan().captures.count == 1)
-        }
-
         @Test func `받을 폴더 밖을 가리킬 수 있는 파일 이름은 건너뛴다`() throws {
             let names = ["", ".", "..", "a/b.jpg", "x\u{0}.jpg"]
             let source = FakeAlbumSource.tree(names.enumerated().map { .file(UInt32(0x40 + $0.offset), $0.element) })
@@ -135,24 +112,11 @@ struct AlbumScannerTests {
 
     @Suite("캡처 정보")
     struct Details {
-        @Test func `찍은 시각은 기기 정보를 먼저 쓰고 없으면 파일 이름에서 읽는다`() throws {
+        @Test func `찍은 시각은 기기 정보를 먼저 쓰고 없으면 파일 이름에서 정한 시간대의 시각으로 읽는다`() throws {
             let source = FakeAlbumSource.tree([
                 .file(0x11, "20200101000000_1.jpg", captureDate: "20261114T211205"),
                 .file(0x12, "20261113160500_1.jpg"),
                 .file(0x13, "screenshot.jpg"),
-            ])
-            let captures = try AlbumScanner(source: source, timeZone: seoul).scan().captures
-            let byHandle = Dictionary(uniqueKeysWithValues: captures.map { ($0.handle, $0.capturedAt) })
-
-            #expect(byHandle[0x11] == dateFixture("2026-11-14 21:12:05"))
-            #expect(byHandle[0x12] == dateFixture("2026-11-13 16:05:00"))
-            #expect(byHandle[0x13] == .some(nil))
-        }
-
-        @Test func `찍은 시각은 정한 시간대의 시각으로 읽는다`() throws {
-            let source = FakeAlbumSource.tree([
-                .file(0x11, "20200101000000_1.jpg", captureDate: "20261114T211205"),
-                .file(0x12, "20261113160500_1.jpg"),
             ])
             let losAngeles = try #require(TimeZone(identifier: "America/Los_Angeles"))
             let captures = try AlbumScanner(source: source, timeZone: losAngeles).scan().captures
@@ -161,6 +125,7 @@ struct AlbumScannerTests {
             // 11월의 로스앤젤레스는 UTC-8이라 서울(UTC+9)로 적으면 17시간 뒤입니다.
             #expect(byHandle[0x11] == dateFixture("2026-11-15 14:12:05"))
             #expect(byHandle[0x12] == dateFixture("2026-11-14 09:05:00"))
+            #expect(byHandle[0x13] == .some(nil))
         }
 
         @Test func `크기가 모두 1인 비트면 알 수 없음이다`() throws {

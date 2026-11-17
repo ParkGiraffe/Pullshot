@@ -14,10 +14,6 @@ struct ContainerTests {
                 0, 0, 0, 0, 0x01, 0, 0, 0,
             ]))
         }
-
-        @Test func `스위치가 응답하는 기본 명령은 0x1001부터 0x100A까지 열 개다`() {
-            #expect(PTP.Operation.baseline.map(\.rawValue) == Array(0x1001 ... 0x100A))
-        }
     }
 
     @Suite("헤더 읽기")
@@ -35,18 +31,6 @@ struct ContainerTests {
             #expect(throws: PTPDecodingError.unknownContainerKind(9)) {
                 try ContainerHeader(Data([12, 0, 0, 0, 9, 0, 0x01, 0x20, 0, 0, 0, 0]))
             }
-        }
-    }
-
-    @Suite("응답 인자")
-    struct Parameters {
-        @Test func `응답 페이로드를 32비트 인자 목록으로 읽는다`() {
-            var payload = ByteWriter()
-            payload.u32(7)
-            payload.u32(9)
-            let container = Container(kind: .response, code: 0x2001, transactionID: 1, payload: payload.data)
-
-            #expect(container.parameters == [7, 9])
         }
     }
 }

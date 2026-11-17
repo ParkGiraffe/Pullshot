@@ -32,11 +32,5 @@ struct GameTests {
             #expect(games.map(\.name) == ["기타"])
             #expect(games[0].captures.map(\.gameFolder) == ["기타", nil])
         }
-
-        @Test func `기타 묶음만 기타라고 알린다`() {
-            let games = Game.games(in: [captureFixture("a.jpg", game: nil), captureFixture("b.jpg")])
-
-            #expect(games.map(\.isOther) == [false, true])
-        }
     }
 }

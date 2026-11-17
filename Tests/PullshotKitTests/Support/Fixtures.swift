@@ -44,11 +44,10 @@ func objectInfoFixture(
     format: PTP.ObjectFormat = .exifJPEG,
     size: UInt32 = 1000,
     parent: UInt32 = 0,
-    storageID: UInt32 = 0x0001_0001,
     captureDate: String = ""
 ) -> Data {
     var writer = ByteWriter()
-    writer.u32(storageID)
+    writer.u32(0x0001_0001)
     writer.u16(format.rawValue)
     writer.u16(0)
     writer.u32(size)

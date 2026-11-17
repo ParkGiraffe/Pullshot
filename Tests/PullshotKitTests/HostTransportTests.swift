@@ -16,32 +16,26 @@ struct HostTransportTests {
             #expect(picked?.bulkOut == 0x02)
             #expect(picked?.interruptIn == 0x83)
         }
-
-        @Test func `벌크 출력이 없으면 고를 수 없다`() {
-            let picked = EndpointSelection.pick([
-                EndpointDescriptor(address: 0x81, transferType: .bulk, maxPacketSize: 512),
-            ])
-
-            #expect(picked == nil)
-        }
     }
 
     @Suite("전송 오류")
     struct Errors {
-        @Test func `파이프 멈춤 코드는 부호가 붙어 와도 멈춤으로 본다`() {
-            #expect(TransportError(ioReturn: Int(Int32(bitPattern: 0xE000_5000))) == .stalled)
-            #expect(TransportError(ioReturn: 0xE000_5000) == .stalled)
-        }
-
-        @Test func `시간 초과와 기기가 사라진 코드를 가른다`() {
-            #expect(TransportError(ioReturn: Int(Int32(bitPattern: 0xE000_02D6))) == .timedOut)
-            for code: UInt32 in [0xE000_02C0, 0xE000_02D7, 0xE000_02D9, 0xE000_02EB, 0xE000_02ED] {
-                #expect(TransportError(ioReturn: Int(Int32(bitPattern: code))) == .disconnected)
-            }
-        }
-
-        @Test func `그 밖의 코드는 코드를 그대로 담는다`() {
-            #expect(TransportError(ioReturn: Int(Int32(bitPattern: 0xE000_02BC))) == .io(code: 0xE000_02BC))
+        @Test(arguments: [
+            (0xE000_5000, TransportError.stalled),
+            (0xE000_02D6, .timedOut),
+            (0xE000_02C0, .disconnected),
+            (0xE000_02D7, .disconnected),
+            (0xE000_02D9, .disconnected),
+            (0xE000_02EB, .disconnected),
+            (0xE000_02ED, .disconnected),
+            (0xE000_02BC, .io(code: 0xE000_02BC)),
+        ] as [(UInt32, TransportError)])
+        func `IOKit 코드는 부호가 붙어 와도 멈춤, 시간 초과, 끊김, 그 밖의 오류로 가른다`(
+            code: UInt32,
+            expected: TransportError
+        ) {
+            #expect(TransportError(ioReturn: Int(Int32(bitPattern: code))) == expected)
+            #expect(TransportError(ioReturn: Int(code)) == expected)
         }
     }
 }

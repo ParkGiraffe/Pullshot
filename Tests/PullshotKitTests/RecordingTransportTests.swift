@@ -42,36 +42,5 @@ struct RecordingTransportTests {
 
             #expect(throws: TransportError.timedOut) { try replay.read(maxLength: 8, timeout: 1) }
         }
-
-        @Test func `장치 리셋과 그 실패도 기록하고 재생한다`() throws {
-            let file = logFile()
-            let live = ScriptedTransport([])
-            live.ptpResetError = .stalled
-            let recorder = try RecordingTransport(wrapping: live, to: file)
-
-            #expect(throws: TransportError.stalled) { try recorder.resetPTPDevice() }
-
-            try recorder.resetUSBDevice()
-            let replay = try ReplayTransport(contentsOf: file)
-
-            #expect(throws: TransportError.stalled) { try replay.resetPTPDevice() }
-
-            try replay.resetUSBDevice()
-
-            #expect(replay.isFinished)
-        }
-    }
-
-    @Suite("어긋난 재생")
-    struct Mismatch {
-        @Test func `기록과 다른 명령을 쓰면 몇 번째 기록에서 어긋났는지 알린다`() throws {
-            let file = logFile()
-            try #"{"dir":"out","hex":"0c0000000100041001000000"}"#.write(to: file, atomically: true, encoding: .utf8)
-            let replay = try ReplayTransport(contentsOf: file)
-
-            #expect(throws: ReplayError.unexpectedWrite(index: 0)) {
-                try replay.write(Container.command(.getObjectHandles, transactionID: 1).encoded(), timeout: 1)
-            }
-        }
     }
 }

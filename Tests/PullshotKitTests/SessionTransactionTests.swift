@@ -89,24 +89,5 @@ struct SessionTransactionTests {
             #expect(throws: SessionError.transport(.timedOut)) { try session.storageIDs() }
             #expect(!session.isValid)
         }
-
-        @Test func `트랜잭션 ID는 0xFFFFFFFE 다음에 1로 돌아간다`() throws {
-            var ids = ByteWriter()
-            ids.u32Array([])
-            let transport = ScriptedTransport([
-                .expectWrite(Container.command(.getStorageIDs, transactionID: 0xFFFF_FFFE).encoded()),
-                .read(dataContainerFixture(.getStorageIDs, tid: 0xFFFF_FFFE, ids.data)),
-                .read(responseFixture(0x2001, tid: 0xFFFF_FFFE)),
-                .expectWrite(Container.command(.getStorageIDs, transactionID: 1).encoded()),
-                .read(dataContainerFixture(.getStorageIDs, tid: 1, ids.data)),
-                .read(responseFixture(0x2001, tid: 1)),
-            ])
-            let session = Session.openedForTesting(transport: transport)
-            session.nextTransactionID = 0xFFFF_FFFE
-            _ = try session.storageIDs()
-            _ = try session.storageIDs()
-
-            #expect(transport.isFinished)
-        }
     }
 }

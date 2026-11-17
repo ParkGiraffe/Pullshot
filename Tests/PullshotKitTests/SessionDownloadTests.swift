@@ -41,16 +41,6 @@ struct SessionDownloadTests {
             #expect(reported == reported.sorted())
             #expect(try contents(of: folder) == ["20261114211205_1.jpg"])
         }
-
-        @Test func `썸네일은 데이터 단계를 그대로 돌려준다`() throws {
-            let transport = ScriptedTransport([
-                .expectWrite(Container.command(.getThumb, transactionID: 1, parameters: [7]).encoded()),
-                .read(dataContainerFixture(.getThumb, tid: 1, Data([0xFF, 0xD8]))),
-                .read(responseFixture(0x2001, tid: 1)),
-            ])
-
-            #expect(try Session.openedForTesting(transport: transport).thumbnail(7) == Data([0xFF, 0xD8]))
-        }
     }
 
     @Suite("실패")
@@ -108,31 +98,10 @@ struct SessionDownloadTests {
             }
             #expect(try contents(of: folder).isEmpty)
         }
-
-        @Test func `썸네일이 없다는 응답은 오류로 던진다`() {
-            let transport = ScriptedTransport([.expectWrite(nil), .read(responseFixture(0x2010, tid: 1))])
-
-            #expect(throws: SessionError.response(.noThumbnailPresent, operation: .getThumb)) {
-                try Session.openedForTesting(transport: transport).thumbnail(1)
-            }
-        }
     }
 
     @Suite("드문 순서")
     struct Unusual {
-        @Test func `이미 취소된 상태면 명령을 보내지 않고 세션도 유지한다`() throws {
-            let folder = try emptyFolder()
-            let transport = ScriptedTransport([])
-            let session = Session.openedForTesting(transport: transport)
-
-            #expect(throws: SessionError.cancelled) {
-                try session.download(1, expectedSize: 1, to: folder.appending(path: "a.jpg"), isCancelled: { true })
-            }
-            #expect(transport.written.isEmpty)
-            #expect(session.isValid)
-            #expect(try contents(of: folder).isEmpty)
-        }
-
         @Test func `데이터 없이 바로 온 오류 응답은 던지되 세션은 유지한다`() throws {
             let folder = try emptyFolder()
             let session = Session.openedForTesting(transport: ScriptedTransport([

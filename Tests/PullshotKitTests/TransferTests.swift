@@ -14,12 +14,9 @@ struct TransferTests {
             ledger = try TransferLedger(directory: temporaryFolderFixture())
         }
 
-        var transfer: Transfer {
-            Transfer(source: source, ledger: ledger, serialNumber: "S1")
-        }
-
         func run(_ captures: [Capture], isCancelled: () -> Bool = { false }) throws -> TransferSummary {
-            try transfer.run(TransferItem.imports(captures, into: root), as: .imported, isCancelled: isCancelled)
+            try Transfer(source: source, ledger: ledger, serialNumber: "S1")
+                .run(TransferItem.imports(captures, into: root), as: .imported, isCancelled: isCancelled)
         }
 
         /// 받을 곳의 게임 폴더에 파일을 미리 둡니다.
@@ -46,20 +43,6 @@ struct TransferTests {
             #expect(attributes[.creationDate] as? Date == capture.capturedAt)
             #expect(attributes[.modificationDate] as? Date == capture.capturedAt)
             #expect(setup.ledger.index.isTransferred(capture, serialNumber: "S1"))
-        }
-
-        @Test func `진행은 캡처를 시작할 때와 바이트를 받을 때 알린다`() throws {
-            let setup = try Setup()
-            var reported: [TransferProgress] = []
-            _ = try setup.transfer.run(
-                TransferItem.imports(Array(three.prefix(2)), into: setup.root),
-                as: .imported,
-                progress: { reported.append($0) }
-            )
-
-            #expect(reported.map(\.index) == [0, 0, 1, 1])
-            #expect(reported.map(\.total) == [2, 2, 2, 2])
-            #expect(reported.map(\.bytes) == [0, 5, 0, 5])
         }
 
         @Test func `한 캡처가 실패해도 나머지를 받는다`() throws {

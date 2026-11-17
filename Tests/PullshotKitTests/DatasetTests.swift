@@ -60,17 +60,17 @@ struct DatasetTests {
         static let seoul = TimeZone(identifier: "Asia/Seoul") ?? .gmt
         static let expected = Date(timeIntervalSince1970: 1_794_658_325) // 2026-11-14 12:12:05 UTC
 
-        @Test func `시간대가 없으면 받은 시간대로 읽는다`() {
-            #expect(DateTimeString.parse("20261114T211205", timeZone: Self.seoul) == Self.expected)
-        }
-
-        @Test func `초 아래 자리는 버린다`() {
-            #expect(DateTimeString.parse("20261114T211205.5", timeZone: Self.seoul) == Self.expected)
-        }
-
-        @Test func `Z는 UTC, 부호 붙은 네 자리는 그 오프셋으로 읽는다`() {
-            #expect(DateTimeString.parse("20261114T121205Z", timeZone: Self.seoul) == Self.expected)
-            #expect(DateTimeString.parse("20261114T211205+0900", timeZone: .gmt) == Self.expected)
+        @Test(arguments: [
+            ("20261114T211205", seoul),
+            ("20261114T211205.5", seoul),
+            ("20261114T121205Z", seoul),
+            ("20261114T211205+0900", .gmt),
+        ] as [(String, TimeZone)])
+        func `시간대가 없으면 받은 시간대로, Z는 UTC로, 부호 붙은 네 자리는 그 오프셋으로 읽고 초 아래는 버린다`(
+            text: String,
+            timeZone: TimeZone
+        ) {
+            #expect(DateTimeString.parse(text, timeZone: timeZone) == Self.expected)
         }
 
         @Test func `형식이 다르거나 없는 날짜면 nil이다`() {

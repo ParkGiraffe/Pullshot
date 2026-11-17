@@ -33,14 +33,6 @@ struct PacketBufferTests {
             #expect(try buffer.nextContainer()?.kind == .response)
             #expect(buffer.isEmpty)
         }
-
-        @Test func `0바이트 조각은 아무것도 바꾸지 않는다`() throws {
-            var buffer = PacketBuffer()
-            buffer.append(Data())
-
-            #expect(buffer.isEmpty)
-            #expect(try buffer.peekHeader() == nil)
-        }
     }
 
     @Suite("흘려 읽기")

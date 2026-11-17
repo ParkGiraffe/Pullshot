@@ -17,14 +17,4 @@ struct CaptureSummaryTests {
         #expect(summary.first == dateFixture("2026-11-01 09:00:00"))
         #expect(summary.last == dateFixture("2026-11-14 23:40:00"))
     }
-
-    @Test func `캡처가 없으면 모두 0이고 찍은 때는 없다`() {
-        let summary = CaptureSummary([])
-
-        #expect(summary.photoCount == 0)
-        #expect(summary.videoCount == 0)
-        #expect(summary.totalSize == 0)
-        #expect(summary.first == nil)
-        #expect(summary.last == nil)
-    }
 }

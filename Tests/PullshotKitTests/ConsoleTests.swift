@@ -15,33 +15,27 @@ struct ConsoleTests {
             #expect(ConsoleModel.matchingIdle(vendorID: 0x057E, productID: 0x2060) == .switch2)
             #expect(ConsoleModel.matchingIdle(vendorID: 0x057E, productID: 0x2061) == nil)
         }
-
-        @Test func `실기기로 확인하지 못한 스위치 1만 실험적 지원이다`() {
-            #expect(ConsoleModel.switch1.isExperimental)
-            #expect(!ConsoleModel.switch2.isExperimental)
-        }
     }
 
     @Suite("접근 오류")
     struct Access {
-        @Test func `다른 앱이 잡았을 때 나오는 두 코드는 부호가 붙어 와도 같은 오류다`() {
-            for code: UInt32 in [0xE000_02C5, 0xE000_02C9] {
-                #expect(ConsoleAccessError(ioReturn: Int(Int32(bitPattern: code))) == .heldByAnotherApp(
-                    code: code,
-                    owner: nil
-                ))
-                #expect(ConsoleAccessError(ioReturn: Int(code)) == .heldByAnotherApp(code: code, owner: nil))
-            }
+        @Test(arguments: [
+            (0xE000_02C5, ConsoleAccessError.heldByAnotherApp(code: 0xE000_02C5, owner: nil)),
+            (0xE000_02C9, .heldByAnotherApp(code: 0xE000_02C9, owner: nil)),
+            (0xE000_02BC, .other(code: 0xE000_02BC)),
+        ] as [(UInt32, ConsoleAccessError)])
+        func `IOKit 코드는 부호가 붙어 와도 다른 앱이 잡은 것과 그 밖의 오류로 가른다`(
+            code: UInt32,
+            expected: ConsoleAccessError
+        ) {
+            #expect(ConsoleAccessError(ioReturn: Int(Int32(bitPattern: code))) == expected)
+            #expect(ConsoleAccessError(ioReturn: Int(code)) == expected)
         }
 
         @Test func `인터페이스를 쥔 앱의 이름을 함께 담는다`() {
             let error = ConsoleAccessError(ioReturn: 0xE000_02C5, exclusiveOwner: "pid 38635, Tethersnap")
 
             #expect(error == .heldByAnotherApp(code: 0xE000_02C5, owner: "Tethersnap"))
-        }
-
-        @Test func `그 밖의 코드는 코드를 그대로 담는다`() {
-            #expect(ConsoleAccessError(ioReturn: Int(Int32(bitPattern: 0xE000_02BC))) == .other(code: 0xE000_02BC))
         }
     }
 

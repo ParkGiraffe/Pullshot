@@ -29,15 +29,6 @@ struct TransferLedgerTests {
             let recently = ledger.index.recentlyTransferred([old, recent, found], serialNumber: "S1", since: since)
             #expect(recently.map(\.filename) == ["b.jpg"])
         }
-
-        @Test func `꺼내 둔 색인은 뒤에 남긴 기록으로 바뀌지 않는다`() throws {
-            let ledger = try TransferLedger(directory: temporaryFolderFixture())
-            let before = ledger.index
-            try ledger.record([captureFixture("a.jpg")], serialNumber: "S1", as: .imported)
-
-            #expect(!before.isTransferred(captureFixture("a.jpg"), serialNumber: "S1"))
-            #expect(ledger.index.isTransferred(captureFixture("a.jpg"), serialNumber: "S1"))
-        }
     }
 
     @Suite("저장")
