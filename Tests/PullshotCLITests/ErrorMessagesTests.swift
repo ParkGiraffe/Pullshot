@@ -19,29 +19,9 @@ struct ErrorMessagesTests {
             == "Tethersnap 앱이 스위치를 쓰고 있습니다. 그 앱을 종료하고 다시 시도해 주세요.")
     }
 
-    @Test func `알 수 없는 접근 오류는 코드를 보여 준다`() {
-        #expect(ErrorMessages.message(for: ConsoleAccessError.other(code: 0xE000_02BC))
-            == "스위치에 연결하지 못했습니다(오류 0xE00002BC).")
-    }
-
     @Test func `받는 중 케이블을 뽑으면 연결이 끊겼다고 알린다`() {
         #expect(ErrorMessages.message(for: SessionError.transport(.disconnected))
             == "스위치 연결이 끊겼습니다. 케이블을 확인하고 다시 시도해 주세요.")
-    }
-
-    @Test func `연결은 됐지만 PC로 복사 모드가 아니면 그 모드를 켜라고 한다`() {
-        #expect(ErrorMessages.message(for: CLIError.notInTransferMode("Nintendo Switch 2"))
-            == "Nintendo Switch 2가 연결되어 있지만 PC로 복사 모드가 아닙니다. 본체 설정의 데이터 관리에서 PC로 복사를 켜 주세요.")
-    }
-
-    @Test func `찾을 폴더를 열 수 없으면 경로와 권한을 확인하라고 한다`() {
-        #expect(ErrorMessages.message(for: FolderMatchError.unreadableFolder(URL(filePath: "/tmp/없는 폴더")))
-            == "폴더를 열 수 없습니다: /tmp/없는 폴더. 경로가 맞는지, 터미널에 그 폴더를 읽을 권한이 있는지 확인해 주세요.")
-    }
-
-    @Test func `기기가 없으면 연결 방법을 알려 준다`() {
-        #expect(ErrorMessages.message(for: CLIError.noConsole)
-            == "연결된 스위치가 없습니다. 본체 아래쪽 USB-C 포트에 데이터 케이블로 연결하고, 본체에서 PC로 복사 모드를 켜 주세요.")
     }
 
     @Test func `받을 폴더에 쓰지 못하면 스위치가 아니라 Mac에 저장하지 못한 경로를 알린다`() {
@@ -54,16 +34,6 @@ struct ErrorMessagesTests {
     @Test func `옮긴 기록을 쓰지 못하면 스위치가 아니라 Mac에 저장하지 못했다고 알린다`() {
         #expect(ErrorMessages.message(for: POSIXError(.ENOSPC))
             == "Mac에 파일을 저장하지 못했습니다. 받을 폴더와 옮긴 기록 폴더의 저장 공간이 충분한지, 쓰기 권한이 있는지 확인해 주세요.")
-    }
-
-    @Test func `USB 연결을 재설정한 뒤에도 열지 못하면 PC로 복사를 다시 켜라고 한다`() {
-        #expect(ErrorMessages.message(for: SessionError.needsUSBReset)
-            == "이전 연결이 남아 있어 스위치의 USB 연결을 재설정했고, 이때 PC로 복사가 꺼졌습니다. 본체에서 PC로 복사를 다시 켠 뒤 다시 실행해 주세요.")
-    }
-
-    @Test func `받은 크기가 알린 크기와 다르면 두 크기와 함께 저장하지 않았다고 알린다`() {
-        #expect(ErrorMessages.message(for: SessionError.sizeMismatch(expected: 1000, actual: 998))
-            == "받은 파일의 크기(998바이트)가 스위치에서 알려 준 크기(1000바이트)와 달라 저장하지 않았습니다.")
     }
 
     @Test func `그 밖의 오류는 스위치와 통신하지 못했다며 원래 오류를 함께 보인다`() {

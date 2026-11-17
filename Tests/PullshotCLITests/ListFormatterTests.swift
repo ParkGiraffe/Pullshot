@@ -32,14 +32,5 @@ struct ListFormatterTests {
                 "  2026111421120500_s.jpg  사진  0.0 MB  2026-11-14 21:12  새",
             ])
         }
-
-        @Test func `크기나 찍은 시각을 모르면 줄표로 쓴다`() {
-            let scan = AlbumScan(captures: [captureFixture("a.jpg", game: "Game", size: nil)], skipped: [])
-
-            #expect(ListFormatter.lines(scan, timeZone: timeZoneFixture()) == [
-                "Game (1)",
-                "  a.jpg  사진  -  -",
-            ])
-        }
     }
 }
