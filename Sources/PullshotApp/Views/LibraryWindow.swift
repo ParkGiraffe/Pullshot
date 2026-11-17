@@ -25,6 +25,11 @@ struct LibraryWindow: View {
             if isReady {
                 let captures = model.visibleCaptures
                 content(captures)
+                    .overlay {
+                        if model.isAskingFirstConnect {
+                            FirstConnectQuestion(model: model)
+                        }
+                    }
                     .navigationTitle(model.scope.title)
                     .navigationSubtitle(subtitle(of: captures))
                     .toolbar {
@@ -91,9 +96,6 @@ struct LibraryWindow: View {
             }
         }
         .onGeometryChange(for: Bool.self) { $0.size.width < 980 } action: { isNarrow = $0 }
-        .sheet(isPresented: $model.isAskingFirstConnect) {
-            FirstConnectSheet(model: model)
-        }
         .environment(model.thumbnails)
         .task { await model.watchConsoles() }
     }

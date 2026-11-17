@@ -51,9 +51,9 @@ final class LibraryModel {
     var isAskingFirstConnect = false
     /// 처음 연결 질문에 답해 옮긴 기록에 넣은 캡처 수입니다. 답하기 전에는 nil입니다.
     private(set) var firstConnectRecordedCount: Int?
-    /// 처음 연결 질문에 답하지 못했을 때 시트에 둘 문구입니다.
+    /// 처음 연결 질문에 답하지 못했을 때 질문 카드에 둘 문구입니다.
     private(set) var firstConnectErrorMessage: String?
-    /// 처음 연결 질문의 답을 옮긴 기록에 남기는 일입니다. 폴더에서 찾기는 폴더가 크면 오래 걸려 시트에서 취소할 수 있고,
+    /// 처음 연결 질문의 답을 옮긴 기록에 남기는 일입니다. 폴더에서 찾기는 폴더가 크면 오래 걸려 질문 카드에서 취소할 수 있고,
     /// 기기를 떠나거나 끝낼 때도 취소합니다.
     private var firstConnectTask: Task<Void, Never>?
     /// 옮기는 중이거나 사용자가 닫지 않은 옮기기 결과입니다. 기기가 빠져도 남겨 안내 화면에 보입니다.
@@ -189,7 +189,7 @@ final class LibraryModel {
         firstConnectTask != nil
     }
 
-    /// 처음 연결 질문의 답을 옮긴 기록에 남깁니다. 폴더를 읽지 못하면 시트에 둘 문구를 남깁니다.
+    /// 처음 연결 질문의 답을 옮긴 기록에 남깁니다. 폴더를 읽지 못하면 질문 카드에 둘 문구를 남깁니다.
     func answerFirstConnect(_ answer: FirstConnectAnswer) {
         guard !isShuttingDown, !isAnsweringFirstConnect else { return }
         firstConnectErrorMessage = nil

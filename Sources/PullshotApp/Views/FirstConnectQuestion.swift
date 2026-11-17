@@ -3,7 +3,7 @@ import SwiftUI
 
 /// 기록이 빈 스위치를 처음 열면, 이미 Mac에 받아 둔 캡처를 옮긴 기록에 넣을지 묻습니다.
 /// "나중에"로 닫으면 답하지 않은 것이라 다음 연결에서 다시 묻습니다.
-struct FirstConnectSheet: View {
+struct FirstConnectQuestion: View {
     let model: LibraryModel
     @State private var isChoosingFolder = false
 
@@ -36,7 +36,10 @@ struct FirstConnectSheet: View {
             }
         }
         .padding(20)
-        .frame(width: 460)
+        .frame(maxWidth: 460)
+        .background(.regularMaterial, in: .rect(cornerRadius: 12))
+        .shadow(radius: 16)
+        .padding()
         .fileImporter(isPresented: $isChoosingFolder, allowedContentTypes: [.folder]) { result in
             if case let .success(folder) = result {
                 model.answerFirstConnect(.findInFolder(folder))
