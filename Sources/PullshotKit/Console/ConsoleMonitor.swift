@@ -4,13 +4,16 @@ import IOKit
 public final class ConsoleMonitor {
     public let changes: AsyncStream<Void>
 
-    private let continuation: AsyncStream<Void>.Continuation
+    private let continuation: UnsafeMutablePointer<AsyncStream<Void>.Continuation>
     private let queue = DispatchQueue(label: "com.parkgiraffe.Pullshot.console-monitor")
     private let port: IONotificationPortRef
     private var notifications: [io_iterator_t] = []
 
     public init() {
-        (changes, continuation) = AsyncStream.makeStream(bufferingPolicy: .bufferingNewest(1))
+        let made = AsyncStream<Void>.makeStream(bufferingPolicy: .bufferingNewest(1))
+        changes = made.stream
+        continuation = .allocate(capacity: 1)
+        continuation.initialize(to: made.continuation)
         port = IONotificationPortCreate(kIOMainPortDefault)
         IONotificationPortSetDispatchQueue(port, queue)
         let productIDs = ConsoleModel.all.map(\.productID) + ConsoleModel.all.compactMap(\.idleProductID)
@@ -20,12 +23,11 @@ public final class ConsoleMonitor {
                 port,
                 type,
                 ConsoleLocator.matchingDictionary(productIDs: productIDs),
-                { monitor, notification in
+                { continuation, notification in
                     drain(notification)
-                    guard let monitor else { return }
-                    Unmanaged<ConsoleMonitor>.fromOpaque(monitor).takeUnretainedValue().continuation.yield()
+                    continuation?.assumingMemoryBound(to: AsyncStream<Void>.Continuation.self).pointee.yield()
                 },
-                Unmanaged.passUnretained(self).toOpaque(),
+                continuation,
                 &notification
             )
             guard result == KERN_SUCCESS else {
@@ -42,7 +44,9 @@ public final class ConsoleMonitor {
             notifications.forEach { IOObjectRelease($0) }
             IONotificationPortDestroy(port)
         }
-        continuation.finish()
+        continuation.pointee.finish()
+        continuation.deinitialize(count: 1)
+        continuation.deallocate()
     }
 }
 
