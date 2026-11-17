@@ -23,8 +23,8 @@ setup-hooks:
 APP_ICONS = icon-red-gamepad icon-purple-gamepad icon-shutter
 APP_ICON_FILES = $(APP_ICONS:%=.build/app-icons/%.icns)
 
-.build/app-icons/%.icns: design/app-icon/%.png design/app-icon/%-small.png design/app-icon/make-icns.sh
-	design/app-icon/make-icns.sh $< $@ design/app-icon/$*-small.png
+.build/app-icons/%.icns: App/Icons/%.png App/Icons/%-small.png Scripts/make-icns.sh
+	Scripts/make-icns.sh $< $@ App/Icons/$*-small.png
 
 # Apple 실리콘과 Intel Mac에서 모두 열리도록 아키텍처마다 따로 빌드해 합칩니다.
 # Command Line Tools에는 `swift build --arch`를 여럿 받는 xcbuild가 없습니다(2026-11-16 확인).

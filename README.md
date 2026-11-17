@@ -61,11 +61,11 @@ make test
 make check         # SwiftLint --strict, SwiftFormat --lint
 ```
 
-코딩 규칙은 [docs/conventions.md](docs/conventions.md), 용어는 [docs/glossary.md](docs/glossary.md), 설계 문서는 [docs/superpowers/specs](docs/superpowers/specs)에 있습니다.
+코딩 규칙은 [docs/conventions.md](docs/conventions.md), 용어는 [docs/glossary.md](docs/glossary.md)에 있습니다.
 
 ## 라이선스
 
-MIT 라이선스로 배포합니다. 전문은 [LICENSE](LICENSE)에 있고, CLI가 쓰는 swift-argument-parser의 라이선스 고지는 [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md)에 있습니다.
+MIT 라이선스로 배포합니다. 전문은 [LICENSE](LICENSE)에 있습니다.
 
 Pullshot은 Nintendo가 만들거나 승인한 프로젝트가 아닌 개인 오픈소스 프로젝트입니다. Nintendo Switch와 Nintendo Switch 2는 Nintendo의 상표이며, 이 문서에서는 지원하는 기기를 밝히는 데에만 씁니다.
 

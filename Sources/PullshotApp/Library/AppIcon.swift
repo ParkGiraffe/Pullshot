@@ -8,7 +8,7 @@ enum AppIcon: String, CaseIterable {
     case purple
     case shutter
 
-    /// 번들의 `.icns` 이름입니다. `make app`이 같은 이름의 `design/app-icon` 그림으로 만듭니다.
+    /// 번들의 `.icns` 이름입니다. `make app`이 같은 이름의 `App/Icons` 그림으로 만듭니다.
     var resourceName: String {
         switch self {
         case .red: "icon-red-gamepad"

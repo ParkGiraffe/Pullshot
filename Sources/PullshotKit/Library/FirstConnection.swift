@@ -1,6 +1,6 @@
 import Foundation
 
-/// 처음 연결 질문의 답입니다(설계 6.3).
+/// 처음 연결 질문의 답입니다.
 public enum FirstConnectAnswer: Equatable, Sendable {
     /// 고른 폴더 아래 어디에 있든 파일 이름과 크기가 같은 캡처를 옮긴 것으로 기록합니다.
     case findInFolder(URL)

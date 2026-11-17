@@ -31,12 +31,12 @@ public struct ExportOptions: Equatable, Sendable {
 public extension TransferItem {
     static let defaultImportFolder = URL.picturesDirectory.appending(path: "Pullshot")
 
-    /// `<root>/<게임 이름>/<원래 파일 이름>`입니다(설계 6.3).
+    /// `<root>/<게임 이름>/<원래 파일 이름>`입니다.
     static func imports(_ captures: [Capture], into root: URL = defaultImportFolder) -> [Self] {
         captures.map { Self(capture: $0, folder: root.appending(path: $0.gameName), filename: $0.filename) }
     }
 
-    /// 폴더마다 찍은 순서로 둡니다. 번호를 붙이면 폴더마다 1부터 세고, 자릿수는 최소 3자리입니다(설계 6.4).
+    /// 폴더마다 찍은 순서로 둡니다. 번호를 붙이면 폴더마다 1부터 세고, 자릿수는 최소 3자리입니다.
     /// 폴더 순서는 입력에서 처음 나온 순서입니다.
     static func exports(_ captures: [Capture], options: ExportOptions, timeZone: TimeZone = .current) -> [Self] {
         var folders: [URL] = []
