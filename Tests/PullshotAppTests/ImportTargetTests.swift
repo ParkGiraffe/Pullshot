@@ -5,12 +5,10 @@ import Testing
 
 @Suite("ImportTarget 테스트")
 struct ImportTargetTests {
-    /// 찍은 시각을 몰라 번호 뒤에 원래 이름이 붙으므로, 번호 이름이 실행하는 곳의 시간대에 기대지 않습니다.
     let captures = [
         captureFixture("a.jpg", at: nil),
         captureFixture("b.mp4", game: "마리오 카트 월드", at: nil, kind: .video),
     ]
-    /// 고른 것 가져오기 규칙을 기본값과 모두 다르게 둡니다.
     let options = ExportOptions(baseFolder: URL(filePath: "/tmp/스위치"), makesGameFolder: false, naming: .numbered)
 
     @Test func `새 항목과 모두 가져오기는 고른 규칙과 관계없이 저장 위치의 게임 이름 폴더에 원래 이름 그대로 둔다`() {

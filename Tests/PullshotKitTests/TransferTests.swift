@@ -4,7 +4,6 @@ import Testing
 
 @Suite("Transfer 테스트")
 struct TransferTests {
-    /// 받을 곳, 기록, 가짜 기기입니다.
     struct Setup {
         let root = temporaryFolderFixture()
         let ledger: TransferLedger
@@ -19,7 +18,6 @@ struct TransferTests {
                 .run(TransferItem.imports(captures, into: root), as: .imported, isCancelled: isCancelled)
         }
 
-        /// 받을 곳의 게임 폴더에 파일을 미리 둡니다.
         func place(_ data: Data, named filename: String) throws -> URL {
             let folder = root.appending(path: "젤다무쌍 봉인전기")
             try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)

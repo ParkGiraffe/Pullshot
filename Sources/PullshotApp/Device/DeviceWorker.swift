@@ -1,20 +1,14 @@
 import Foundation
 import PullshotKit
 
-/// 기기와 주고받는 일을 모두 맡습니다. `Session`, `HostTransport`, `TransferLedger`는 밖으로 내보내지 않고
-/// `Sendable` 값만 돌려줍니다. 취소는 부른 작업의 `Task.isCancelled`를 Kit에 넘겨 확인합니다.
 actor DeviceWorker {
-    /// 미리보기 원본을 받는 곳입니다. 앱을 시작할 때와 끝낼 때 지웁니다.
     static let previewFolder = URL.temporaryDirectory.appending(path: "Pullshot-preview")
 
-    /// 블로킹 USB 읽기가 협력 스레드 풀을 막지 않도록 전용 큐에서 돕니다.
     private let queue = DispatchSerialQueue(label: "com.parkgiraffe.Pullshot.device")
     private let ledger: TransferLedger
-    /// 화면 쪽도 연결 오류를 같은 파일에 남기도록 내놓습니다.
     let log: FileLog
     private var transport: HostTransport?
     private var session: Session?
-    /// 연 기기의 일련번호입니다. 닫으면 nil입니다.
     private var serialNumber: String?
 
     nonisolated var unownedExecutor: UnownedSerialExecutor {
@@ -25,7 +19,6 @@ actor DeviceWorker {
         ledger.index
     }
 
-    /// 연 세션을 아직 쓸 수 있는지입니다. 받는 중 Mac 쓰기 오류처럼 기기가 꽂힌 채 세션이 버려지면 거짓이 됩니다.
     var hasUsableSession: Bool {
         session?.isValid == true
     }
@@ -35,8 +28,6 @@ actor DeviceWorker {
         self.log = log
     }
 
-    /// 앞 세션을 닫고 새로 엽니다. 남은 세션을 풀려고 USB 장치를 다시 붙였으면 `needsUSBReset`을 그대로 던지고,
-    /// 기기가 다시 나타나면 부른 쪽이 다시 엽니다.
     func open(_ console: AttachedConsole, isVerbose: Bool) throws -> DeviceInfo {
         close()
         let trace: ((String) -> Void)? = isVerbose ? { [log] in log.write($0) } : nil
@@ -77,14 +68,12 @@ actor DeviceWorker {
         )
     }
 
-    /// 화면 밖으로 나간 칸의 요청이 기기에 가지 않도록 보내기 전에 취소를 확인합니다.
     func thumbnail(of capture: Capture) throws -> Data {
         let session = try requireSession()
         try Task.checkCancellation()
         return try session.thumbnail(capture.handle)
     }
 
-    /// 진행은 캡처를 시작할 때와 앞 알림에서 0.1초가 지났을 때만 넘깁니다. 받는 조각마다 넘기면 화면이 따라가지 못합니다.
     func transfer(
         _ items: [TransferItem],
         as kind: TransferKind,
@@ -108,8 +97,6 @@ actor DeviceWorker {
         return summary
     }
 
-    /// `<미리보기 폴더>/<게임 이름>/<파일 이름>`에 받습니다. 크기가 같은 파일이 있으면 다시 받지 않고,
-    /// 옮긴 기록에는 남기지 않습니다.
     func preview(_ capture: Capture) throws -> URL {
         let session = try requireSession()
         let folder = Self.previewFolder.appending(path: capture.gameName)
@@ -123,13 +110,11 @@ actor DeviceWorker {
         return file
     }
 
-    /// 그 캡처의 미리보기 원본이 그 자리에 다 받아져 있는지입니다. 크기를 모르는 캡처는 다 받았는지 알 수 없어 거짓입니다.
     static func hasPreview(of capture: Capture, at file: URL) -> Bool {
         let attributes = try? FileManager.default.attributesOfItem(atPath: file.path(percentEncoded: false))
         return capture.size != nil && (attributes?[.size] as? NSNumber)?.uint64Value == capture.size
     }
 
-    /// 세션을 닫고 인터페이스를 놓습니다. 기기에 세션이 남으면 다음 연결이 USB 장치 리셋까지 갑니다.
     func close() {
         session?.close()
         transport?.close()
@@ -143,11 +128,9 @@ actor DeviceWorker {
         return session
     }
 
-    /// 다시 붙은 기기는 노드가 먼저 보이고 사진 전송 인터페이스는 조금 늦게 생기므로, 그동안은 몇 초 더 기다립니다.
     private func openTransport(_ console: AttachedConsole, trace: ((String) -> Void)?) throws -> HostTransport {
         let deadline = Date().addingTimeInterval(5)
         while true {
-            // 기기를 바꾸려 취소한 열기가 재시도로 큐를 막지 않게 합니다.
             try Task.checkCancellation()
             do {
                 return try HostTransport(console: console, trace: trace)

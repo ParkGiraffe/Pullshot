@@ -1,7 +1,7 @@
 disabled_rules:
   - function_body_length
   - function_parameter_count
-  - identifier_name # 한국어 테스트 이름
+  - identifier_name
   - large_tuple
   - trailing_whitespace
 

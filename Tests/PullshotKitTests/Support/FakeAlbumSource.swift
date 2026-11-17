@@ -1,7 +1,6 @@
 import Foundation
 @testable import PullshotKit
 
-/// 폴더 나무를 흉내 내는 앨범입니다. 받은 부모 인자를 모아 두어 평면 질의를 했는지 확인합니다.
 final class FakeAlbumSource: AlbumSource {
     enum Node {
         case folder(UInt32, String, [Self])
@@ -31,7 +30,6 @@ final class FakeAlbumSource: AlbumSource {
         return source
     }
 
-    /// 폴더 하나가 자기 자신을 자식으로 다시 돌려주게 만듭니다.
     func makeCycle(at folder: UInt32) {
         children[folder, default: []].append(folder)
     }

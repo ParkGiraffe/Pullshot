@@ -1,7 +1,6 @@
 import PullshotKit
 import SwiftUI
 
-/// 오른쪽 칸 아래 단추 자리에 두는 옮기기 진행과 결과입니다. 결과는 닫거나 다른 것을 고르거나 다른 범위를 볼 때까지 남깁니다.
 struct TransferPanel: View {
     let run: LibraryModel.TransferRun
     let model: LibraryModel
@@ -77,7 +76,6 @@ struct TransferPanel: View {
         }
     }
 
-    /// 크기를 모르는 캡처는 받은 비율도 모르므로 nil이고, 막대는 움직이는 모양으로 둡니다.
     private func fileFraction(of progress: TransferProgress) -> Double? {
         guard let size = progress.capture.size, size > 0 else { return nil }
         return min(Double(progress.bytes) / Double(size), 1)

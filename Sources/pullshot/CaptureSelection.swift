@@ -1,7 +1,6 @@
 import ArgumentParser
 import PullshotKit
 
-/// `pull`과 `export`가 함께 받는 고르기 옵션입니다.
 struct SelectionOptions: ParsableArguments {
     @Flag(name: .customLong("all"), help: "모든 캡처를 고릅니다.")
     var isAll = false
@@ -19,7 +18,6 @@ struct SelectionOptions: ParsableArguments {
         guard isAll || isNewOnly || !names.isEmpty else { throw ValidationError("--all, --new, 캡처 이름 중 하나를 주세요.") }
     }
 
-    /// 새 항목은 이 기기의 옮긴 기록에 없는 캡처입니다. 찾지 못한 이름은 표준 오류에 알리고 개수만 돌려줍니다.
     func choose(
         from captures: [Capture],
         ledger: TransferLedger,
@@ -34,13 +32,11 @@ struct SelectionOptions: ParsableArguments {
     }
 }
 
-/// 명령줄에서 고른 캡처입니다. `pull`, `export`, `list`가 함께 씁니다.
 struct CaptureSelection {
     var names: [String]
     var game: String?
     var isNewOnly: Bool
 
-    /// 게임과 새 항목으로 먼저 좁힌 뒤, 이름을 주면 그 이름만 고릅니다. 이름은 파일 이름이나 "게임 폴더/파일 이름"입니다.
     func choose(from captures: [Capture], isNew: (Capture) -> Bool) -> (chosen: [Capture], missing: [String]) {
         let candidates = captures.filter { capture in
             (game.map { capture.gameName == $0 } ?? true) && (!isNewOnly || isNew(capture))

@@ -41,7 +41,6 @@ struct Export: ParsableCommand {
             )
             let items = TransferItem.exports(chosen, options: options)
             guard !isDryRun else {
-                // 같은 이름의 파일이 이미 있으면 실제로는 "이름 2.확장자"로 저장될 수 있습니다.
                 let basePath = out.url.path(percentEncoded: false) + "/"
                 for item in items {
                     let path = item.folder.appending(path: item.filename).path(percentEncoded: false)

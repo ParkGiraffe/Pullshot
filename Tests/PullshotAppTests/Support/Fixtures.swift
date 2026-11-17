@@ -2,12 +2,10 @@ import Foundation
 @testable import PullshotApp
 @testable import PullshotKit
 
-/// 문자열 표가 사전이 아니거나 비어 있을 때 던집니다. 빈 표끼리 비교해 테스트가 통과하는 일을 막습니다.
 enum StringsTableError: Error {
     case unreadable(String)
 }
 
-/// 리포 뿌리입니다. 테스트 파일 위치에서 찾습니다.
 private let repositoryFolder = URL(filePath: #filePath)
     .deletingLastPathComponent()
     .deletingLastPathComponent()
@@ -23,7 +21,6 @@ func stringsTable(_ language: String) throws -> [String: String] {
     return table
 }
 
-/// "yyyy-MM-dd HH:mm:ss"를 서울 시각으로 읽습니다.
 func dateFixture(_ text: String) -> Date {
     let formatter = DateFormatter()
     formatter.locale = Locale(identifier: "en_US_POSIX")
@@ -33,14 +30,12 @@ func dateFixture(_ text: String) -> Date {
     return date
 }
 
-/// 그레고리력, 서울 시간대입니다. 날짜 묶기가 실행하는 곳의 시간대에 기대지 않게 합니다.
 func calendarFixture() -> Calendar {
     var calendar = Calendar(identifier: .gregorian)
     calendar.timeZone = TimeZone(identifier: "Asia/Seoul") ?? .gmt
     return calendar
 }
 
-/// 훑기를 거친 캡처입니다. 찍은 시각은 서울 시각 글로 받습니다.
 func captureFixture(
     _ filename: String = "2026111421120500_s.jpg",
     game: String? = "젤다무쌍 봉인전기",
@@ -59,7 +54,6 @@ func captureFixture(
     )
 }
 
-/// 이 테스트 프로세스가 처음 쓸 때 한 번 비우고 다시 만드는 임시 뿌리 폴더입니다. 전 실행이 남긴 것을 치웁니다.
 private let temporaryRoot: URL = {
     let root = FileManager.default.temporaryDirectory.appending(path: "PullshotTests/App")
     try? FileManager.default.removeItem(at: root)
@@ -67,13 +61,10 @@ private let temporaryRoot: URL = {
     return root
 }()
 
-/// 임시 뿌리 폴더 아래 새 경로입니다. 만들지는 않습니다.
 func temporaryFolderFixture() -> URL {
     temporaryRoot.appending(path: "\(UUID())")
 }
 
-/// 테스트마다 따로 쓰는 설정 저장소입니다. suite 이름에 절대 경로를 주면 `~/Library/Preferences`가 아니라
-/// 그 경로의 plist에 써서, 테스트가 사용자 설정 폴더에 파일을 남기지 않습니다(2026-11-16, macOS 27.2 확인).
 func defaultsFixture() -> UserDefaults {
     guard let defaults = TemporaryDefaults(suitePath: temporaryFolderFixture().path(percentEncoded: false)) else {
         preconditionFailure("설정 저장소를 만들지 못했습니다")
@@ -81,8 +72,6 @@ func defaultsFixture() -> UserDefaults {
     return defaults
 }
 
-/// 놓을 때 자기 plist를 지우는 설정 저장소입니다. 도메인만 지우면 plist가 임시 폴더에 남아, 파일까지 지웁니다
-/// (2026-11-17, macOS 27.2 확인). 모델이 쥐고 있으면 그 모델이 사라질 때 지워집니다.
 private final class TemporaryDefaults: UserDefaults {
     private let suitePath: String
 
@@ -97,7 +86,6 @@ private final class TemporaryDefaults: UserDefaults {
     }
 }
 
-/// 기기를 열지 않은 모델입니다. 옮긴 기록, 로그, 설정은 테스트마다 따로 둡니다.
 @MainActor
 func libraryModelFixture() throws -> LibraryModel {
     let worker = try DeviceWorker(
@@ -107,7 +95,6 @@ func libraryModelFixture() throws -> LibraryModel {
     return LibraryModel(worker: worker, settings: AppSettings(defaults: defaultsFixture()))
 }
 
-/// PC로 복사 모드로 꽂힌 스위치입니다. 같은 기기인지는 `registryID`로 가립니다.
 func consoleFixture(_ registryID: UInt64, model: ConsoleModel = .switch2) -> AttachedConsole {
     AttachedConsole(model: model, registryID: registryID, locationID: nil, serialNumber: "XKJ1000\(registryID)")
 }

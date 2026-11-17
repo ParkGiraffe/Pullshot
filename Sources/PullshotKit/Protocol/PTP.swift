@@ -1,9 +1,5 @@
-/// PIMA 15740(PTP) 표준의 코드 값입니다.
 public enum PTP {
-    /// GetObjectHandles의 세 번째 인자로 넣으면 루트 바로 아래 객체만 돌려받습니다.
-    /// 0을 넣는 평면 질의는 스위치가 거부하므로 쓰지 않습니다.
     public static let rootParent: UInt32 = 0xFFFF_FFFF
-    /// OpenSession에 넘기는 세션 ID입니다. 표준은 0을 금지합니다.
     public static let sessionID: UInt32 = 1
 
     public enum ContainerKind: UInt16, Sendable {
@@ -31,7 +27,6 @@ public enum PTP {
         public static let getObject = Self(rawValue: 0x1009)
         public static let getThumb = Self(rawValue: 0x100A)
 
-        /// 스위치가 응답하는 명령 전부입니다. 지우기(0x100B)는 없습니다.
         public static let baseline: [Self] = [
             .getDeviceInfo, .openSession, .closeSession, .getStorageIDs, .getStorageInfo,
             .getNumObjects, .getObjectHandles, .getObjectInfo, .getObject, .getThumb,
@@ -68,12 +63,10 @@ public enum PTP {
         }
 
         public static let undefined = Self(rawValue: 0x3000)
-        /// 폴더입니다. 스위치 앨범에서는 게임 하나가 폴더 하나입니다.
         public static let association = Self(rawValue: 0x3001)
         public static let mpeg = Self(rawValue: 0x300B)
         public static let exifJPEG = Self(rawValue: 0x3801)
         public static let png = Self(rawValue: 0x380B)
-        /// MTP 확장의 MP4 형식입니다. 표준 PTP 기기도 쓰는 경우가 있어 영상으로 받아들입니다.
         public static let mp4Container = Self(rawValue: 0xB982)
     }
 }

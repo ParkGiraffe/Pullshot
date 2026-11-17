@@ -16,7 +16,6 @@ struct SessionDownloadTests {
         try FileManager.default.contentsOfDirectory(atPath: folder.path(percentEncoded: false))
     }
 
-    /// 1,512바이트 데이터 컨테이너를 700, 600, 212바이트로 나눠 보내고 OK로 끝냅니다.
     static func chunkedObject() -> [ScriptedTransport.Step] {
         let whole = dataContainerFixture(.getObject, tid: 1, payload)
         return [

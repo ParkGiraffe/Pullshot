@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// 설정 창입니다. 저장 위치, 앱 아이콘, 자세한 로그를 둡니다. 자세한 로그는 다음 연결부터 씁니다.
 struct SettingsView: View {
     @Bindable var settings: AppSettings
     @State private var isChoosingImportFolder = false
@@ -40,7 +39,6 @@ struct SettingsView: View {
         }
     }
 
-    /// Finder에서 고른 아이콘처럼 그림 뒤에 옅은 바탕을, 이름에 강조색 바탕을 깝니다.
     private func iconButton(_ icon: AppIcon) -> some View {
         let isChosen = settings.appIcon == icon
         return Button {

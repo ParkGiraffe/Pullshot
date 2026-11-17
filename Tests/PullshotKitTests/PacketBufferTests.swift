@@ -71,7 +71,6 @@ struct PacketBufferTests {
             #expect(Self.peakResidentBytes() - peakBefore < 64 * 1024 * 1024)
         }
 
-        /// 이 프로세스가 지금까지 가장 많이 쓴 실제 메모리입니다(macOS는 바이트 단위).
         static func peakResidentBytes() -> Int {
             var usage = rusage()
             getrusage(RUSAGE_SELF, &usage)

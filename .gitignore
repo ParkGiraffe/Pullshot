@@ -1,15 +1,11 @@
-# Swift Package Manager
 .build/
 .swiftpm/
 Package.resolved
 
-# macOS
 .DS_Store
 
-# 실기기 덤프: 기기 일련번호와 사용자 캡처가 들어 있습니다
 LocalFixtures/
 
-# 배포물, 작업 기록
 dist/
 .superpowers/
 .omc/

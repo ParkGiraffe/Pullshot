@@ -1,8 +1,6 @@
 import Foundation
 
-/// PTP 날짜 문자열 `YYYYMMDDThhmmss[.s][Z|±hhmm]`을 읽습니다.
 public enum DateTimeString {
-    /// 시간대가 없으면 `timeZone`으로 읽고, 2월 30일처럼 없는 날짜면 nil입니다.
     public static func parse(_ text: String, timeZone: TimeZone) -> Date? {
         let pattern = /(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})(?:\.\d+)?(Z|[+-]\d{4})?/
         guard let match = text.wholeMatch(of: pattern) else { return nil }
@@ -14,7 +12,6 @@ public enum DateTimeString {
             hour: Int(hour), minute: Int(minute), second: Int(second)
         )
         guard let date = calendar.date(from: components) else { return nil }
-        // Calendar는 없는 날짜를 다음 달로 넘기므로, 만든 날짜를 다시 풀어 입력과 같은지 확인합니다.
         let roundTrip = calendar.dateComponents([.year, .month, .day, .hour, .minute, .second], from: date)
         return roundTrip == components ? date : nil
     }

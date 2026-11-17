@@ -2,11 +2,8 @@ import Foundation
 import PullshotKit
 import Synchronization
 
-/// 사용자가 이슈에 그대로 붙일 수 있는 로그 파일입니다. 그래서 파일 이름, 게임 이름, 경로, 일련번호는 쓰지 않고,
-/// 오류는 `describe`로 종류와 코드만 남깁니다.
 final class FileLog: Sendable {
     static let defaultFile = URL.libraryDirectory.appending(path: "Logs/Pullshot/pullshot.log")
-    /// 이보다 큰 파일은 앱을 열 때 `pullshot.1.log`로 옮깁니다. 앞서 옮긴 파일은 덮어씁니다.
     static let maxSize = 5_000_000
 
     private static let timestamp = Date.ISO8601FormatStyle(includingFractionalSeconds: true)
@@ -17,7 +14,6 @@ final class FileLog: Sendable {
         handle = Mutex(Self.open(file))
     }
 
-    /// 쓰지 못하면 앱을 멈추지 않고 그 줄을 통합 로그에 남깁니다.
     func write(_ line: String) {
         let data = Data("\(Date.now.formatted(Self.timestamp)) \(line)\n".utf8)
         let isWritten = handle.withLock { (try? $0?.write(contentsOf: data)) != nil }
@@ -25,7 +21,6 @@ final class FileLog: Sendable {
         Log.app.error("로그 파일에 쓰지 못한 줄: \(line, privacy: .public)")
     }
 
-    /// 오류를 로그에 쓸 꼴로 바꿉니다. 이름과 경로가 든 값은 빼고 case 이름과 코드만 남깁니다.
     static func describe(_ error: any Error) -> String {
         switch error {
         case let error as SessionError:

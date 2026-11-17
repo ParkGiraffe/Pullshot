@@ -1,6 +1,5 @@
 import Foundation
 
-/// 격자의 날짜 보기에 쓰는 달과 날의 묶음입니다. 달, 날, 날 안의 캡처 모두 최근 것이 먼저입니다.
 public struct DateSections: Equatable, Sendable {
     public struct Day: Equatable, Sendable, Identifiable {
         public var start: Date

@@ -122,7 +122,6 @@ struct AlbumScannerTests {
             let captures = try AlbumScanner(source: source, timeZone: losAngeles).scan().captures
             let byHandle = Dictionary(uniqueKeysWithValues: captures.map { ($0.handle, $0.capturedAt) })
 
-            // 11월의 로스앤젤레스는 UTC-8이라 서울(UTC+9)로 적으면 17시간 뒤입니다.
             #expect(byHandle[0x11] == dateFixture("2026-11-15 14:12:05"))
             #expect(byHandle[0x12] == dateFixture("2026-11-14 09:05:00"))
             #expect(byHandle[0x13] == .some(nil))

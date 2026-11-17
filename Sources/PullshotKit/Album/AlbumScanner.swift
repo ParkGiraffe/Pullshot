@@ -1,6 +1,5 @@
 import Foundation
 
-/// 앨범을 훑는 데 필요한 질의입니다. `Session`이 따르고, 테스트는 가짜 앨범으로 바꿉니다.
 public protocol AlbumSource: AnyObject {
     func storageIDs() throws -> [UInt32]
     func objectHandles(storage: UInt32, parent: UInt32) throws -> [UInt32]
@@ -24,7 +23,6 @@ public struct AlbumScan: Equatable, Sendable {
     }
 }
 
-/// 앨범 폴더를 따라 내려가며 캡처를 모읍니다. 스위치는 저장소 전체를 한 번에 달라는 평면 질의를 거부합니다.
 public struct AlbumScanner {
     private let source: AlbumSource
     private let timeZone: TimeZone
@@ -34,9 +32,6 @@ public struct AlbumScanner {
         self.timeZone = timeZone
     }
 
-    /// 객체 하나나 저장소 하나를 읽지 못하면 그것만 건너뛰고, 전송이 끊기면 멈춥니다.
-    /// 저장소를 하나도 읽지 못하면 빈 앨범이 아니라 마지막 응답 오류로 끝납니다. 스위치의 저장소는 앨범 하나뿐입니다.
-    /// `progress`에는 지금까지 본 객체 수를 넘깁니다. 취소는 객체 사이에서 확인하므로 세션은 계속 쓸 수 있습니다.
     public func scan(progress: (Int) -> Void = { _ in }, isCancelled: () -> Bool = { false }) throws -> AlbumScan {
         var walk = Walk()
         var rootError: SessionError?
@@ -76,7 +71,6 @@ public struct AlbumScanner {
                 record(info, handle: handle, in: storage, gameFolder: gameFolder, walk: &walk)
                 continue
             }
-            // 폴더가 자기나 조상을 다시 가리키는 기기에서도 끝나도록 한 번 본 폴더는 다시 내려가지 않습니다.
             guard walk.visitedFolders.insert(handle).inserted, let children = try readOrSkip(handle, walk: &walk, {
                 try source.objectHandles(storage: storage, parent: handle)
             }) else { continue }
@@ -110,7 +104,6 @@ public struct AlbumScanner {
         ))
     }
 
-    /// 기기가 OK가 아닌 응답을 보냈거나 데이터를 풀 수 없는 객체는 건너뛰고, 그 밖의 실패(전송, 세션)는 그대로 던집니다.
     private func readOrSkip<T>(_ handle: UInt32, walk: inout Walk, _ read: () throws -> T) throws -> T? {
         do {
             return try read()
@@ -126,13 +119,11 @@ public struct AlbumScanner {
         if let date = DateTimeString.parse(info.captureDate, timeZone: timeZone) {
             return date
         }
-        // 스위치 캡처는 파일 이름이 찍은 시각(yyyyMMddHHmmss)으로 시작합니다.
         let digits = info.filename.prefix(14)
         guard digits.count == 14, digits.allSatisfy(\.isASCII), digits.allSatisfy(\.isNumber) else { return nil }
         return DateTimeString.parse("\(digits.prefix(8))T\(digits.suffix(6))", timeZone: timeZone)
     }
 
-    /// 확장자로 정하고, 확장자가 없을 때만 PTP 형식을 봅니다.
     private static func kind(of info: ObjectInfo) -> Capture.Kind? {
         switch URL(filePath: info.filename).pathExtension.lowercased() {
         case "jpg", "jpeg", "png":

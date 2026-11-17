@@ -1,6 +1,5 @@
 import Foundation
 
-/// 컨테이너 앞 12바이트입니다. 길이는 헤더를 포함합니다.
 public struct ContainerHeader: Equatable, Sendable {
     public static let size = 12
 
@@ -24,7 +23,6 @@ public extension ContainerHeader {
     }
 }
 
-/// 명령, 데이터, 응답, 이벤트 하나입니다.
 public struct Container: Equatable, Sendable {
     public var kind: PTP.ContainerKind
     public var code: UInt16
@@ -48,7 +46,6 @@ public struct Container: Equatable, Sendable {
         return writer.data
     }
 
-    /// 응답 컨테이너의 인자입니다. 4바이트로 나눠떨어지지 않는 꼬리는 버립니다.
     public var parameters: [UInt32] {
         var reader = ByteReader(payload)
         return (0 ..< payload.count / 4).compactMap { _ in try? reader.u32() }

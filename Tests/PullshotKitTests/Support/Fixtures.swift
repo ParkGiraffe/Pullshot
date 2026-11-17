@@ -1,7 +1,6 @@
 import Foundation
 @testable import PullshotKit
 
-/// 스위치 2를 흉내 낸 DeviceInfo 데이터셋입니다.
 func deviceInfoFixture(
     model: String = "Nintendo Switch 2",
     serial: String = "TEST0001",
@@ -66,7 +65,6 @@ func objectInfoFixture(
     return writer.data
 }
 
-/// "yyyy-MM-dd HH:mm:ss"를 서울 시각으로 읽습니다.
 func dateFixture(_ text: String) -> Date {
     let formatter = DateFormatter()
     formatter.locale = Locale(identifier: "en_US_POSIX")
@@ -76,14 +74,12 @@ func dateFixture(_ text: String) -> Date {
     return date
 }
 
-/// 그레고리력, 서울 시간대입니다. 날짜 묶기 테스트가 실행하는 곳의 시간대에 기대지 않게 합니다.
 func calendarFixture() -> Calendar {
     var calendar = Calendar(identifier: .gregorian)
     calendar.timeZone = TimeZone(identifier: "Asia/Seoul") ?? .gmt
     return calendar
 }
 
-/// 훑기를 거친 캡처입니다. 찍은 시각은 서울 시각 글로 받습니다.
 func captureFixture(
     _ filename: String = "2026111421120500_s.jpg",
     game: String? = "젤다무쌍 봉인전기",
@@ -103,7 +99,6 @@ func captureFixture(
     )
 }
 
-/// 이 테스트 프로세스가 처음 쓸 때 한 번 비우고 다시 만드는 임시 뿌리 폴더입니다. 전 실행이 남긴 것을 치웁니다.
 private let temporaryRoot: URL = {
     let root = FileManager.default.temporaryDirectory.appending(path: "PullshotTests/Kit")
     try? FileManager.default.removeItem(at: root)
@@ -111,7 +106,6 @@ private let temporaryRoot: URL = {
     return root
 }()
 
-/// 임시 뿌리 폴더 아래 새 경로입니다. 만들지는 않습니다.
 func temporaryFolderFixture() -> URL {
     temporaryRoot.appending(path: "\(UUID())")
 }

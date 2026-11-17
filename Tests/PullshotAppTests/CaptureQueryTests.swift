@@ -48,7 +48,6 @@ struct CaptureQueryTests {
             == ["a.jpg", "b.jpg"])
     }
 
-    /// 고르기, 화살표, 미리보기 패널이 이 순서로 움직이므로, 날짜 보기에서 화면에 놓이는 순서와 같아야 합니다.
     @Test func `보일 캡처는 날짜 보기에 놓이는 칸 순서와 같다`() {
         let captures = [
             captureFixture("a.jpg", at: "2026-10-31 23:00:00"),

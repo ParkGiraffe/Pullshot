@@ -58,7 +58,7 @@ struct DatasetTests {
     @Suite("날짜 문자열")
     struct DateTime {
         static let seoul = TimeZone(identifier: "Asia/Seoul") ?? .gmt
-        static let expected = Date(timeIntervalSince1970: 1_794_658_325) // 2026-11-14 12:12:05 UTC
+        static let expected = Date(timeIntervalSince1970: 1_794_658_325)
 
         @Test(arguments: [
             ("20261114T211205", seoul),

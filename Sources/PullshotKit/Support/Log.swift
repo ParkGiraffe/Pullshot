@@ -1,6 +1,5 @@
 import os
 
-/// 통합 로그 분류입니다. 파일 이름, 게임 이름, 경로, 일련번호는 `privacy: .private`로 남깁니다.
 public enum Log {
     private static let subsystem = "com.parkgiraffe.Pullshot"
 

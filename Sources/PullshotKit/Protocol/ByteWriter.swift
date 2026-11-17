@@ -1,6 +1,5 @@
 import Foundation
 
-/// PTP 데이터를 리틀 엔디언으로 이어 씁니다.
 public struct ByteWriter {
     public private(set) var data = Data()
 
@@ -26,7 +25,6 @@ public struct ByteWriter {
         data.append(value)
     }
 
-    /// 빈 문자열은 개수 0 한 바이트이고, 나머지는 종결 문자까지 센 개수 뒤에 UTF-16LE로 씁니다.
     public mutating func string(_ text: String) {
         guard !text.isEmpty else {
             u8(0)

@@ -82,12 +82,10 @@ struct GridSelectionTests {
     }
 }
 
-/// 파일 이름으로 만든 캡처입니다. `.mp4`로 끝나면 동영상입니다.
 private func capturesFixture(_ filenames: [String]) -> [Capture] {
     filenames.map { captureFixture($0, kind: $0.hasSuffix(".mp4") ? .video : .photo) }
 }
 
-/// `anchor`를 그냥 눌러 고른 뒤 미리보기로 받을 캡처의 파일 이름입니다.
 private func previewTargets(anchor: String, in captures: [Capture]) -> [String] {
     var selection = GridSelection()
     let anchorID = captures.first { $0.filename == anchor }?.id ?? ""

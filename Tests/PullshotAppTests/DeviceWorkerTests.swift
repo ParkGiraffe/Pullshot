@@ -6,7 +6,6 @@ import Testing
 struct DeviceWorkerTests {
     @Suite("받아 둔 미리보기 원본")
     struct PreviewOriginal {
-        /// 받아 둔 파일의 바이트 수(nil이면 파일 없음), 캡처의 크기(nil이면 모름), 다시 받지 않는지입니다.
         @Test(arguments: [
             (5, 5, true),
             (3, 5, false),

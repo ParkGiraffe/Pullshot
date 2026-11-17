@@ -1,7 +1,6 @@
 import PullshotKit
 import SwiftUI
 
-/// 사이드바 위 기기 칸입니다. 연 기기와 연결 상태를 보이고, 스위치가 둘 이상 꽂히면 바꿀 수 있습니다.
 struct DeviceSwitcher: View {
     let model: LibraryModel
 
@@ -80,7 +79,6 @@ struct DeviceSwitcher: View {
         }
     }
 
-    /// 같은 이름의 스위치가 둘 이상 꽂혀 있으면 USB 일련번호 끝 네 자리로 가립니다.
     private func name(of console: AttachedConsole) -> String {
         let name = console.model.name
         guard model.consoles.count(where: { $0.model.name == name }) > 1, let serialNumber = console.serialNumber else {

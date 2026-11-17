@@ -3,12 +3,9 @@ import Foundation
 public enum TransferKind: String, Codable, Sendable {
     case imported
     case exported
-    /// 처음 연결 질문에서 고른 폴더나 받을 곳에 이미 있던 캡처입니다. 지금 옮긴 것이 아니라 옮긴 날로 세지 않습니다.
     case foundInFolder
-    /// 처음 연결 질문에서 모두 옮긴 것으로 표시한 캡처입니다.
     case markedAll
 
-    /// 실제로 Mac에 옮긴 일인지입니다. 처음 연결 답으로 남긴 기록의 날짜는 옮긴 날이 아닙니다.
     var isActualTransfer: Bool {
         self == .imported || self == .exported
     }
@@ -20,9 +17,6 @@ public struct LedgerEntry: Codable, Equatable, Sendable {
     public var date: Date
 }
 
-/// Mac으로 옮긴 캡처의 기록입니다. 기록에 없는 캡처가 새 항목입니다.
-/// `transfers.jsonl`에 한 줄씩 덧붙여 쓰고, 열 때 한 번 읽어 색인을 만듭니다.
-/// 기록에는 일련번호와 파일 이름이 들어 있어 통합 로그에 남기지 않습니다.
 public final class TransferLedger {
     public static let defaultDirectory = URL.applicationSupportDirectory.appending(path: "Pullshot")
 
@@ -30,11 +24,8 @@ public final class TransferLedger {
 
     private let file: URL
     private let answeredFile: URL
-    /// 처음 연결 질문에 답한 기기입니다. "모두 새 항목으로"는 기록을 남기지 않아 따로 둡니다.
     private(set) var answeredSerialNumbers: Set<String> = []
-    /// 기록을 읽어 쌓은 색인입니다. 값이라 꺼내 간 뒤의 기록은 보이지 않습니다.
     public private(set) var index = LedgerIndex()
-    /// 앞서 꺼진 앱이 줄을 쓰다 말았으면 다음 줄을 새 줄에서 시작해야 합니다.
     private var endsWithNewline = true
 
     public init(directory: URL = defaultDirectory) throws {
@@ -42,7 +33,6 @@ public final class TransferLedger {
         file = directory.appending(path: "transfers.jsonl")
         answeredFile = directory.appending(path: "answered-devices.json")
         if FileManager.default.fileExists(atPath: answeredFile.path(percentEncoded: false)) {
-            // 이 파일을 잃으면 처음 연결 질문을 한 번 더 물을 뿐이라 기록 전체를 막지 않습니다. 다음 답이 다시 씁니다.
             do {
                 let data = try Data(contentsOf: answeredFile)
                 answeredSerialNumbers = try Set(JSONDecoder().decode([String].self, from: data))
@@ -67,7 +57,6 @@ public final class TransferLedger {
         }
     }
 
-    /// 한 번의 호출에서 만든 줄을 한 번에 덧붙입니다. 쓰지 못하면 던지고 색인도 바꾸지 않습니다.
     public func record(
         _ captures: [Capture],
         serialNumber: String,
@@ -93,7 +82,6 @@ public final class TransferLedger {
         answeredSerialNumbers = answered
     }
 
-    /// 앱과 CLI가 함께 써도 줄이 섞이지 않도록 O_APPEND로 열어 한 번에 씁니다.
     private func append(_ data: Data) throws {
         let descriptor = open(file.path(percentEncoded: false), O_WRONLY | O_APPEND | O_CREAT, 0o644)
         guard descriptor >= 0 else { throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO) }

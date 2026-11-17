@@ -1,7 +1,6 @@
 import Foundation
 @testable import PullshotKit
 
-/// 내려받기를 흉내 내는 기기입니다. 캡처마다 결과를 정해 둘 수 있습니다.
 final class FakeDownloadSource: DownloadSource {
     enum Outcome {
         case write
@@ -14,7 +13,6 @@ final class FakeDownloadSource: DownloadSource {
     private(set) var downloaded: [UInt32] = []
     private(set) var isValid = true
 
-    /// `write`는 기대 크기만큼(모르면 1바이트) 쓰고 다 쓴 뒤 진행을 한 번 알립니다.
     func download(
         _ handle: UInt32,
         expectedSize: UInt64?,

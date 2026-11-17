@@ -30,7 +30,6 @@ struct Ledger: ParsableCommand {
 
     func run() throws {
         try Terminal.run {
-            // 훑기에 16초쯤 걸리므로 폴더 경로부터 확인합니다.
             if let folder {
                 try FolderMatcher.requireReadable(folder.url)
             }

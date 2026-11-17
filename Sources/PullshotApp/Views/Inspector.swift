@@ -1,11 +1,8 @@
 import PullshotKit
 import SwiftUI
 
-/// 오른쪽 칸입니다. 고른 것이 없으면 보는 범위의 정보와 새 항목, 모두 가져오기를, 고르면 고른 캡처의 정보와
-/// 가져오기 설정을 둡니다. 저장 위치는 두 상태가 같은 설정을 씁니다.
 struct Inspector: View {
     let model: LibraryModel
-    /// 격자에 보이는 캡처입니다.
     let captures: [Capture]
     @State private var isChoosingImportFolder = false
 
@@ -107,7 +104,6 @@ struct Inspector: View {
         }
     }
 
-    /// 저장 위치입니다. 누르면 폴더를 골라 바로 바꿉니다.
     private var importFolderButton: some View {
         Button {
             isChoosingImportFolder = true
@@ -138,7 +134,6 @@ struct Inspector: View {
         }
     }
 
-    /// 최근 것을 맨 위에 두고 뒤의 두 장을 비스듬히 겹칩니다.
     private func stack(_ captures: [Capture]) -> some View {
         ZStack {
             ForEach(Array(captures.enumerated()), id: \.element.id) { offset, capture in
@@ -193,14 +188,12 @@ struct Inspector: View {
             .foregroundStyle(.secondary)
     }
 
-    /// 크기를 아는 캡처만 더한 값을 1000 단위로 씁니다.
     private func size(_ summary: CaptureSummary) -> Text {
         Text(verbatim: ByteCountFormatter.string(fromByteCount: Int64(summary.totalSize), countStyle: .decimal))
     }
 }
 
 extension URL {
-    /// 홈 폴더를 `~`로 줄인 경로입니다. 폴더 고르기가 돌려준 URL의 끝 `/`는 뗍니다.
     var abbreviatedPath: String {
         ((path(percentEncoded: false) as NSString).standardizingPath as NSString).abbreviatingWithTildeInPath
     }

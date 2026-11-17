@@ -23,7 +23,6 @@ struct PreviewKeyTests {
     }
 }
 
-/// 실제 화살표 키처럼 기능 키와 숫자판 표시를 함께 단 키 누름입니다.
 private func keyFixture(_ key: NSEvent.SpecialKey, modifiers: NSEvent.ModifierFlags = []) throws -> NSEvent {
     try keyFixture(String(Character(key.unicodeScalar)), modifiers: modifiers.union([.function, .numericPad]))
 }

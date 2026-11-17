@@ -2,21 +2,17 @@ import AppKit
 import Observation
 import PullshotKit
 
-/// 창이 보이는 상태입니다. 기기 일은 `worker`에 맡기고, 받은 값만 들고 있습니다.
 @MainActor @Observable
 final class LibraryModel {
     enum Connection: Equatable {
         case searching
-        /// 스위치가 꽂혀 있지만 PC로 복사 모드가 아닙니다. 값은 기기 이름입니다.
         case notInTransferMode(String)
-        /// 남은 세션을 풀려고 USB 장치를 다시 붙였습니다. 스위치는 PC로 복사 모드에서 나갑니다.
         case reattachNeeded
         case connecting(AttachedConsole)
         case scanning(AttachedConsole, seen: Int)
         case ready(AttachedConsole, DeviceInfo)
         case failed(AttachedConsole, message: String)
 
-        /// 열었거나 여는 중인 기기입니다.
         var console: AttachedConsole? {
             switch self {
             case let .connecting(console), let .scanning(console, _), let .ready(console, _), let .failed(console, _):
@@ -27,13 +23,10 @@ final class LibraryModel {
         }
     }
 
-    /// 가져오기 한 번입니다. 끝난 뒤에도 사용자가 닫거나 다른 것을 고를 때까지 결과를 남겨 둡니다.
     struct TransferRun {
-        /// 시작할 때의 저장 위치입니다.
         var folder: URL
         var progress: TransferProgress?
         var summary: TransferSummary?
-        /// 옮긴 기록을 쓰지 못하는 등 결과 없이 멈췄을 때의 문구입니다. Kit이 이때는 결과 대신 오류를 던집니다.
         var errorMessage: String?
 
         var isFinished: Bool {
@@ -42,57 +35,37 @@ final class LibraryModel {
     }
 
     private(set) var connection = Connection.searching
-    /// PC로 복사 모드로 꽂힌 스위치입니다.
     private(set) var consoles: [AttachedConsole] = []
     private(set) var captures: [Capture] = []
     private(set) var index = LedgerIndex()
     private(set) var serialNumber: String?
     let isDemo: Bool
     var isAskingFirstConnect = false
-    /// 처음 연결 질문에 답해 옮긴 기록에 넣은 캡처 수입니다. 답하기 전에는 nil입니다.
     private(set) var firstConnectRecordedCount: Int?
-    /// 처음 연결 질문에 답하지 못했을 때 질문 카드에 둘 문구입니다.
     private(set) var firstConnectErrorMessage: String?
-    /// 처음 연결 질문의 답을 옮긴 기록에 남기는 일입니다. 폴더에서 찾기는 폴더가 크면 오래 걸려 질문 카드에서 취소할 수 있고,
-    /// 기기를 떠나거나 끝낼 때도 취소합니다.
     private var firstConnectTask: Task<Void, Never>?
-    /// 옮기는 중이거나 사용자가 닫지 않은 옮기기 결과입니다. 기기가 빠져도 남겨 안내 화면에 보입니다.
     private(set) var transferRun: TransferRun?
     private(set) var scope = LibraryScope.all
     private(set) var kind = KindFilter.all
     var gameSearch = ""
     var selection = GridSelection()
-    /// 사용자가 툴바 단추로 둔 오른쪽 칸 상태입니다. 창이 좁아 접힐 때도 바꾸지 않습니다.
     var isInspectorShown = true
     let worker: DeviceWorker
     let thumbnails: ThumbnailStore
     let settings: AppSettings
 
-    /// 감시를 놓으면 `changes`가 끝나므로 창이 있는 동안 쥐고 있다가 끝낼 때 놓습니다.
     @ObservationIgnored private var monitor: ConsoleMonitor?
-    /// 끝내기가 기다리는 동안 감시 알림이나 단추가 새 기기 일을 시작하지 않게 합니다.
-    /// 끝내기가 모은 작업 밖에서 세션이 열리면 닫지 못한 채 앱이 끝납니다.
     @ObservationIgnored private(set) var isShuttingDown = false
-    /// 연 기기에서 하는 일입니다. 기기를 바꾸거나 기기가 빠지면 취소합니다.
     @ObservationIgnored private var deviceTask: Task<Void, Never>?
-    /// 기기가 빠져도 취소하지 않습니다. 끊긴 연결로 끝나야 결과에 받지 못한 수가 남습니다.
     @ObservationIgnored private var transferTask: Task<Void, Never>?
-    /// 미리보기 패널(Quick Look)입니다. 기준 캡처를 보이고, 패널에서 누른 화살표를 모델에 넘깁니다.
     @ObservationIgnored let previewPanel = PreviewPanelController()
-    /// 격자가 놓은 열 수입니다. 미리보기 패널의 위아래 화살표도 격자처럼 한 줄을 옮기도록 격자가 알려 줍니다.
     @ObservationIgnored var gridColumns = 1
-    /// 미리보기 패널이 보이는 캡처입니다. 패널을 닫으면 nil입니다.
-    /// 미리보기 상태는 `LibraryModel+Selection.swift`가 바꿉니다.
     @ObservationIgnored var previewCapture: Capture?
-    /// 미리보기로 받은 원본과, 원본을 받기 전에 보일 썸네일 파일입니다. 기기를 떠날 때 비웁니다.
     @ObservationIgnored var previewOriginals: [Capture.ID: URL] = [:]
     @ObservationIgnored var previewThumbnails: [Capture.ID: URL] = [:]
-    /// 미리보기 파일을 받는 일입니다. 기준 캡처와 앞뒤 사진만 받고, 멀어진 캡처의 받기는 취소합니다.
-    /// 떠난 기기의 미리보기가 뒤늦게 뜨지 않도록 기기를 떠날 때와 끝낼 때도 취소합니다.
     @ObservationIgnored var previewTasks: [Capture.ID: Task<Void, Never>] = [:]
 
     init(worker: DeviceWorker, settings: AppSettings) {
-        // 앞 실행이 끝내기 전에 멈췄으면 미리보기 원본이 남아 있습니다.
         try? FileManager.default.removeItem(at: DeviceWorker.previewFolder)
         self.worker = worker
         self.settings = settings
@@ -108,34 +81,26 @@ final class LibraryModel {
         connection = .ready(DemoAlbum.console, DemoAlbum.info)
     }
 
-    /// 사이드바 범위와 필터입니다.
     var query: CaptureQuery {
         CaptureQuery(scope: scope, kind: kind)
     }
 
-    /// 사이드바 범위와 필터를 거쳐 격자에 보일 캡처입니다.
     var visibleCaptures: [Capture] {
         query.captures(in: captures, index: index, serialNumber: serialNumber ?? "", now: .now)
     }
 
-    /// 격자가 비었을 때 그 까닭입니다.
     var emptyReason: EmptyReason? {
         query.emptyReason(in: captures, index: index, serialNumber: serialNumber ?? "", now: .now)
     }
 
-    /// 고른 캡처를 격자에 보이는 순서(최신순)로 둡니다. 보이지 않게 된 캡처는 넣지 않습니다.
     var selectedCaptures: [Capture] {
         visibleCaptures.filter { selection.selected.contains($0.id) }
     }
 
-    /// 열었거나 여는 중인 세션이 있는지입니다. 기기가 빠졌어도 옮기기가 끝나기 전에는 세션을 쥐고 있습니다.
-    /// 데모는 기기를 열지 않습니다.
     var hasOpenSession: Bool {
         !isDemo && (connection.console != nil || isTransferring)
     }
 
-    /// 하던 일(연결과 훑기, 옮기기, 미리보기, 처음 연결 질문의 답)을 취소하고 미리보기 패널을 닫은 뒤, 일이 끝나길 기다려
-    /// 세션을 닫고 미리보기 원본을 지웁니다. 세션이 남으면 다음 연결이 USB 장치 리셋까지 갑니다.
     func shutdown() async {
         isShuttingDown = true
         monitor = nil
@@ -149,10 +114,8 @@ final class LibraryModel {
         try? FileManager.default.removeItem(at: DeviceWorker.previewFolder)
     }
 
-    /// 꽂힌 기기를 한 번 살피고, 그 뒤로는 기기가 꽂히거나 빠질 때마다 다시 살핍니다. 데모에서는 감시하지 않습니다.
     func watchConsoles() async {
         guard !isDemo, !isShuttingDown else { return }
-        // 감시는 `monitor`만 쥐어, 끝내기가 놓으면 알림이 바로 끝나게 합니다.
         monitor = ConsoleMonitor()
         guard let changes = monitor?.changes else { return }
         await inspectConsoles()
@@ -166,7 +129,6 @@ final class LibraryModel {
         open(console)
     }
 
-    /// 사이드바에서 고른 범위를 봅니다. 고른 것과 끝난 옮기기 결과는 앞 범위의 것이라 치우고 미리보기 패널도 닫습니다.
     func show(_ scope: LibraryScope) {
         guard scope != self.scope else { return }
         self.scope = scope
@@ -175,8 +137,6 @@ final class LibraryModel {
         previewPanel.close()
     }
 
-    /// 사진과 동영상 필터를 바꿉니다. 보이지 않게 된 캡처를 고른 것에서 빼고, 그래서 고른 것이 바뀌면 사이드바 범위를
-    /// 바꿀 때처럼 끝난 옮기기 결과를 닫습니다.
     func filter(_ kind: KindFilter) {
         guard kind != self.kind else { return }
         self.kind = kind
@@ -189,7 +149,6 @@ final class LibraryModel {
         firstConnectTask != nil
     }
 
-    /// 처음 연결 질문의 답을 옮긴 기록에 남깁니다. 폴더를 읽지 못하면 질문 카드에 둘 문구를 남깁니다.
     func answerFirstConnect(_ answer: FirstConnectAnswer) {
         guard !isShuttingDown, !isAnsweringFirstConnect else { return }
         firstConnectErrorMessage = nil
@@ -198,7 +157,6 @@ final class LibraryModel {
                 firstConnectRecordedCount = try await worker.answerFirstConnectQuestion(answer, captures: captures)
                 index = await worker.index
             } catch is CancellationError {
-                // 사용자가 멈춘 것이라 실패로 남기지 않습니다.
             } catch {
                 worker.log.write("처음 연결 질문에 답하지 못함: \(FileLog.describe(error))")
                 firstConnectErrorMessage = AppErrorMessages.message(for: error)
@@ -216,13 +174,11 @@ final class LibraryModel {
         open(console)
     }
 
-    /// 연 기기가 그대로 꽂혀 있으면 두고, 빠졌으면 남은 기기를 엽니다. 남은 기기가 없으면 안내 화면으로 돌아갑니다.
     private func inspectConsoles() async {
         guard !isShuttingDown else { return }
         consoles = ConsoleLocator.attached()
         guard let console = ConsoleChoice.next(current: connection.console, attached: consoles) else {
             leaveConsole()
-            // USB 리셋 뒤에는 스위치가 대기 상태로 다시 붙으므로, PC로 복사를 다시 켜 달라는 안내를 그대로 둡니다.
             if connection != .reattachNeeded {
                 connection = ConsoleLocator.idle().first.map { .notInTransferMode($0.name) } ?? .searching
             }
@@ -234,7 +190,6 @@ final class LibraryModel {
         }
     }
 
-    /// 하던 일을 취소하고 그 기기를 엽니다. 앞 세션은 `worker.open`이 닫습니다.
     private func open(_ console: AttachedConsole) {
         guard !isShuttingDown else { return }
         leaveConsole()
@@ -242,18 +197,14 @@ final class LibraryModel {
         deviceTask = Task { await load(console) }
     }
 
-    /// 옮기기나 미리보기가 세션을 버렸으면 그 기기를 다시 엽니다. 받는 중 Mac 디스크가 차는 것처럼 기기가 꽂힌 채
-    /// 버려지면 감시 알림이 오지 않아, 다시 열지 않으면 버린 세션 위에서 연결됨으로 남습니다. 옮기기 결과는 남습니다.
     func reopenIfSessionLost() async {
         guard await !worker.hasUsableSession, case let .ready(console, _) = connection else { return }
         open(console)
     }
 
-    /// 하던 일을 취소하고 연 기기의 캡처, 고른 것, 질문을 치웁니다. 옮기기 결과는 안내 화면에 보이도록 남깁니다.
     private func leaveConsole() {
         deviceTask?.cancel()
         firstConnectTask?.cancel()
-        // 다른 기기에도 같은 게임 폴더와 파일 이름의 캡처가 있을 수 있어, 받아 둔 미리보기 파일을 잊습니다.
         stopPreview()
         previewOriginals = [:]
         previewThumbnails = [:]
@@ -268,8 +219,6 @@ final class LibraryModel {
         gameSearch = ""
     }
 
-    /// 열고 훑습니다. 취소됐으면 뒤에 연 기기의 상태를 덮지 않도록 아무것도 바꾸지 않습니다.
-    /// USB 리셋만은 리셋이 낸 빠짐 알림이 먼저 와서 취소됐을 수 있으므로, 다른 기기를 열고 있지 않으면 안내를 남깁니다.
     private func load(_ console: AttachedConsole) async {
         do {
             let info = try await worker.open(console, isVerbose: settings.isVerboseLog)
@@ -298,21 +247,17 @@ final class LibraryModel {
         }
     }
 
-    /// 훑기 진행은 큐를 거쳐 늦게 올 수 있으므로, 그 기기를 아직 훑는 중이고 앞 값보다 클 때만 반영합니다.
     private func showScanProgress(_ seen: Int, of console: AttachedConsole) {
         guard case let .scanning(scanned, previous) = connection, scanned == console, seen > previous else { return }
         connection = .scanning(console, seen: seen)
     }
 }
 
-/// 가져오기입니다. 옮기는 동안 기기가 빠져도 결과를 남겨 안내 화면에 보입니다.
 extension LibraryModel {
-    /// 저장 위치입니다. 설정에서 고르지 않았으면 `~/Pictures/Pullshot`입니다.
     var importFolder: URL {
         settings.importFolder
     }
 
-    /// 저장 위치와, 고른 것을 가져올 때 폴더별로 나눌지와 파일 이름 규칙입니다.
     var importOptions: ExportOptions {
         ExportOptions(
             baseFolder: importFolder,
@@ -321,12 +266,10 @@ extension LibraryModel {
         )
     }
 
-    /// 옮기는 동안은 가져오기와 기기 전환을 끕니다.
     var isTransferring: Bool {
         transferRun.map { !$0.isFinished } ?? false
     }
 
-    /// 가져올 대상에 든 캡처입니다. 새 항목과 모두는 보이는 캡처에서, 고른 것은 고른 캡처에서 고릅니다.
     func captures(in target: ImportTarget) -> [Capture] {
         switch target {
         case .newItems:
@@ -338,12 +281,10 @@ extension LibraryModel {
         }
     }
 
-    /// 가져올 대상을 저장 위치에 둘 자리입니다. 오른쪽 칸의 이름 미리보기도 이 자리를 보입니다.
     func importItems(_ target: ImportTarget) -> [TransferItem] {
         target.items(captures(in: target), options: importOptions)
     }
 
-    /// Kit이 받던 파일의 남은 데이터를 끝까지 읽어 버리고 멈춥니다. 결과에 취소했다고 남습니다.
     func cancelTransfer() {
         transferTask?.cancel()
     }
@@ -353,7 +294,6 @@ extension LibraryModel {
         transferRun = nil
     }
 
-    /// 저장한 파일이 한 폴더에 있으면 그 파일들을, 여러 폴더에 있거나 저장한 파일이 없으면 저장 위치를 Finder에서 보입니다.
     func revealInFinder() {
         guard let run = transferRun else { return }
         let saved = run.summary?.saved ?? []
@@ -361,7 +301,6 @@ extension LibraryModel {
         NSWorkspace.shared.activateFileViewerSelecting(folders.count == 1 ? saved : [run.folder])
     }
 
-    /// 가져올 대상을 저장 위치로 옮깁니다. 끝나면 결과와 옮긴 기록 색인을 맞춥니다.
     func startImport(_ target: ImportTarget) {
         guard !isShuttingDown, !isTransferring else { return }
         let items = importItems(target)
@@ -382,7 +321,6 @@ extension LibraryModel {
         }
     }
 
-    /// 옮기기 진행도 큐를 거쳐 늦게 올 수 있으므로, 옮기는 중이고 앞 값보다 뒤일 때만 반영합니다.
     private func showTransferProgress(_ progress: TransferProgress) {
         guard isTransferring else { return }
         if let previous = transferRun?.progress, (progress.index, progress.bytes) < (previous.index, previous.bytes) {

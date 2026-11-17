@@ -1,10 +1,7 @@
 import Foundation
 import PullshotKit
 
-/// 훑은 앨범을 게임별 목록 글로 씁니다. `list`와 `dump`가 씁니다.
 enum ListFormatter {
-    /// 게임은 가장 최근 캡처 순, 기타는 끝입니다(`Game.games`). 칸은 공백 두 칸으로 나누고,
-    /// 파일 이름은 왼쪽, 크기는 오른쪽에 맞춥니다. 새 항목은 줄 끝에 "새"를 붙입니다.
     static func lines(
         _ scan: AlbumScan,
         isNew: (Capture) -> Bool = { _ in false },
@@ -31,7 +28,6 @@ enum ListFormatter {
         }
     }
 
-    /// 1 MB는 1,000,000바이트입니다.
     private static func sizeText(_ capture: Capture) -> String {
         capture.size.map { String(format: "%.1f MB", Double($0) / 1_000_000) } ?? "-"
     }

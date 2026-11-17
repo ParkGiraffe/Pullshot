@@ -1,7 +1,5 @@
 import Foundation
 
-/// 전송 기록 한 줄입니다. JSON Lines로 한 줄에 하나씩 씁니다.
-/// `dir`은 out(쓰기), in(읽기), in-error(읽기 실패), reset(장치 리셋)입니다.
 struct TransportRecord: Codable, Equatable {
     var dir: String
     var hex: String?
@@ -9,8 +7,6 @@ struct TransportRecord: Codable, Equatable {
     var kind: String?
 }
 
-/// 감싼 전송에 모든 호출을 넘기면서 주고받은 바이트를 파일에 남깁니다. 실기기 덤프를 테스트 픽스처로 쓰려고 둡니다.
-/// 기록에는 기기 일련번호와 사용자 캡처가 들어가므로 공개 리포에 올리지 않습니다.
 public final class RecordingTransport: Transport {
     private let wrapped: Transport
     private let file: FileHandle
@@ -76,7 +72,6 @@ public enum ReplayError: Error, Equatable {
     case exhausted
 }
 
-/// 기록을 순서대로 되풀이합니다. 쓰기는 기록과 바이트까지 같아야 하고, 읽기는 기록된 바이트나 오류를 돌려줍니다.
 public final class ReplayTransport: Transport {
     private let records: [TransportRecord]
     private var index = 0

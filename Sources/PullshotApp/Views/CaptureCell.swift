@@ -1,8 +1,6 @@
 import PullshotKit
 import SwiftUI
 
-/// 격자의 한 칸입니다. 새 항목은 왼쪽 위에 주황 점, 영상은 왼쪽 아래에 재생 표시를 두고,
-/// 고른 칸은 강조색 테두리와 오른쪽 아래 체크를 둡니다.
 struct CaptureCell: View {
     let capture: Capture
     let isNew: Bool

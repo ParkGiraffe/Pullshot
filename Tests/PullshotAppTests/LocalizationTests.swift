@@ -21,7 +21,6 @@ struct LocalizationTests {
     }
 }
 
-/// 위치 지정(`%1$@`)을 뺀 서식 지정자 종류를 정렬해 돌려줍니다. 영어에서 순서를 바꿔도 같다고 봅니다.
 private func formatSpecifiers(_ text: String) -> [String] {
     text.matches(of: /%(?:\d+\$)?(lld|ld|d|@|f)/).map { String($0.output.1) }.sorted()
 }

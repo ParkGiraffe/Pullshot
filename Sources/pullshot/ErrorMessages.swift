@@ -3,11 +3,9 @@ import PullshotKit
 
 enum CLIError: Error, Equatable {
     case noConsole
-    /// 스위치가 꽂혀 있지만 PC로 복사 모드가 아닙니다. 값은 기기 이름입니다.
     case notInTransferMode(String)
 }
 
-/// 오류를 터미널에 보일 문구로 바꿉니다. Kit 타입에는 문구가 없으므로 CLI는 여기 한 곳에서만 바꿉니다.
 enum ErrorMessages {
     static func message(for error: Error) -> String {
         switch error {
@@ -34,8 +32,6 @@ enum ErrorMessages {
         }
     }
 
-    /// Mac 쪽 파일 오류면 문구를, 아니면 nil을 돌려줍니다. 원인이 Mac인데 케이블과 스위치를 의심하지 않게 하려는 것입니다.
-    /// Kit은 이 오류를 감싸지 않고 넘깁니다. 받을 폴더와 파일은 경로를 담은 CocoaError, 옮긴 기록은 errno만 담은 POSIXError입니다.
     private static func fileNotSaved(_ error: Error) -> String? {
         let path: String?
         switch error {
@@ -52,7 +48,6 @@ enum ErrorMessages {
 
     private static func message(for error: ConsoleAccessError) -> String {
         switch error {
-        // ptpcamerad는 미리보기, 이미지 캡처, 사진 앱이 띄우는 시스템 도우미라 앱 이름 대신 그 앱들을 알려 줍니다.
         case let .heldByAnotherApp(_, owner?) where owner != "ptpcamerad":
             "\(owner) 앱이 스위치를 쓰고 있습니다. 그 앱을 종료하고 다시 시도해 주세요."
         case .heldByAnotherApp:

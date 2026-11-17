@@ -2,10 +2,8 @@ import Foundation
 import Testing
 @testable import PullshotKit
 
-/// 정해 둔 순서대로 쓰기를 확인하고 읽기에 답하는 가짜 전송입니다.
 final class ScriptedTransport: Transport {
     enum Step {
-        /// nil이면 내용은 따지지 않고 쓰기가 일어났는지만 봅니다.
         case expectWrite(Data?)
         case read(Data)
         case readError(TransportError)

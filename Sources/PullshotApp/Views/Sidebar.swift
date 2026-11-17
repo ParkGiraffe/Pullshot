@@ -2,7 +2,6 @@ import PullshotKit
 import SwiftUI
 
 extension LibraryScope {
-    /// 툴바 제목입니다.
     var title: Text {
         switch self {
         case .all: Text("모든 항목")
@@ -14,12 +13,10 @@ extension LibraryScope {
     }
 }
 
-/// Kit은 기타 묶음을 가져올 폴더 이름으로 부르므로, 화면에는 문자열 표의 이름을 보입니다.
 private func gameTitle(_ name: String) -> String {
     name == Game.otherFolderName ? String(localized: "기타") : name
 }
 
-/// 기기 칸 아래 보기 범위 목록입니다. 고정 항목, 게임 목록, 게임 찾기 칸 순서입니다.
 struct Sidebar: View {
     @Bindable var model: LibraryModel
 

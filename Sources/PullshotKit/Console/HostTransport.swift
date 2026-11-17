@@ -2,8 +2,6 @@ import Foundation
 import IOKit
 import IOUSBHost
 
-/// IOUSBHost로 스위치의 still image 인터페이스(class 6, subclass 1, protocol 1)를 잡고 벌크 파이프로 주고받습니다.
-/// 드라이버나 커널 확장 없이 사용자 공간에서 동작합니다.
 public final class HostTransport: Transport {
     private static let stillImage = (interfaceClass: 6, subclass: 1, protocol: 1)
 
@@ -68,7 +66,6 @@ public final class HostTransport: Transport {
         return Data(bytes: buffer.bytes, count: received)
     }
 
-    /// PTP 클래스 요청 Device Reset(bRequest 0x66)을 인터페이스에 보냅니다.
     public func resetPTPDevice() throws {
         guard let interface else { throw TransportError.disconnected }
         trace?("PTP 장치 리셋")
@@ -88,7 +85,6 @@ public final class HostTransport: Transport {
         }
     }
 
-    /// 인터페이스를 놓고 USB 장치를 다시 붙입니다. 기기가 다시 나타나면 새 전송을 열어야 합니다.
     public func resetUSBDevice() throws {
         trace?("USB 장치 리셋")
         close()
@@ -139,7 +135,6 @@ public final class HostTransport: Transport {
         return nil
     }
 
-    /// 인터페이스의 엔드포인트 디스크립터를 차례로 읽습니다. 마지막(nil)에서 반드시 멈춥니다.
     private static func endpoints(of interface: IOUSBHostInterface) -> [EndpointDescriptor] {
         let configuration = interface.configurationDescriptor
         let interfaceDescriptor = interface.interfaceDescriptor
@@ -163,16 +158,14 @@ public final class HostTransport: Transport {
 }
 
 extension TransportError {
-    /// IOKit과 IOUSBHost 오류 코드를 전송 오류로 바꿉니다. 코드는 Int32로 부호가 붙어 올 때가 있어 32비트로 맞춥니다.
     init(ioReturn: Int) {
         let code = UInt32(truncatingIfNeeded: ioReturn)
         switch code {
-        case 0xE000_5000: // kUSBHostReturnPipeStalled
+        case 0xE000_5000:
             self = .stalled
-        case 0xE000_02D6: // kIOReturnTimeout
+        case 0xE000_02D6:
             self = .timedOut
         case 0xE000_02C0, 0xE000_02D7, 0xE000_02D9, 0xE000_02EB, 0xE000_02ED:
-            // NoDevice, Offline, NotAttached, Aborted, NotResponding: 케이블을 뽑았거나 기기가 PC로 복사 모드를 나갔습니다.
             self = .disconnected
         default:
             self = .io(code: code)
