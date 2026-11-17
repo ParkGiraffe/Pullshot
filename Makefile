@@ -19,9 +19,16 @@ check:
 setup-hooks:
 	git config core.hooksPath Scripts/git-hooks
 
+# 설정에서 고르는 앱 아이콘(`AppIcon`) 세 가지입니다. 빨강이 Info.plist의 번들 기본 아이콘입니다.
+APP_ICONS = icon-red-gamepad icon-purple-gamepad icon-shutter
+APP_ICON_FILES = $(APP_ICONS:%=.build/app-icons/%.icns)
+
+.build/app-icons/%.icns: design/app-icon/%.png design/app-icon/%-small.png design/app-icon/make-icns.sh
+	design/app-icon/make-icns.sh $< $@ design/app-icon/$*-small.png
+
 # Apple 실리콘과 Intel Mac에서 모두 열리도록 아키텍처마다 따로 빌드해 합칩니다.
 # Command Line Tools에는 `swift build --arch`를 여럿 받는 xcbuild가 없습니다(2026-11-16 확인).
-app:
+app: $(APP_ICON_FILES)
 	swift build -c release --product PullshotApp --triple arm64-apple-macosx
 	swift build -c release --product PullshotApp --triple x86_64-apple-macosx
 	rm -rf dist/Pullshot.app
@@ -31,6 +38,7 @@ app:
 		"$$(swift build -c release --triple x86_64-apple-macosx --show-bin-path)/PullshotApp"
 	cp App/Info.plist dist/Pullshot.app/Contents/
 	cp -R App/*.lproj dist/Pullshot.app/Contents/Resources/
+	cp $(APP_ICON_FILES) dist/Pullshot.app/Contents/Resources/
 	codesign --force --sign - dist/Pullshot.app
 
 dmg: app

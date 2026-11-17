@@ -1,13 +1,13 @@
 # 앱 아이콘 시안
 
-Pullshot 앱 아이콘 시안 다섯 개입니다. 하나를 고르면 `make-icns.sh`로 `.icns`를 만들어 앱에 붙입니다.
+Pullshot 앱 아이콘 시안 다섯 개와 앱에 붙인 아이콘 세 가지입니다. 앱 아이콘은 `make app`이 `make-icns.sh`로 `.icns`를 만들어 앱에 넣습니다.
 
 ## 파일
 
 - `concept-<번호>-<이름>.svg`: 시안 원본입니다.
 - `concept-<번호>-<이름>.png`: 원본을 1024x1024로 그린 것입니다.
 - `concepts-light.png`, `concepts-dark.png`: 밝은 배경과 어두운 배경에서 시안마다 256, 128, 64, 32, 16 크기를 나란히 둔 비교 이미지입니다.
-- `make-icns.sh`: 1024 PNG 하나로 `.icns`를 만드는 스크립트입니다.
+- `make-icns.sh`: 1024 PNG로 `.icns`를 만드는 스크립트입니다. 작은 크기용 PNG를 함께 주면 16, 32 크기 칸은 그 그림으로 만듭니다.
 
 ## 공통 규격
 
@@ -34,18 +34,18 @@ Pullshot 앱 아이콘 시안 다섯 개입니다. 하나를 고르면 `make-icn
 - 보라(`icon-purple-gamepad`): 같은 그림에 바탕만 앱 강조색 보라 `#7A69FF`로 바꾸고, 흰 선이 잘 보이도록 위는 조금 밝게, 아래는 조금 짙게 했습니다.
 - 셔터 프레임(`icon-shutter`): 같은 괄호 안에 게임패드 대신 원 하나와 조리개 날 여섯 개를 선으로 그린 조리개를 두었고, 바탕은 짙은 흑연색 `#2B2838`입니다.
 
-아이콘마다 32, 16 크기에 쓸 56 굵기 판(`-small`)이 따로 있습니다. 게임패드 판은 십자키와 단추를 뺐고, 셔터 프레임 판은 조리개 날을 빼고 원과 가운데 육각형만 남겼습니다. 크기별 비교는 `icon-set-compare.png`에, 512 크기로 나란히 둔 그림은 `icon-set-preview.png`에 있습니다. `make-icns.sh`는 지금 1024 PNG 하나만 받으므로, `-small` 판을 쓰려면 16, 16@2x, 32 칸을 이 판에서 만들도록 스크립트를 고쳐야 합니다.
+아이콘마다 32, 16 크기에 쓸 56 굵기 판(`-small`)이 따로 있습니다. 게임패드 판은 십자키와 단추를 뺐고, 셔터 프레임 판은 조리개 날을 빼고 원과 가운데 육각형만 남겼습니다. 크기별 비교는 `icon-set-compare.png`에, 512 크기로 나란히 둔 그림은 `icon-set-preview.png`에 있습니다. `make app`은 이 판을 `make-icns.sh`에 함께 넘겨 16, 16@2x, 32 칸을 이 판으로 만듭니다.
 
-## 고른 뒤 .icns 만들기
+## .icns 만들기
 
-고른 시안의 1024 PNG와 출력 경로를 넘깁니다. `sips`로 16, 32, 128, 256, 512 크기의 1x와 2x 그림을 만들고 `iconutil`로 묶습니다.
+1024 PNG와 출력 경로를 넘기고, 작은 크기용 판이 있으면 셋째 인자로 넘깁니다. `sips`로 16, 32, 128, 256, 512 크기의 1x와 2x 그림을 만들고 `iconutil`로 묶으며, 작은 크기용 판을 주면 16, 16@2x, 32 칸은 그 판에서 만듭니다.
 
 ```bash
 cd design/app-icon
-./make-icns.sh concept-5-monogram-p.png ../../App/AppIcon.icns
+./make-icns.sh icon-red-gamepad.png "$TMPDIR/icon-red-gamepad.icns" icon-red-gamepad-small.png
 ```
 
-앱에 붙일 때는 `make app`이 `AppIcon.icns`를 `Contents/Resources/`에 복사하게 하고, `App/Info.plist`의 `CFBundleIconFile`을 `AppIcon`으로 적습니다.
+`make app`은 앱 아이콘 세 가지의 `.icns`를 `.build/app-icons/`에 만들어 번들의 `Contents/Resources/`에 넣은 뒤 서명합니다. `.icns`는 리포에 넣지 않습니다. `App/Info.plist`의 `CFBundleIconFile`이 빨강(`icon-red-gamepad`)이라 Finder, Launchpad, DMG에는 빨강이 보이고, 설정에서 고른 아이콘은 앱이 열려 있는 동안 Dock과 앱 전환기에만 보입니다.
 
 SVG를 고쳤으면 PNG를 다시 그린 뒤 `.icns`를 만듭니다. 이번 PNG는 macOS AppKit의 `NSImage`로 SVG를 읽어 1024 크기로 그렸습니다.
 

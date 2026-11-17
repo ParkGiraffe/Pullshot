@@ -6,6 +6,8 @@
 	<string>ko</string>
 	<key>CFBundleExecutable</key>
 	<string>Pullshot</string>
+	<key>CFBundleIconFile</key>
+	<string>icon-red-gamepad</string>
 	<key>CFBundleIdentifier</key>
 	<string>com.parkgiraffe.Pullshot</string>
 	<key>CFBundleLocalizations</key>
