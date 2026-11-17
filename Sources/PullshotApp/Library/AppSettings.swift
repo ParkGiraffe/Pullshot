@@ -8,16 +8,16 @@ final class AppSettings {
         didSet { defaults.set(importFolder.path(percentEncoded: false), forKey: SettingsKey.importFolder.rawValue) }
     }
 
-    var makesGameFolder: Bool {
-        didSet { defaults.set(makesGameFolder, forKey: SettingsKey.makesGameFolder.rawValue) }
+    var shouldMakeGameFolder: Bool {
+        didSet { defaults.set(shouldMakeGameFolder, forKey: SettingsKey.shouldMakeGameFolder.rawValue) }
     }
 
-    var exportNaming: ExportNaming {
-        didSet { defaults.set(exportNaming.rawValue, forKey: SettingsKey.exportNaming.rawValue) }
+    var importNaming: ExportNaming {
+        didSet { defaults.set(importNaming.rawValue, forKey: SettingsKey.importNaming.rawValue) }
     }
 
-    var isVerboseLog: Bool {
-        didSet { defaults.set(isVerboseLog, forKey: SettingsKey.isVerboseLog.rawValue) }
+    var isVerboseLogging: Bool {
+        didSet { defaults.set(isVerboseLogging, forKey: SettingsKey.isVerboseLogging.rawValue) }
     }
 
     var appIcon: AppIcon {
@@ -30,11 +30,11 @@ final class AppSettings {
         self.defaults = defaults
         importFolder = defaults.string(forKey: SettingsKey.importFolder.rawValue).map { URL(filePath: $0) }
             ?? TransferItem.defaultImportFolder
-        makesGameFolder = defaults.object(forKey: SettingsKey.makesGameFolder.rawValue) == nil
-            || defaults.bool(forKey: SettingsKey.makesGameFolder.rawValue)
-        exportNaming = defaults.string(forKey: SettingsKey.exportNaming.rawValue)
+        shouldMakeGameFolder = defaults.object(forKey: SettingsKey.shouldMakeGameFolder.rawValue) == nil
+            || defaults.bool(forKey: SettingsKey.shouldMakeGameFolder.rawValue)
+        importNaming = defaults.string(forKey: SettingsKey.importNaming.rawValue)
             .flatMap(ExportNaming.init) ?? .original
-        isVerboseLog = defaults.bool(forKey: SettingsKey.isVerboseLog.rawValue)
+        isVerboseLogging = defaults.bool(forKey: SettingsKey.isVerboseLogging.rawValue)
         appIcon = defaults.string(forKey: SettingsKey.appIcon.rawValue).flatMap(AppIcon.init) ?? .red
     }
 }

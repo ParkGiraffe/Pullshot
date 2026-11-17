@@ -13,12 +13,12 @@ public enum ExportNaming: String, Sendable {
 
 public struct ExportOptions: Equatable, Sendable {
     public var baseFolder: URL
-    public var makesGameFolder: Bool
+    public var shouldMakeGameFolder: Bool
     public var naming: ExportNaming
 
-    public init(baseFolder: URL, makesGameFolder: Bool = true, naming: ExportNaming = .original) {
+    public init(baseFolder: URL, shouldMakeGameFolder: Bool = true, naming: ExportNaming = .original) {
         self.baseFolder = baseFolder
-        self.makesGameFolder = makesGameFolder
+        self.shouldMakeGameFolder = shouldMakeGameFolder
         self.naming = naming
     }
 }
@@ -34,7 +34,7 @@ public extension TransferItem {
         var folders: [URL] = []
         var capturesByFolder: [URL: [Capture]] = [:]
         for capture in captures {
-            let folder = options.makesGameFolder
+            let folder = options.shouldMakeGameFolder
                 ? options.baseFolder.appending(path: capture.gameName)
                 : options.baseFolder
             if capturesByFolder[folder] == nil {

@@ -16,7 +16,7 @@ struct LedgerOptions: ParsableArguments {
 
 extension TransferLedger {
     func hintIfFirstConnection(serialNumber: String) {
-        guard needsFirstConnectQuestion(serialNumber: serialNumber) else { return }
+        guard shouldAskFirstConnectQuestion(serialNumber: serialNumber) else { return }
         Terminal.error("처음 연결한 기기입니다. 이미 받아 둔 캡처가 있으면 pullshot ledger --from-folder <폴더>로 옮긴 기록에 넣어 주세요.")
     }
 }

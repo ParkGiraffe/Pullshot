@@ -3,13 +3,13 @@
 | 용어 | 뜻 | 코드 |
 |---|---|---|
 | 기기 | 캡처를 보내 주는 Nintendo Switch 2 또는 Nintendo Switch입니다. | `ConsoleModel`, `AttachedConsole` |
-| PC로 복사 모드 | 기기가 USB로 캡처를 보내는 상태입니다. 본체 설정의 데이터 관리 메뉴에서 켭니다. | |
+| PC로 복사 모드 | 기기가 USB로 캡처를 보내는 상태입니다. 본체 설정의 데이터 관리 메뉴에서 켭니다. 꺼진 채 꽂힌 기기는 대기 상태라고 합니다. | `LibraryModel.Connection.notInTransferMode`, `ConsoleLocator.idle()` |
 | 전송 | 기기와 바이트를 주고받는 통로입니다. 실제 USB, 테스트용 가짜, 기록과 재생이 있습니다. | `Transport` |
 | 세션 | 기기와 연 PTP 세션입니다. 핸들과 저장소 ID는 세션 안에서만 뜻이 있습니다. | `Session` |
 | 앨범 | 기기에 저장된 캡처 전체입니다. | `AlbumScan` |
 | 캡처 | 기기가 찍은 사진 한 장이나 동영상 하나입니다. 앱 화면에는 캡처라고 쓰지 않고 "사진과 동영상"이나 "사진", "동영상"이라고 씁니다. | `Capture` |
 | 항목 | 화면의 목록과 칸 이름(모든 항목, 새 항목, 고른 항목)에서 캡처를 부르는 말입니다. 화면 문장에서는 "사진과 동영상"이라고 쓰고, 코드와 문서의 문장에서는 캡처라고 씁니다. | |
-| 게임 | 캡처가 든 앨범 폴더입니다. 폴더 이름이 게임 이름입니다. | `Game`, `Capture.gameName` |
+| 게임 | 캡처가 든 앨범 폴더입니다. 폴더 이름이 게임 이름입니다. 앱 사이드바에서는 폴더라고 씁니다. | `Game`, `Capture.gameName`, `LibraryModel.gameSearch` |
 | 기타 | 게임 폴더 밖에 있거나 스위치의 "기타" 폴더에 든 캡처의 묶음입니다. 옮긴 기록의 키에는 원래 폴더 이름을 그대로 둡니다. | `Game.isOther`, `Game.otherFolderName` |
 | 옮김 | 가져오기나 CLI의 `pull`, `export`로 캡처를 Mac에 저장한 일입니다. | `Transfer`, `TransferKind` |
 | 저장 위치 | 앱이 가져온 캡처를 두는 기준 폴더입니다. 기본값은 `~/Pictures/Pullshot`입니다. | `AppSettings.importFolder` |

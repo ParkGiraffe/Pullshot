@@ -36,7 +36,7 @@ struct Export: ParsableCommand {
             let (chosen, missing) = selection.choose(from: scan.captures, ledger: ledger, serialNumber: serialNumber)
             let options = ExportOptions(
                 baseFolder: out.url,
-                makesGameFolder: !shouldSkipGameFolder,
+                shouldMakeGameFolder: !shouldSkipGameFolder,
                 naming: isNumbered ? .numbered : .original
             )
             let items = TransferItem.exports(chosen, options: options)

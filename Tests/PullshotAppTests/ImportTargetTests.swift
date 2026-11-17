@@ -9,10 +9,10 @@ struct ImportTargetTests {
         captureFixture("a.jpg", at: nil),
         captureFixture("b.mp4", game: "마리오 카트 월드", at: nil, kind: .video),
     ]
-    let options = ExportOptions(baseFolder: URL(filePath: "/tmp/스위치"), makesGameFolder: false, naming: .numbered)
+    let options = ExportOptions(baseFolder: URL(filePath: "/tmp/스위치"), shouldMakeGameFolder: false, naming: .numbered)
 
     @Test func `새 항목과 모두 가져오기는 고른 규칙과 관계없이 저장 위치의 게임 이름 폴더에 원래 이름 그대로 둔다`() {
-        for target in [ImportTarget.newItems, .all] {
+        for target in [ImportTarget.new, .all] {
             #expect(paths(target.items(captures, options: options)) == [
                 "/tmp/스위치/젤다무쌍 봉인전기/a.jpg",
                 "/tmp/스위치/마리오 카트 월드/b.mp4",

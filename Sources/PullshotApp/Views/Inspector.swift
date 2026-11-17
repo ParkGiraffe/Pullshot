@@ -23,7 +23,7 @@ struct Inspector: View {
 
     @ViewBuilder private var scopeInfo: some View {
         let summary = CaptureSummary(captures)
-        let newCount = model.captures(in: .newItems).count
+        let newCount = model.captures(in: .new).count
         if let latest = captures.min(by: Capture.newestFirst) {
             Thumbnail(capture: latest)
                 .aspectRatio(16 / 9, contentMode: .fit)
@@ -43,7 +43,7 @@ struct Inspector: View {
             TransferPanel(run: run, model: model)
         } else {
             Button {
-                model.startImport(.newItems)
+                model.startImport(.new)
             } label: {
                 Label("새 항목 \(newCount)개 가져오기", systemImage: "square.and.arrow.down")
                     .frame(maxWidth: .infinity)
@@ -74,12 +74,12 @@ struct Inspector: View {
         }
         Divider()
         importFolderButton
-        Toggle("폴더별로 나눠 저장", isOn: $settings.makesGameFolder)
-        Picker("파일 이름", selection: $settings.exportNaming) {
+        Toggle("폴더별로 나눠 저장", isOn: $settings.shouldMakeGameFolder)
+        Picker("파일 이름", selection: $settings.importNaming) {
             Text("원래 이름 그대로").tag(ExportNaming.original)
             Text("찍은 순서대로 번호 붙이기").tag(ExportNaming.numbered)
         }
-        Text(verbatim: ExportPreview.lines(model.importItems(.selected)).joined(separator: "\n"))
+        Text(verbatim: ImportPreview.lines(model.importItems(.selected)).joined(separator: "\n"))
             .font(.caption.monospaced())
             .foregroundStyle(.secondary)
             .frame(maxWidth: .infinity, alignment: .leading)

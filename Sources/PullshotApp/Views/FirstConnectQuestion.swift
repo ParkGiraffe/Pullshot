@@ -17,11 +17,11 @@ struct FirstConnectQuestion: View {
                 HStack {
                     Spacer()
                     Button("확인") {
-                        model.isAskingFirstConnect = false
+                        model.isFirstConnectQuestionShown = false
                     }
                     .keyboardShortcut(.defaultAction)
                 }
-            } else if model.isAnsweringFirstConnect {
+            } else if model.isRecordingFirstConnectAnswer {
                 HStack {
                     ProgressView()
                         .controlSize(.small)
@@ -77,7 +77,7 @@ struct FirstConnectQuestion: View {
         HStack {
             Spacer()
             Button("나중에") {
-                model.isAskingFirstConnect = false
+                model.isFirstConnectQuestionShown = false
             }
             .keyboardShortcut(.cancelAction)
         }

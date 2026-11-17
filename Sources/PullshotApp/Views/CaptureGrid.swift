@@ -177,7 +177,7 @@ struct CaptureGrid: View {
     }
 
     private func timeRange(_ summary: CaptureSummary) -> String {
-        guard let first = summary.first, let last = summary.last else { return "" }
+        guard let first = summary.firstCapturedAt, let last = summary.lastCapturedAt else { return "" }
         return CaptureTimeText.current.timeRange(first, last)
     }
 }

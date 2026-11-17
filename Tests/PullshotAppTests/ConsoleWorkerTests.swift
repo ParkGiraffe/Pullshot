@@ -2,8 +2,8 @@ import Foundation
 import Testing
 @testable import PullshotApp
 
-@Suite("DeviceWorker 테스트")
-struct DeviceWorkerTests {
+@Suite("ConsoleWorker 테스트")
+struct ConsoleWorkerTests {
     @Suite("받아 둔 미리보기 원본")
     struct PreviewOriginal {
         @Test(arguments: [
@@ -15,7 +15,7 @@ struct DeviceWorkerTests {
         func `크기를 아는 캡처와 크기가 같은 파일이 있을 때만 다시 받지 않는다`(
             fileBytes: Int?,
             captureSize: UInt64?,
-            hasPreview: Bool
+            hasDownloadedOriginal: Bool
         ) throws {
             let folder = temporaryFolderFixture()
             try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
@@ -23,7 +23,8 @@ struct DeviceWorkerTests {
             if let fileBytes {
                 try Data(count: fileBytes).write(to: file)
             }
-            #expect(DeviceWorker.hasPreview(of: captureFixture(size: captureSize), at: file) == hasPreview)
+            #expect(ConsoleWorker
+                .hasDownloadedOriginal(of: captureFixture(size: captureSize), at: file) == hasDownloadedOriginal)
         }
     }
 }

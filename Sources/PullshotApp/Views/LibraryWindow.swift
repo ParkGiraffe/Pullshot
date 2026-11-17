@@ -23,7 +23,7 @@ struct LibraryWindow: View {
                 let captures = model.visibleCaptures
                 content(captures)
                     .overlay {
-                        if model.isAskingFirstConnect {
+                        if model.isFirstConnectQuestionShown {
                             FirstConnectQuestion(model: model)
                         }
                     }
@@ -52,7 +52,7 @@ struct LibraryWindow: View {
                         }
                         ToolbarItem {
                             Menu {
-                                Picker("필터", selection: Binding(get: { model.kind }, set: { model.filter($0) })) {
+                                Picker("필터", selection: Binding(get: { model.kindFilter }, set: { model.filter($0) })) {
                                     Text("사진과 동영상").tag(KindFilter.all)
                                     Text("사진").tag(KindFilter.photos)
                                     Text("동영상").tag(KindFilter.videos)
@@ -98,7 +98,7 @@ struct LibraryWindow: View {
                 selection: Binding(get: { model.selection }, set: { model.select($0) }),
                 gridRows: $model.gridRows
             ) { capture in
-                model.serialNumber.map { !model.index.isTransferred(capture, serialNumber: $0) } ?? false
+                model.serialNumber.map { !model.ledgerIndex.isTransferred(capture, serialNumber: $0) } ?? false
             } preview: {
                 model.preview()
             } togglePreview: {
@@ -131,7 +131,7 @@ struct LibraryWindow: View {
     private func subtitle(of captures: [Capture]) -> String {
         let summary = CaptureSummary(captures)
         var parts: [String] = []
-        if let first = summary.first, let last = summary.last {
+        if let first = summary.firstCapturedAt, let last = summary.lastCapturedAt {
             parts.append((first ..< last).formatted(.interval.month().day()))
         }
         if summary.photoCount > 0 {

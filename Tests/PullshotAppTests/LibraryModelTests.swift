@@ -11,7 +11,7 @@ struct LibraryModelTests {
             let model = try libraryModelFixture()
             await model.shutdown()
             model.choose(consoleFixture(1))
-            #expect(model.connection == .searching)
+            #expect(model.connection == .noConsole)
         }
     }
 

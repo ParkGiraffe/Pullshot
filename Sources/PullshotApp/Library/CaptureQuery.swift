@@ -21,22 +21,22 @@ struct CaptureQuery: Hashable {
     static let recentPeriod: TimeInterval = 30 * 86400
 
     var scope: LibraryScope
-    var kind: KindFilter
+    var kindFilter: KindFilter
 
     var shownKind: KindFilter {
-        kind == .all && scope == .videos ? .videos : kind
+        kindFilter == .all && scope == .videos ? .videos : kindFilter
     }
 
-    func captures(in captures: [Capture], index: LedgerIndex, serialNumber: String, now: Date) -> [Capture] {
+    func captures(in captures: [Capture], ledgerIndex: LedgerIndex, serialNumber: String, now: Date) -> [Capture] {
         let inScope = switch scope {
         case .all:
             captures
         case .new:
-            index.newCaptures(captures, serialNumber: serialNumber)
+            ledgerIndex.newCaptures(captures, serialNumber: serialNumber)
         case .videos:
             captures.filter { $0.kind == .video }
         case .recentlyTransferred:
-            index.recentlyTransferred(
+            ledgerIndex.recentlyTransferred(
                 captures,
                 serialNumber: serialNumber,
                 since: now.addingTimeInterval(-Self.recentPeriod)
@@ -44,7 +44,7 @@ struct CaptureQuery: Hashable {
         case let .game(name):
             captures.filter { $0.gameName == name }
         }
-        let shown = switch kind {
+        let shown = switch kindFilter {
         case .all: inScope
         case .photos: inScope.filter { $0.kind == .photo }
         case .videos: inScope.filter { $0.kind == .video }
@@ -52,12 +52,17 @@ struct CaptureQuery: Hashable {
         return shown.sorted(by: Capture.newestFirst)
     }
 
-    func emptyReason(in captures: [Capture], index: LedgerIndex, serialNumber: String, now: Date) -> EmptyReason? {
-        let isScopeEmpty = Self(scope: scope, kind: .all)
-            .captures(in: captures, index: index, serialNumber: serialNumber, now: now)
+    func emptyReason(
+        in captures: [Capture],
+        ledgerIndex: LedgerIndex,
+        serialNumber: String,
+        now: Date
+    ) -> EmptyReason? {
+        let isScopeEmpty = Self(scope: scope, kindFilter: .all)
+            .captures(in: captures, ledgerIndex: ledgerIndex, serialNumber: serialNumber, now: now)
             .isEmpty
         if !isScopeEmpty {
-            return kind == .photos ? .onlyPhotosShown : .onlyVideosShown
+            return kindFilter == .photos ? .onlyPhotosShown : .onlyVideosShown
         }
         return switch scope {
         case .new: .allTransferred

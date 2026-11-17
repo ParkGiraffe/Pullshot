@@ -7,7 +7,7 @@ public enum FirstConnectAnswer: Equatable, Sendable {
 }
 
 public extension TransferLedger {
-    func needsFirstConnectQuestion(serialNumber: String) -> Bool {
+    func shouldAskFirstConnectQuestion(serialNumber: String) -> Bool {
         !answeredSerialNumbers.contains(serialNumber) && !index.hasRecords(for: serialNumber)
     }
 

@@ -14,7 +14,7 @@ struct CaptureSummaryTests {
         #expect(summary.photoCount == 2)
         #expect(summary.videoCount == 1)
         #expect(summary.totalSize == 400)
-        #expect(summary.first == dateFixture("2026-11-01 09:00:00"))
-        #expect(summary.last == dateFixture("2026-11-14 23:40:00"))
+        #expect(summary.firstCapturedAt == dateFixture("2026-11-01 09:00:00"))
+        #expect(summary.lastCapturedAt == dateFixture("2026-11-14 23:40:00"))
     }
 }

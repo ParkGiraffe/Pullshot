@@ -1,7 +1,7 @@
 import Foundation
 import PullshotKit
 
-actor DeviceWorker {
+actor ConsoleWorker {
     static let previewFolder = URL.temporaryDirectory.appending(path: "Pullshot-preview")
 
     private let queue = DispatchSerialQueue(label: "com.parkgiraffe.Pullshot.device")
@@ -15,7 +15,7 @@ actor DeviceWorker {
         queue.asUnownedSerialExecutor()
     }
 
-    var index: LedgerIndex {
+    var ledgerIndex: LedgerIndex {
         ledger.index
     }
 
@@ -54,8 +54,8 @@ actor DeviceWorker {
         return scan
     }
 
-    func needsFirstConnectQuestion() -> Bool {
-        serialNumber.map(ledger.needsFirstConnectQuestion) ?? false
+    func shouldAskFirstConnectQuestion() -> Bool {
+        serialNumber.map(ledger.shouldAskFirstConnectQuestion) ?? false
     }
 
     func answerFirstConnectQuestion(_ answer: FirstConnectAnswer, captures: [Capture]) throws -> Int {
@@ -97,11 +97,11 @@ actor DeviceWorker {
         return summary
     }
 
-    func preview(_ capture: Capture) throws -> URL {
+    func downloadOriginal(_ capture: Capture) throws -> URL {
         let session = try requireSession()
         let folder = Self.previewFolder.appending(path: capture.gameName)
         let file = folder.appending(path: capture.filename)
-        if Self.hasPreview(of: capture, at: file) {
+        if Self.hasDownloadedOriginal(of: capture, at: file) {
             return file
         }
         try? FileManager.default.removeItem(at: file)
@@ -110,7 +110,7 @@ actor DeviceWorker {
         return file
     }
 
-    static func hasPreview(of capture: Capture, at file: URL) -> Bool {
+    static func hasDownloadedOriginal(of capture: Capture, at file: URL) -> Bool {
         let attributes = try? FileManager.default.attributesOfItem(atPath: file.path(percentEncoded: false))
         return capture.size != nil && (attributes?[.size] as? NSNumber)?.uint64Value == capture.size
     }

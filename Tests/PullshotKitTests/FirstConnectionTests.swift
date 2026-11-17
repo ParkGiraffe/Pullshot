@@ -9,7 +9,7 @@ struct FirstConnectionTests {
         @Test func `기록도 답도 없는 기기에만 묻고 한 번 답하면 다시 묻지 않는다`() throws {
             let folder = temporaryFolderFixture()
             let ledger = try TransferLedger(directory: folder)
-            #expect(ledger.needsFirstConnectQuestion(serialNumber: "S1"))
+            #expect(ledger.shouldAskFirstConnectQuestion(serialNumber: "S1"))
 
             let recorded = try ledger.answerFirstConnectQuestion(
                 .leaveAllNew,
@@ -19,7 +19,7 @@ struct FirstConnectionTests {
 
             #expect(recorded == 0)
 
-            #expect(try !TransferLedger(directory: folder).needsFirstConnectQuestion(serialNumber: "S1"))
+            #expect(try !TransferLedger(directory: folder).shouldAskFirstConnectQuestion(serialNumber: "S1"))
             #expect(ledger.index.newCaptures([captureFixture()], serialNumber: "S1").count == 1)
         }
 
@@ -27,7 +27,7 @@ struct FirstConnectionTests {
             let ledger = try TransferLedger(directory: temporaryFolderFixture())
             try ledger.record([captureFixture()], serialNumber: "S1", as: .imported)
 
-            #expect(!ledger.needsFirstConnectQuestion(serialNumber: "S1"))
+            #expect(!ledger.shouldAskFirstConnectQuestion(serialNumber: "S1"))
         }
 
         @Test func `답한 기기 파일이 깨져도 기록을 열고 다시 묻는다`() throws {
@@ -37,11 +37,11 @@ struct FirstConnectionTests {
             let ledger = try TransferLedger(directory: folder)
 
             #expect(ledger.index.isTransferred(captureFixture("a.jpg"), serialNumber: "S1"))
-            #expect(ledger.needsFirstConnectQuestion(serialNumber: "S2"))
+            #expect(ledger.shouldAskFirstConnectQuestion(serialNumber: "S2"))
 
             _ = try ledger.answerFirstConnectQuestion(.leaveAllNew, captures: [], serialNumber: "S2")
 
-            #expect(try !TransferLedger(directory: folder).needsFirstConnectQuestion(serialNumber: "S2"))
+            #expect(try !TransferLedger(directory: folder).shouldAskFirstConnectQuestion(serialNumber: "S2"))
         }
     }
 
@@ -69,7 +69,7 @@ struct FirstConnectionTests {
                     isCancelled: { true }
                 )
             }
-            #expect(ledger.needsFirstConnectQuestion(serialNumber: "S1"))
+            #expect(ledger.shouldAskFirstConnectQuestion(serialNumber: "S1"))
         }
     }
 
@@ -105,7 +105,7 @@ struct FirstConnectionTests {
                     serialNumber: "S1"
                 )
             }
-            #expect(ledger.needsFirstConnectQuestion(serialNumber: "S1"))
+            #expect(ledger.shouldAskFirstConnectQuestion(serialNumber: "S1"))
         }
 
         @Test func `읽을 수 없는 하위 폴더가 있어도 나머지에서 찾는다`() throws {

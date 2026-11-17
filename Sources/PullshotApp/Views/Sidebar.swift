@@ -22,7 +22,7 @@ struct Sidebar: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            DeviceSwitcher(model: model)
+            ConsoleSwitcher(model: model)
                 .padding(.horizontal, 10)
             if case .ready = model.connection {
                 list
@@ -44,13 +44,14 @@ struct Sidebar: View {
     private var list: some View {
         let serialNumber = model.serialNumber ?? ""
         let allGames = Game.games(in: model.captures)
-        let newIDs = Set(model.index.newCaptures(model.captures, serialNumber: serialNumber).map(\.id))
+        let newIDs = Set(model.ledgerIndex.newCaptures(model.captures, serialNumber: serialNumber).map(\.id))
         let shownGames = model.gameSearch.isEmpty
             ? allGames
             : allGames.filter { gameTitle($0.name).localizedStandardContains(model.gameSearch) }
         func count(_ scope: LibraryScope) -> Int {
-            CaptureQuery(scope: scope, kind: .all)
-                .captures(in: model.captures, index: model.index, serialNumber: serialNumber, now: .now).count
+            CaptureQuery(scope: scope, kindFilter: .all)
+                .captures(in: model.captures, ledgerIndex: model.ledgerIndex, serialNumber: serialNumber, now: .now)
+                .count
         }
         return List(selection: Binding(get: { model.scope }, set: { model.show($0 ?? .all) })) {
             pinnedRow("모든 항목", icon: "square.grid.2x2", scope: .all, count: model.captures.count)

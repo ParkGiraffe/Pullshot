@@ -5,9 +5,9 @@ import PullshotKit
 @MainActor @Observable
 final class LibraryModel {
     enum Connection: Equatable {
-        case searching
+        case noConsole
         case notInTransferMode(String)
-        case reattachNeeded
+        case usbReset
         case connecting(AttachedConsole)
         case scanning(AttachedConsole, seen: Int)
         case ready(AttachedConsole, DeviceInfo)
@@ -17,7 +17,7 @@ final class LibraryModel {
             switch self {
             case let .connecting(console), let .scanning(console, _), let .ready(console, _), let .failed(console, _):
                 console
-            case .searching, .notInTransferMode, .reattachNeeded:
+            case .noConsole, .notInTransferMode, .usbReset:
                 nil
             }
         }
@@ -34,23 +34,23 @@ final class LibraryModel {
         }
     }
 
-    private(set) var connection = Connection.searching
+    private(set) var connection = Connection.noConsole
     private(set) var consoles: [AttachedConsole] = []
     private(set) var captures: [Capture] = []
-    private(set) var index = LedgerIndex()
+    private(set) var ledgerIndex = LedgerIndex()
     private(set) var serialNumber: String?
     let isDemo: Bool
-    var isAskingFirstConnect = false
+    var isFirstConnectQuestionShown = false
     private(set) var firstConnectRecordedCount: Int?
     private(set) var firstConnectErrorMessage: String?
     private var firstConnectTask: Task<Void, Never>?
     private(set) var transferRun: TransferRun?
     private(set) var scope = LibraryScope.all
-    private(set) var kind = KindFilter.all
+    private(set) var kindFilter = KindFilter.all
     var gameSearch = ""
     var selection = GridSelection()
     var isInspectorShown = true
-    let worker: DeviceWorker
+    let worker: ConsoleWorker
     let thumbnails: ThumbnailStore
     let settings: AppSettings
 
@@ -65,8 +65,8 @@ final class LibraryModel {
     @ObservationIgnored var previewThumbnails: [Capture.ID: URL] = [:]
     @ObservationIgnored var previewTasks: [Capture.ID: Task<Void, Never>] = [:]
 
-    init(worker: DeviceWorker, settings: AppSettings) {
-        try? FileManager.default.removeItem(at: DeviceWorker.previewFolder)
+    init(worker: ConsoleWorker, settings: AppSettings) {
+        try? FileManager.default.removeItem(at: ConsoleWorker.previewFolder)
         self.worker = worker
         self.settings = settings
         thumbnails = ThumbnailStore(worker: worker)
@@ -82,15 +82,15 @@ final class LibraryModel {
     }
 
     var query: CaptureQuery {
-        CaptureQuery(scope: scope, kind: kind)
+        CaptureQuery(scope: scope, kindFilter: kindFilter)
     }
 
     var visibleCaptures: [Capture] {
-        query.captures(in: captures, index: index, serialNumber: serialNumber ?? "", now: .now)
+        query.captures(in: captures, ledgerIndex: ledgerIndex, serialNumber: serialNumber ?? "", now: .now)
     }
 
     var emptyReason: EmptyReason? {
-        query.emptyReason(in: captures, index: index, serialNumber: serialNumber ?? "", now: .now)
+        query.emptyReason(in: captures, ledgerIndex: ledgerIndex, serialNumber: serialNumber ?? "", now: .now)
     }
 
     var selectedCaptures: [Capture] {
@@ -111,7 +111,7 @@ final class LibraryModel {
             await task.value
         }
         await worker.close()
-        try? FileManager.default.removeItem(at: DeviceWorker.previewFolder)
+        try? FileManager.default.removeItem(at: ConsoleWorker.previewFolder)
     }
 
     func watchConsoles() async {
@@ -137,27 +137,27 @@ final class LibraryModel {
         previewPanel.close()
     }
 
-    func filter(_ kind: KindFilter) {
-        guard kind != self.kind else { return }
-        self.kind = kind
+    func filter(_ kindFilter: KindFilter) {
+        guard kindFilter != self.kindFilter else { return }
+        self.kindFilter = kindFilter
         var kept = selection
         kept.keep(visibleCaptures.map(\.id))
         select(kept)
     }
 
-    var isAnsweringFirstConnect: Bool {
+    var isRecordingFirstConnectAnswer: Bool {
         firstConnectTask != nil
     }
 
     func answerFirstConnect(_ answer: FirstConnectAnswer) {
-        guard !isShuttingDown, !isAnsweringFirstConnect else { return }
+        guard !isShuttingDown, !isRecordingFirstConnectAnswer else { return }
         firstConnectErrorMessage = nil
         firstConnectTask = Task {
             do {
                 let recordedCount = try await worker.answerFirstConnectQuestion(answer, captures: captures)
                 guard !Task.isCancelled else { return }
                 firstConnectRecordedCount = recordedCount
-                index = await worker.index
+                ledgerIndex = await worker.ledgerIndex
             } catch {
                 guard !Task.isCancelled else { return }
                 worker.log.write("처음 연결 질문에 답하지 못함: \(FileLog.describe(error))")
@@ -180,10 +180,10 @@ final class LibraryModel {
     private func inspectConsoles() async {
         guard !isShuttingDown else { return }
         consoles = ConsoleLocator.attached()
-        guard let console = ConsoleChoice.next(current: connection.console, attached: consoles) else {
+        guard let console = ConsoleChoice.preferring(connection.console, among: consoles) else {
             leaveConsole()
-            if connection != .reattachNeeded {
-                connection = ConsoleLocator.idle().first.map { .notInTransferMode($0.name) } ?? .searching
+            if connection != .usbReset {
+                connection = ConsoleLocator.idle().first.map { .notInTransferMode($0.name) } ?? .noConsole
             }
             await worker.close()
             return
@@ -215,7 +215,7 @@ final class LibraryModel {
         selection.clear()
         serialNumber = nil
         thumbnails.serialNumber = nil
-        isAskingFirstConnect = false
+        isFirstConnectQuestionShown = false
         firstConnectRecordedCount = nil
         firstConnectErrorMessage = nil
         scope = .all
@@ -224,25 +224,25 @@ final class LibraryModel {
 
     private func load(_ console: AttachedConsole) async {
         do {
-            let info = try await worker.open(console, isVerbose: settings.isVerboseLog)
+            let info = try await worker.open(console, isVerbose: settings.isVerboseLogging)
             try Task.checkCancellation()
             connection = .scanning(console, seen: 0)
             let scan = try await worker.scan { seen in
                 guard seen.isMultiple(of: 100) else { return }
                 Task { @MainActor in self.showScanProgress(seen, of: console) }
             }
-            let index = await worker.index
-            let needsFirstConnectQuestion = await worker.needsFirstConnectQuestion()
+            let ledgerIndex = await worker.ledgerIndex
+            let shouldAskFirstConnectQuestion = await worker.shouldAskFirstConnectQuestion()
             try Task.checkCancellation()
             captures = scan.captures
-            self.index = index
+            self.ledgerIndex = ledgerIndex
             serialNumber = info.serialNumber
             thumbnails.serialNumber = info.serialNumber
-            isAskingFirstConnect = needsFirstConnectQuestion
+            isFirstConnectQuestionShown = shouldAskFirstConnectQuestion
             connection = .ready(console, info)
         } catch SessionError.needsUSBReset where connection.console == nil || connection.console == console {
             worker.log.write("연결하지 못함: \(FileLog.describe(SessionError.needsUSBReset))")
-            connection = .reattachNeeded
+            connection = .usbReset
         } catch {
             guard !Task.isCancelled else { return }
             worker.log.write("연결하지 못함: \(FileLog.describe(error))")
@@ -260,8 +260,8 @@ extension LibraryModel {
     var importOptions: ExportOptions {
         ExportOptions(
             baseFolder: settings.importFolder,
-            makesGameFolder: settings.makesGameFolder,
-            naming: settings.exportNaming
+            shouldMakeGameFolder: settings.shouldMakeGameFolder,
+            naming: settings.importNaming
         )
     }
 
@@ -271,8 +271,8 @@ extension LibraryModel {
 
     func captures(in target: ImportTarget) -> [Capture] {
         switch target {
-        case .newItems:
-            index.newCaptures(visibleCaptures, serialNumber: serialNumber ?? "")
+        case .new:
+            ledgerIndex.newCaptures(visibleCaptures, serialNumber: serialNumber ?? "")
         case .all:
             visibleCaptures
         case .selected:
@@ -315,7 +315,7 @@ extension LibraryModel {
                 worker.log.write("옮기기를 마치지 못함: \(FileLog.describe(error))")
                 transferRun?.errorMessage = AppErrorMessages.message(for: error)
             }
-            index = await worker.index
+            ledgerIndex = await worker.ledgerIndex
             await reopenIfSessionLost()
         }
     }

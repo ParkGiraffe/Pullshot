@@ -61,7 +61,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
         guard let model, model.hasOpenSession else {
-            try? FileManager.default.removeItem(at: DeviceWorker.previewFolder)
+            try? FileManager.default.removeItem(at: ConsoleWorker.previewFolder)
             return .terminateNow
         }
         Task {
@@ -88,7 +88,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private static func makeModel(ledgerDirectory: URL, settings: AppSettings) -> LibraryModel? {
         let log = FileLog()
         do {
-            let worker = try DeviceWorker(ledgerDirectory: ledgerDirectory, log: log)
+            let worker = try ConsoleWorker(ledgerDirectory: ledgerDirectory, log: log)
             return LibraryModel(worker: worker, settings: settings)
         } catch {
             log.write("옮긴 기록을 열지 못함: \(FileLog.describe(error))")

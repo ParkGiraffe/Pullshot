@@ -1,11 +1,11 @@
 enum SettingsKey: String {
     case ledgerFolder
     case importFolder
-    case makesGameFolder
-    case exportNaming
+    case shouldMakeGameFolder
+    case importNaming
     case thumbnailSize
     case viewMode
-    case isVerboseLog
+    case isVerboseLogging
     case appIcon
     case demoAlbum
 }

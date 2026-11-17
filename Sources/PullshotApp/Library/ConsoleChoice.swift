@@ -1,7 +1,7 @@
 import PullshotKit
 
 enum ConsoleChoice {
-    static func next(current: AttachedConsole?, attached: [AttachedConsole]) -> AttachedConsole? {
+    static func preferring(_ current: AttachedConsole?, among attached: [AttachedConsole]) -> AttachedConsole? {
         attached.first { $0.registryID == current?.registryID } ?? attached.first
     }
 }

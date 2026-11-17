@@ -10,7 +10,7 @@ struct ConnectionGuide: View {
                 transferResult(summary)
             }
             switch model.connection {
-            case .searching:
+            case .noConsole:
                 symbol("cable.connector")
                 Text("스위치를 연결해 주세요")
                     .font(.title2.bold())
@@ -23,7 +23,7 @@ struct ConnectionGuide: View {
                 Text("\(name)가 연결되어 있지만 PC로 복사 모드가 아닙니다.")
                     .font(.title3.bold())
                 steps(["본체 설정의 데이터 관리에서 PC로 복사를 켭니다."])
-            case .reattachNeeded:
+            case .usbReset:
                 symbol("arrow.triangle.2.circlepath")
                 Text("이전 연결이 남아 있어 스위치의 USB 연결을 재설정했고, 이때 PC로 복사가 꺼졌습니다. 본체에서 PC로 복사를 다시 켜 주세요.")
                     .font(.title3)

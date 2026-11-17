@@ -88,7 +88,7 @@ private final class TemporaryDefaults: UserDefaults {
 
 @MainActor
 func libraryModelFixture() throws -> LibraryModel {
-    let worker = try DeviceWorker(
+    let worker = try ConsoleWorker(
         ledgerDirectory: temporaryFolderFixture(),
         log: FileLog(file: temporaryFolderFixture().appending(path: "pullshot.log"))
     )

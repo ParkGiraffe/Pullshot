@@ -2,13 +2,13 @@ import Foundation
 import PullshotKit
 
 enum ImportTarget {
-    case newItems
+    case new
     case all
     case selected
 
     func items(_ captures: [Capture], options: ExportOptions) -> [TransferItem] {
         switch self {
-        case .newItems, .all:
+        case .new, .all:
             TransferItem.imports(captures, into: options.baseFolder)
         case .selected:
             TransferItem.exports(captures, options: options)
@@ -17,7 +17,7 @@ enum ImportTarget {
 
     var kind: TransferKind {
         switch self {
-        case .newItems, .all:
+        case .new, .all:
             .imported
         case .selected:
             .exported

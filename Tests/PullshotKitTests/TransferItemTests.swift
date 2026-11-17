@@ -27,7 +27,7 @@ struct TransferItemTests {
     @Suite("내보낼 이름")
     struct Exporting {
         @Test func `게임 이름 폴더를 끄면 기준 폴더에 원래 이름으로 둔다`() {
-            let options = ExportOptions(baseFolder: URL(filePath: "/tmp/blog"), makesGameFolder: false)
+            let options = ExportOptions(baseFolder: URL(filePath: "/tmp/blog"), shouldMakeGameFolder: false)
             let items = TransferItem.exports([captureFixture("a.jpg")], options: options, timeZone: seoul)
 
             #expect(folders(items) == ["/tmp/blog"])

@@ -11,16 +11,16 @@ struct AppSettingsTests {
     @Test func `바꾼 설정은 다시 읽어도 남는다`() {
         let settings = AppSettings(defaults: defaults)
         settings.importFolder = URL(filePath: "/tmp/스위치")
-        settings.makesGameFolder = false
-        settings.exportNaming = .numbered
-        settings.isVerboseLog = true
+        settings.shouldMakeGameFolder = false
+        settings.importNaming = .numbered
+        settings.isVerboseLogging = true
         settings.appIcon = .shutter
 
         let reread = AppSettings(defaults: defaults)
         #expect(reread.importFolder == URL(filePath: "/tmp/스위치"))
-        #expect(reread.makesGameFolder == false)
-        #expect(reread.exportNaming == .numbered)
-        #expect(reread.isVerboseLog)
+        #expect(reread.shouldMakeGameFolder == false)
+        #expect(reread.importNaming == .numbered)
+        #expect(reread.isVerboseLogging)
         #expect(reread.appIcon == .shutter)
     }
 }

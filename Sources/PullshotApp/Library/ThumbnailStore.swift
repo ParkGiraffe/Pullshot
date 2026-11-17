@@ -17,10 +17,10 @@ final class ThumbnailStore {
     var isDemo = false
 
     @ObservationIgnored private let memory = NSCache<NSString, NSImage>()
-    @ObservationIgnored private let worker: DeviceWorker
+    @ObservationIgnored private let worker: ConsoleWorker
     @ObservationIgnored private let cache: ThumbnailCache
 
-    init(worker: DeviceWorker, cache: ThumbnailCache = ThumbnailCache()) {
+    init(worker: ConsoleWorker, cache: ThumbnailCache = ThumbnailCache()) {
         self.worker = worker
         self.cache = cache
     }
@@ -42,9 +42,9 @@ final class ThumbnailStore {
         return image
     }
 
-    func previewFile(for capture: Capture) async -> URL? {
+    func enlargedThumbnailFile(for capture: Capture) async -> URL? {
         guard let serialNumber, Capture.isSafeFilename(serialNumber) else { return nil }
-        let file = DeviceWorker.previewFolder.appending(path: ".thumbnails").appending(path: serialNumber)
+        let file = ConsoleWorker.previewFolder.appending(path: ".thumbnails").appending(path: serialNumber)
             .appending(path: capture.gameName).appending(path: "\(capture.filename).jpg")
         if FileManager.default.fileExists(atPath: file.path(percentEncoded: false)) {
             return file

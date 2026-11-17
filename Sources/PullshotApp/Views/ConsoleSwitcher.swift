@@ -1,7 +1,7 @@
 import PullshotKit
 import SwiftUI
 
-struct DeviceSwitcher: View {
+struct ConsoleSwitcher: View {
     let model: LibraryModel
 
     var body: some View {
@@ -72,9 +72,9 @@ struct DeviceSwitcher: View {
             Text("연결하지 못함")
         case .notInTransferMode:
             Text("PC로 복사 모드가 아님")
-        case .reattachNeeded:
+        case .usbReset:
             Text("PC로 복사를 다시 켜야 함")
-        case .searching:
+        case .noConsole:
             Text("연결된 스위치 없음")
         }
     }
