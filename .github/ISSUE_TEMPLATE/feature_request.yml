@@ -1,0 +1,21 @@
+name: 기능 제안
+description: 있으면 좋을 기능이나 바뀌었으면 하는 동작을 제안합니다.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: 하고 싶은 일
+      description: 어떤 상황에서 무엇을 하고 싶은지 적어 주세요.
+    validations:
+      required: true
+  - type: textarea
+    id: today
+    attributes:
+      label: 지금은 어떻게 하나요
+      description: 지금 Pullshot이나 다른 도구로 어떻게 하고 있는지, 무엇이 불편한지 적어 주세요.
+  - type: textarea
+    id: idea
+    attributes:
+      label: 제안
+      description: 생각해 둔 방법이 있으면 적어 주세요. 화면 그림이 있으면 붙여 주셔도 좋습니다.

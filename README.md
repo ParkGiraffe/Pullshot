@@ -61,7 +61,7 @@ make test
 make check         # SwiftLint --strict, SwiftFormat --lint
 ```
 
-코딩 규칙은 [docs/conventions.md](docs/conventions.md), 용어는 [docs/glossary.md](docs/glossary.md)에 있습니다.
+코딩 규칙은 [docs/conventions.md](docs/conventions.md), 용어는 [docs/glossary.md](docs/glossary.md)에 있습니다. 이슈와 PR을 여는 방법은 [CONTRIBUTING.md](CONTRIBUTING.md)에 있습니다.
 
 ## 라이선스
 
