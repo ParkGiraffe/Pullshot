@@ -66,7 +66,7 @@ final class LibraryModel {
     @ObservationIgnored var previewTasks: [Capture.ID: Task<Void, Never>] = [:]
 
     init(worker: ConsoleWorker, settings: AppSettings) {
-        try? FileManager.default.removeItem(at: ConsoleWorker.previewFolder)
+        try? FileManager.default.removeItem(at: worker.previewFolder)
         self.worker = worker
         self.settings = settings
         thumbnails = ThumbnailStore(worker: worker)
@@ -111,7 +111,7 @@ final class LibraryModel {
             await task.value
         }
         await worker.close()
-        try? FileManager.default.removeItem(at: ConsoleWorker.previewFolder)
+        try? FileManager.default.removeItem(at: worker.previewFolder)
     }
 
     func watchConsoles() async {

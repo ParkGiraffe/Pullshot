@@ -44,7 +44,7 @@ final class ThumbnailStore {
 
     func enlargedThumbnailFile(for capture: Capture) async -> URL? {
         guard let serialNumber, Capture.isSafeFilename(serialNumber) else { return nil }
-        let file = ConsoleWorker.previewFolder.appending(path: ".thumbnails").appending(path: serialNumber)
+        let file = worker.previewFolder.appending(path: ".thumbnails").appending(path: serialNumber)
             .appending(path: capture.gameName).appending(path: "\(capture.filename).jpg")
         if FileManager.default.fileExists(atPath: file.path(percentEncoded: false)) {
             return file

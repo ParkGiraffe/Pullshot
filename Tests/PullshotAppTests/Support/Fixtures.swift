@@ -90,6 +90,7 @@ private final class TemporaryDefaults: UserDefaults {
 func libraryModelFixture() throws -> LibraryModel {
     let worker = try ConsoleWorker(
         ledgerDirectory: temporaryFolderFixture(),
+        previewFolder: temporaryFolderFixture(),
         log: FileLog(file: temporaryFolderFixture().appending(path: "pullshot.log"))
     )
     return LibraryModel(worker: worker, settings: AppSettings(defaults: defaultsFixture()))

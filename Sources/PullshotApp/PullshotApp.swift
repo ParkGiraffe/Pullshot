@@ -60,8 +60,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
-        guard let model, model.hasOpenSession else {
-            try? FileManager.default.removeItem(at: ConsoleWorker.previewFolder)
+        guard let model else { return .terminateNow }
+        guard model.hasOpenSession else {
+            try? FileManager.default.removeItem(at: model.worker.previewFolder)
             return .terminateNow
         }
         Task {

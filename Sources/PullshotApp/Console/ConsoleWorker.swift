@@ -2,10 +2,9 @@ import Foundation
 import PullshotKit
 
 actor ConsoleWorker {
-    static let previewFolder = URL.temporaryDirectory.appending(path: "Pullshot-preview")
-
     private let queue = DispatchSerialQueue(label: "com.parkgiraffe.Pullshot.device")
     private let ledger: TransferLedger
+    nonisolated let previewFolder: URL
     let log: FileLog
     private var transport: HostTransport?
     private var session: Session?
@@ -23,8 +22,13 @@ actor ConsoleWorker {
         session?.isValid == true
     }
 
-    init(ledgerDirectory: URL, log: FileLog) throws {
+    init(
+        ledgerDirectory: URL,
+        previewFolder: URL = URL.temporaryDirectory.appending(path: "Pullshot-preview"),
+        log: FileLog
+    ) throws {
         ledger = try TransferLedger(directory: ledgerDirectory)
+        self.previewFolder = previewFolder
         self.log = log
     }
 
@@ -99,7 +103,7 @@ actor ConsoleWorker {
 
     func downloadOriginal(_ capture: Capture) throws -> URL {
         let session = try requireSession()
-        let folder = Self.previewFolder.appending(path: capture.gameName)
+        let folder = previewFolder.appending(path: capture.gameName)
         let file = folder.appending(path: capture.filename)
         if Self.hasDownloadedOriginal(of: capture, at: file) {
             return file
