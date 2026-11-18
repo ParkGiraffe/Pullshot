@@ -6,8 +6,8 @@ struct ConnectionGuide: View {
 
     var body: some View {
         VStack(spacing: 16) {
-            if let summary = model.transferRun?.summary {
-                transferResult(summary)
+            if let summary = model.transferRun?.summary, summary.notAttempted > 0, !summary.isCancelled {
+                interruptedTransfer(summary)
             }
             switch model.connection {
             case .noConsole:
@@ -52,15 +52,13 @@ struct ConnectionGuide: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
-    private func transferResult(_ summary: TransferSummary) -> some View {
+    private func interruptedTransfer(_ summary: TransferSummary) -> some View {
         VStack(spacing: 6) {
             Text(TransferText.summary(summary))
                 .font(.headline)
                 .monospacedDigit()
-            if summary.notAttempted > 0, !summary.isCancelled {
-                Text("연결이 끊겨 남은 사진과 동영상을 가져오지 못했습니다. 다시 연결하면 이어서 가져올 수 있습니다.")
-                    .foregroundStyle(.secondary)
-            }
+            Text("연결이 끊겨 남은 사진과 동영상을 가져오지 못했습니다. 다시 연결하면 이어서 가져올 수 있습니다.")
+                .foregroundStyle(.secondary)
         }
         .padding(12)
         .frame(maxWidth: .infinity)
