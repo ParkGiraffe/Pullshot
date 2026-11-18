@@ -5,17 +5,17 @@ body:
   - type: textarea
     id: goal
     attributes:
-      label: 하고 싶은 일
-      description: 어떤 상황에서 무엇을 하고 싶은지 적어 주세요.
+      label: 하고 싶은 작업
+      description: 어떤 상황에서 무엇을 하고 싶은지 작성해 주세요.
     validations:
       required: true
   - type: textarea
     id: today
     attributes:
-      label: 지금은 어떻게 하나요
-      description: 지금 Pullshot이나 다른 도구로 어떻게 하고 있는지, 무엇이 불편한지 적어 주세요.
+      label: 현재 방법
+      description: 지금 Pullshot이나 다른 도구로 어떻게 하고 있는지, 어떤 점이 불편한지 작성해 주세요.
   - type: textarea
     id: idea
     attributes:
       label: 제안
-      description: 생각해 둔 방법이 있으면 적어 주세요. 화면 그림이 있으면 붙여 주셔도 좋습니다.
+      description: 생각해 둔 방법이 있으면 작성해 주세요. 참고할 스크린샷이나 그림이 있으면 첨부해 주셔도 좋습니다.

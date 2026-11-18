@@ -5,21 +5,21 @@ body:
   - type: markdown
     attributes:
       value: |
-        문제를 다시 겪을 수 있다면, 설정에서 "자세한 로그 남기기"를 켜고 한 번 더 해 본 뒤 알려 주세요. 로그에는 파일 이름, 게임 이름, 경로, 일련번호가 남지 않습니다.
+        문제를 재현할 수 있다면 설정에서 "자세한 로그 남기기"를 켜고 한 번 더 시도한 뒤 알려 주세요. 로그에는 파일 이름, 게임 이름, 경로, 일련번호가 기록되지 않습니다.
   - type: textarea
     id: what-happened
     attributes:
-      label: 무슨 일이 있었나요
-      description: 무엇을 하다가 어떤 일이 생겼는지 적어 주세요. 화면에 나온 문구가 있으면 그대로 옮겨 주세요.
+      label: 문제 설명
+      description: 어떤 작업 중에 어떤 문제가 생겼는지 작성해 주세요. 화면에 나온 문구가 있으면 그대로 붙여 넣어 주세요.
     validations:
       required: true
   - type: textarea
     id: steps
     attributes:
-      label: 다시 겪는 순서
+      label: 재현 순서
       placeholder: |
         1. 스위치를 연결하고 PC로 복사를 켭니다.
-        2. 사이드바에서 폴더 하나를 고릅니다.
+        2. 사이드바에서 폴더 하나를 선택합니다.
         3. ...
   - type: textarea
     id: expected
@@ -38,12 +38,12 @@ body:
     id: firmware
     attributes:
       label: 본체 시스템 버전
-      description: 본체 설정의 시스템에서 볼 수 있습니다. 연결되면 앱 사이드바 맨 위에도 나옵니다.
-      placeholder: 예. 23.5.0
+      description: 본체 설정의 시스템에서 확인할 수 있고, 연결되어 있으면 앱 사이드바 맨 위에도 표시됩니다.
+      placeholder: "예: 23.5.0"
   - type: dropdown
     id: surface
     attributes:
-      label: 사용한 것
+      label: 앱 또는 CLI
       options:
         - 앱
         - CLI(pullshot)
@@ -53,14 +53,14 @@ body:
     id: version
     attributes:
       label: Pullshot 버전
-      description: 앱은 Pullshot 메뉴의 Pullshot에 관하여에서 볼 수 있습니다. 소스에서 만들었다면 커밋 해시를 적어 주세요.
+      description: 앱은 Pullshot 메뉴의 "Pullshot에 관하여"에서 확인할 수 있습니다. 소스에서 빌드했다면 커밋 해시를 작성해 주세요.
   - type: input
     id: mac
     attributes:
       label: Mac과 macOS 버전
-      placeholder: 예. MacBook Air M2, macOS 15.4
+      placeholder: "예: MacBook Air M2, macOS 15.4"
   - type: textarea
     id: log
     attributes:
       label: 로그
-      description: 앱은 도움말 메뉴의 로그 파일 보기로 찾은 pullshot.log를 끌어다 놓아 주세요. CLI는 --verbose를 붙여 다시 실행한 출력을 붙여 주세요.
+      description: 앱은 도움말 메뉴의 "로그 파일 보기"로 찾은 pullshot.log 파일을 첨부해 주세요. CLI는 --verbose 옵션을 붙여 다시 실행한 출력을 붙여 넣어 주세요.
