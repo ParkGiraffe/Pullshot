@@ -3,7 +3,7 @@ import Foundation
 import PullshotKit
 
 struct Probe: ParsableCommand {
-    static let configuration = CommandConfiguration(abstract: "기기 정보, 지원 명령, 저장소를 보여 줍니다.")
+    static let configuration = CommandConfiguration(abstract: "기기 정보, 지원하는 PTP 명령, 저장소를 출력합니다.")
 
     @OptionGroup var connection: ConnectionOptions
 

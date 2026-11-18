@@ -23,13 +23,13 @@ struct ListFormatterTests {
             ])
         }
 
-        @Test func `새 항목에는 줄 끝에 새를 붙인다`() {
+        @Test func `새 항목에는 줄 끝에 새 항목이라고 표시한다`() {
             let capture = captureFixture("2026111421120500_s.jpg", at: "20261114T211205")
             let scan = AlbumScan(captures: [capture], skipped: [])
 
             #expect(ListFormatter.lines(scan, isNew: { _ in true }, timeZone: timeZoneFixture()) == [
                 "젤다무쌍 봉인전기 (1)",
-                "  2026111421120500_s.jpg  사진  0.0 MB  2026-11-14 21:12  새",
+                "  2026111421120500_s.jpg  사진  0.0 MB  2026-11-14 21:12  새 항목",
             ])
         }
     }

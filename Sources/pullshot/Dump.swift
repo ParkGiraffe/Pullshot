@@ -4,10 +4,10 @@ import PullshotKit
 
 struct Dump: ParsableCommand {
     static let configuration = CommandConfiguration(
-        abstract: "실기기 응답을 그대로 기록합니다. 테스트 픽스처를 만들 때 씁니다."
+        abstract: "실기기 응답을 그대로 저장합니다. 테스트 픽스처를 만들 때 사용합니다."
     )
 
-    @Option(help: "기록을 남길 폴더입니다.")
+    @Option(help: "저장할 폴더입니다.")
     var out: Path
 
     @OptionGroup var connection: ConnectionOptions
@@ -38,8 +38,8 @@ struct Dump: ParsableCommand {
                     to: files.appending(path: photo.filename)
                 )
             }
-            print("기록을 남겼습니다: \(folder.path(percentEncoded: false))")
-            Terminal.error("이 폴더에는 기기 일련번호와 캡처가 들어 있습니다. 공개 리포에 올리지 말아 주세요.")
+            print("저장했습니다: \(folder.path(percentEncoded: false))")
+            Terminal.error("이 폴더에는 기기 일련번호와 사진이 들어 있습니다. 공개 리포에 올리지 말아 주세요.")
         }
     }
 

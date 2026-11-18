@@ -20,7 +20,7 @@ enum ListFormatter {
                 String(repeating: " ", count: sizeWidth - sizeText(capture).count) + sizeText(capture),
                 capture.capturedAt.map(dateFormatter.string(from:)) ?? "-",
             ]
-            return "  " + columns.joined(separator: "  ") + (isNew(capture) ? "  새" : "")
+            return "  " + columns.joined(separator: "  ") + (isNew(capture) ? "  새 항목" : "")
         }
 
         return Game.games(in: scan.captures).flatMap { game in

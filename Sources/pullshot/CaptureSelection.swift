@@ -2,20 +2,20 @@ import ArgumentParser
 import PullshotKit
 
 struct SelectionOptions: ParsableArguments {
-    @Flag(name: .customLong("all"), help: "모든 캡처를 고릅니다.")
+    @Flag(name: .customLong("all"), help: "모든 사진과 동영상을 선택합니다.")
     var isAll = false
 
-    @Flag(name: .customLong("new"), help: "옮긴 적 없는 새 항목만 고릅니다.")
+    @Flag(name: .customLong("new"), help: "옮긴 적 없는 새 항목만 선택합니다.")
     var isNewOnly = false
 
-    @Argument(help: "고를 캡처입니다. list에 나온 파일 이름이나 \"게임/파일 이름\"입니다.")
+    @Argument(help: "가져올 사진과 동영상입니다. list에 나온 파일 이름이나 \"게임/파일 이름\"으로 지정합니다.")
     var names: [String] = []
 
-    @Option(help: "이 게임의 캡처만 고릅니다.")
+    @Option(help: "이 게임의 사진과 동영상만 선택합니다.")
     var game: String?
 
     func validate() throws {
-        guard isAll || isNewOnly || !names.isEmpty else { throw ValidationError("--all, --new, 캡처 이름 중 하나를 주세요.") }
+        guard isAll || isNewOnly || !names.isEmpty else { throw ValidationError("--all, --new, 파일 이름 중 하나를 지정해 주세요.") }
     }
 
     func choose(
@@ -27,7 +27,7 @@ struct SelectionOptions: ParsableArguments {
         let (chosen, missing) = selection.choose(from: captures) {
             !ledger.index.isTransferred($0, serialNumber: serialNumber)
         }
-        missing.forEach { Terminal.error("찾지 못한 캡처: \($0)") }
+        missing.forEach { Terminal.error("찾지 못한 파일: \($0)") }
         return (chosen, missing.count)
     }
 }

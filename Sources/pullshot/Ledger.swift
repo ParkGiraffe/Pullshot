@@ -4,19 +4,19 @@ import PullshotKit
 
 struct Ledger: ParsableCommand {
     static let configuration = CommandConfiguration(
-        abstract: "처음 연결 질문에 답합니다. 이미 받아 둔 캡처를 옮긴 기록에 넣어 새 항목에서 뺍니다."
+        abstract: "처음 연결 질문에 답합니다. Mac에 이미 저장한 사진과 동영상을 옮긴 기록에 추가해 새 항목에서 제외합니다."
     )
 
     @Option(
         name: .customLong("from-folder"),
-        help: "이 폴더 아래 어디에 있든 파일 이름과 크기가 같은 캡처를 옮긴 것으로 기록합니다."
+        help: "이 폴더와 하위 폴더에서 파일 이름과 크기가 같은 사진과 동영상을 찾아 옮긴 것으로 기록합니다."
     )
     var folder: Path?
 
-    @Flag(name: .customLong("mark-all"), help: "지금 있는 캡처를 모두 옮긴 것으로 기록합니다.")
+    @Flag(name: .customLong("mark-all"), help: "스위치에 있는 사진과 동영상을 모두 옮긴 것으로 기록합니다.")
     var shouldMarkAll = false
 
-    @Flag(name: .customLong("leave-new"), help: "기록하지 않고 모두 새 항목으로 둡니다. 다시 묻지 않습니다.")
+    @Flag(name: .customLong("leave-new"), help: "기록하지 않고 모두 새 항목으로 유지합니다. 다시 묻지 않습니다.")
     var shouldLeaveNew = false
 
     @OptionGroup var connection: ConnectionOptions
@@ -24,7 +24,7 @@ struct Ledger: ParsableCommand {
 
     func validate() throws {
         guard [folder != nil, shouldMarkAll, shouldLeaveNew].count(where: { $0 }) == 1 else {
-            throw ValidationError("--from-folder, --mark-all, --leave-new 중 하나를 주세요.")
+            throw ValidationError("--from-folder, --mark-all, --leave-new 중 하나를 지정해 주세요.")
         }
     }
 
@@ -50,7 +50,7 @@ struct Ledger: ParsableCommand {
                 serialNumber: connection.info.serialNumber,
                 isCancelled: { Terminal.isInterrupted }
             )
-            print("기록에 넣은 캡처 \(recorded)개")
+            print("기록에 추가한 사진과 동영상 \(recorded)개")
         }
     }
 }

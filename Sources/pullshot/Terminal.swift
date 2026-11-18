@@ -59,7 +59,7 @@ enum Terminal {
         source.setEventHandler {
             switch interruptRequest.receive() {
             case .cancel:
-                Self.error("취소하는 중입니다. Ctrl-C를 한 번 더 누르면 바로 끝나지만, 다음에 연결할 때 본체에서 PC로 복사를 다시 켜야 할 수 있습니다.")
+                Self.error("취소하는 중입니다. Ctrl-C를 한 번 더 누르면 바로 종료되지만, 다음에 연결할 때 본체에서 PC로 복사를 다시 켜야 할 수 있습니다.")
             case .quit:
                 exit(130)
             }

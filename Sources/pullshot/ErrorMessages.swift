@@ -22,11 +22,11 @@ enum ErrorMessages {
         case let SessionError.destinationExists(name):
             "이미 같은 이름의 파일이 있습니다: \(name)"
         case SessionError.needsUSBReset:
-            "이전 연결이 남아 있어 스위치의 USB 연결을 재설정했고, 이때 PC로 복사가 꺼졌습니다. 본체에서 PC로 복사를 다시 켠 뒤 다시 실행해 주세요."
+            "이전 연결이 남아 있어 스위치의 USB 연결을 재설정했고, 이때 PC로 복사가 꺼졌습니다. 본체에서 PC로 복사를 켠 뒤 다시 실행해 주세요."
         case let SessionError.sizeMismatch(expected, actual):
-            "받은 파일의 크기(\(actual)바이트)가 스위치에서 알려 준 크기(\(expected)바이트)와 달라 저장하지 않았습니다."
+            "가져온 파일의 크기(\(actual)바이트)가 스위치에서 알려 준 크기(\(expected)바이트)와 달라 저장하지 않았습니다."
         case let FolderMatchError.unreadableFolder(folder):
-            "폴더를 열 수 없습니다: \(folder.path(percentEncoded: false)). 경로가 맞는지, 터미널에 그 폴더를 읽을 권한이 있는지 확인해 주세요."
+            "폴더를 열 수 없습니다: \(folder.path(percentEncoded: false)). 경로가 맞는지, 터미널에 그 폴더의 읽기 권한이 있는지 확인해 주세요."
         default:
             fileNotSaved(error) ?? "스위치와 통신하지 못했습니다: \(error)"
         }
@@ -43,15 +43,15 @@ enum ErrorMessages {
             return nil
         }
         return path.map { "Mac에 파일을 저장하지 못했습니다: \($0). 폴더가 있는지, 저장 공간이 충분한지, 쓰기 권한이 있는지 확인해 주세요." }
-            ?? "Mac에 파일을 저장하지 못했습니다. 받을 폴더와 옮긴 기록 폴더의 저장 공간이 충분한지, 쓰기 권한이 있는지 확인해 주세요."
+            ?? "Mac에 파일을 저장하지 못했습니다. 저장 위치와 옮긴 기록 폴더의 저장 공간이 충분한지, 쓰기 권한이 있는지 확인해 주세요."
     }
 
     private static func message(for error: ConsoleAccessError) -> String {
         switch error {
         case let .heldByAnotherApp(_, owner?) where owner != "ptpcamerad":
-            "\(owner) 앱이 스위치를 쓰고 있습니다. 그 앱을 종료하고 다시 시도해 주세요."
+            "\(owner) 앱이 스위치를 사용하고 있습니다. 그 앱을 종료하고 다시 시도해 주세요."
         case .heldByAnotherApp:
-            "다른 앱이 스위치를 쓰고 있습니다. 미리보기, 이미지 캡처, 사진 앱을 종료하고 다시 시도해 주세요."
+            "다른 앱이 스위치를 사용하고 있습니다. 미리보기, 이미지 캡처, 사진 앱을 종료하고 다시 시도해 주세요."
         case .noStillImageInterface, .missingEndpoints:
             "스위치의 사진 전송 기능을 찾지 못했습니다. 본체에서 PC로 복사 모드가 켜져 있는지 확인해 주세요."
         case let .other(code):

@@ -13,7 +13,7 @@ enum TransferReport {
         summary.saved.forEach { print("저장: " + $0.path(percentEncoded: false).replacing(rootPath, with: "")) }
         summary.failures.forEach { Terminal.error("\($0.capture.id): \(ErrorMessages.message(for: $0.error))") }
         let failed = summary.failures.count + missing
-        print("저장 \(summary.saved.count)개, 건너뜀 \(summary.skipped)개, 실패 \(failed)개, 받지 못함 \(summary.notAttempted)개")
+        print("저장 \(summary.saved.count)개, 건너뜀 \(summary.skipped)개, 실패 \(failed)개, 가져오지 못함 \(summary.notAttempted)개")
         if summary.isCancelled {
             Terminal.error("취소했습니다.")
             throw ExitCode(130)
