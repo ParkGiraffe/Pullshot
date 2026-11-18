@@ -15,7 +15,8 @@ struct SelectionOptions: ParsableArguments {
     var game: String?
 
     func validate() throws {
-        guard isAll || isNewOnly || !names.isEmpty else { throw ValidationError("--all, --new, 파일 이름 중 하나를 지정해 주세요.") }
+        guard isAll || isNewOnly || !names.isEmpty
+        else { throw ValidationError("--all, --new, 파일 이름 중 하나 이상을 지정해 주세요.") }
     }
 
     func choose(

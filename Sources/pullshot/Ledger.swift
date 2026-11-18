@@ -4,7 +4,7 @@ import PullshotKit
 
 struct Ledger: ParsableCommand {
     static let configuration = CommandConfiguration(
-        abstract: "처음 연결 질문에 답합니다. Mac에 이미 저장한 사진과 동영상을 가져온 기록에 추가해 새 항목에서 제외합니다."
+        abstract: "처음 연결 질문에 답합니다. 폴더에서 찾은 사진과 동영상이나 스위치의 모든 사진과 동영상을 가져온 기록에 추가하거나, 모두 새 항목으로 유지합니다."
     )
 
     @Option(

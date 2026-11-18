@@ -63,4 +63,4 @@ body:
     id: log
     attributes:
       label: 로그
-      description: 앱은 도움말 메뉴의 "로그 파일 보기"로 찾은 pullshot.log 파일을 첨부해 주세요. CLI는 --verbose 옵션을 붙여 다시 실행한 출력을 붙여 넣어 주세요.
+      description: 앱은 도움말 메뉴의 "로그 파일 보기"로 찾은 pullshot.log 파일을 첨부해 주세요. CLI는 --verbose 옵션을 붙여 다시 실행한 출력을 붙여 넣어 주세요. CLI 출력에는 파일 이름과 게임 이름이, probe 출력에는 일련번호가 들어 있기 때문에 필요하면 가려 주세요.

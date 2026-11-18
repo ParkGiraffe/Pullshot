@@ -58,6 +58,7 @@ struct CaptureQuery: Hashable {
         serialNumber: String,
         now: Date
     ) -> EmptyReason? {
+        guard !captures.isEmpty else { return nil }
         let isScopeEmpty = Self(scope: scope, kindFilter: .all)
             .captures(in: captures, ledgerIndex: ledgerIndex, serialNumber: serialNumber, now: now)
             .isEmpty

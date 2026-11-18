@@ -13,6 +13,6 @@
 | 기타 | 기타는 게임 폴더 밖에 있거나 스위치의 "기타" 폴더에 든 사진과 동영상의 묶음입니다. 가져온 기록의 키에는 원래 폴더 이름을 그대로 저장합니다. | `Game.isOther`, `Game.otherFolderName` |
 | 저장 위치 | 저장 위치는 앱이 가져온 사진과 동영상을 저장하는 기준 폴더이며, 기본값은 `~/Pictures/Pullshot`입니다. | `AppSettings.importFolder` |
 | 가져오기 | 가져오기는 앱의 가져오기 버튼이나 CLI의 `pull`로 사진과 동영상을 Mac에 복사하고 가져온 기록에 추가하는 것입니다. 앱에서 새 항목과 모두 가져오기는 저장 위치의 게임 이름 폴더에 원래 이름 그대로 저장하고, 선택한 항목을 가져올 때는 폴더별로 나눠 저장할지와 번호를 붙일지 선택할 수 있습니다. | `Transfer`, `ImportTarget`, `TransferKind.imported` |
-| 내보내기 | 내보내기는 번호를 붙이거나 게임 이름 폴더 없이 가져온 것을 가져온 기록에서 구분하는 이름입니다. 앱 화면과 CLI 명령에는 쓰지 않습니다. | `TransferKind.exported`, `ExportOptions` |
+| 내보내기 | 내보내기는 가져온 기록에서 일반 가져오기와 구분해 남기는 기록 종류이며, 앱 화면과 CLI 명령에는 쓰지 않습니다. 앱에서 선택한 항목을 가져오면 폴더별 저장과 파일 이름 설정과 상관없이 늘 내보내기로 기록하고, CLI `pull`은 `--numbered`나 `--no-game-folder`를 지정할 때만 내보내기로 기록합니다. | `TransferKind.exported`, `ExportOptions` |
 | 가져온 기록 | 가져온 기록은 가져오거나 폴더에서 찾았거나 모두 가져온 것으로 표시한 사진과 동영상을 기기 일련번호, 기록 종류와 함께 저장한 파일이며, 새 항목은 이 기록으로 구분합니다. | `TransferLedger`, `TransferKind`, `CaptureKey` |
 | 새 항목 | 새 항목은 가져온 기록에 없는 사진과 동영상입니다. | `LedgerIndex.newCaptures` |

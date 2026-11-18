@@ -9,7 +9,7 @@ struct FirstConnectQuestion: View {
         VStack(alignment: .leading, spacing: 14) {
             Text("Mac에 이미 저장한 사진과 동영상이 있나요?")
                 .font(.title3.bold())
-            Text("처음 연결한 스위치입니다. Mac에 이미 저장한 사진과 동영상을 가져온 기록에 추가하면 새 항목에 표시되지 않습니다.")
+            Text("아직 가져온 기록이 없는 스위치입니다. Mac에 이미 저장한 사진과 동영상을 가져온 기록에 추가하면 새 항목에 표시되지 않습니다.")
                 .fixedSize(horizontal: false, vertical: true)
             if let count = model.firstConnectRecordedCount {
                 Text("기록에 추가한 사진과 동영상 \(count)개")
@@ -60,6 +60,7 @@ struct FirstConnectQuestion: View {
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
+            .help("파일 이름과 크기가 스위치와 같은 파일만 찾아 가져온 기록에 추가합니다.")
             Button {
                 model.answerFirstConnect(.markAll)
             } label: {

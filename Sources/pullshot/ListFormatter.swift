@@ -12,11 +12,12 @@ enum ListFormatter {
         dateFormatter.timeZone = timeZone
         dateFormatter.dateFormat = "yyyy-MM-dd HH:mm"
         let nameWidth = scan.captures.map(\.filename.count).max() ?? 0
+        let kindWidth = scan.captures.map { kindText($0).count }.max() ?? 0
         let sizeWidth = scan.captures.map { sizeText($0).count }.max() ?? 0
         func line(_ capture: Capture) -> String {
             let columns = [
                 capture.filename.padding(toLength: nameWidth, withPad: " ", startingAt: 0),
-                capture.kind == .photo ? "사진" : "영상",
+                kindText(capture) + String(repeating: "  ", count: kindWidth - kindText(capture).count),
                 String(repeating: " ", count: sizeWidth - sizeText(capture).count) + sizeText(capture),
                 capture.capturedAt.map(dateFormatter.string(from:)) ?? "-",
             ]
@@ -26,6 +27,10 @@ enum ListFormatter {
         return Game.games(in: scan.captures).flatMap { game in
             ["\(game.name) (\(game.captures.count))"] + game.captures.map(line)
         }
+    }
+
+    private static func kindText(_ capture: Capture) -> String {
+        capture.kind == .photo ? "사진" : "동영상"
     }
 
     private static func sizeText(_ capture: Capture) -> String {

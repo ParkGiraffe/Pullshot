@@ -13,22 +13,18 @@ enum AppErrorMessages {
         case let SessionError.destinationExists(name):
             String(localized: "이미 같은 이름의 파일이 있습니다: \(name)")
         case SessionError.sizeMismatch:
-            String(localized: "가져온 파일의 크기가 스위치에서 알려 준 크기와 달라 저장하지 않았습니다.")
+            String(localized: "받은 데이터의 크기가 스위치가 알려 준 크기와 달라 파일을 저장하지 않았습니다.")
         case SessionError.cancelled, is CancellationError:
             String(localized: "취소했습니다.")
         case let FolderMatchError.unreadableFolder(folder):
             String(localized: "폴더를 열 수 없습니다: \(folder.lastPathComponent). 폴더가 있는지, 읽기 권한이 있는지 확인해 주세요.")
         case let error as CocoaError where error.isFileError:
-            fileNotSaved
+            String(localized: "Mac에 파일을 저장하지 못했습니다. 저장할 폴더가 있는지, 저장 공간이 충분한지, 쓰기 권한이 있는지 확인해 주세요.")
         case is POSIXError:
-            fileNotSaved
+            String(localized: "Mac에 파일을 저장하지 못했습니다. 저장 위치와 가져온 기록 폴더의 저장 공간이 충분한지, 쓰기 권한이 있는지 확인해 주세요.")
         default:
             String(localized: "스위치와 통신하지 못했습니다. 도움말 메뉴의 로그 파일 보기에서 자세한 내용을 확인할 수 있습니다.")
         }
-    }
-
-    private static var fileNotSaved: String {
-        String(localized: "Mac에 파일을 저장하지 못했습니다. 저장할 폴더가 있는지, 저장 공간이 충분한지, 쓰기 권한이 있는지 확인해 주세요.")
     }
 
     private static func message(for error: ConsoleAccessError) -> String {

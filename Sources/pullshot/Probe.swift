@@ -25,7 +25,7 @@ struct Probe: ParsableCommand {
         return [
             "모델: \(info.model)",
             "제조사: \(info.manufacturer)",
-            "펌웨어: \(info.deviceVersion)",
+            "시스템 버전: \(info.deviceVersion)",
             "일련번호: \(info.serialNumber)",
             "PTP 버전: \(info.standardVersion)",
             "지원 명령: " + info.operationsSupported.map { String(format: "0x%04X", $0) }.joined(separator: " "),

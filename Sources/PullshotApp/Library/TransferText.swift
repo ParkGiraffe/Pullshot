@@ -11,7 +11,9 @@ enum TransferText {
             parts.append(String(localized: "실패 \(summary.failures.count)개"))
         }
         if summary.notAttempted > 0 {
-            parts.append(String(localized: "가져오지 못함 \(summary.notAttempted)개"))
+            parts.append(summary.isCancelled
+                ? String(localized: "가져오지 않음 \(summary.notAttempted)개")
+                : String(localized: "가져오지 못함 \(summary.notAttempted)개"))
         }
         return parts.joined(separator: " · ")
     }

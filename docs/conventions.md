@@ -58,6 +58,7 @@ Pullshot 코드를 작성하고 리뷰할 때의 기준입니다. 아래 두 가
 
 - 코드에는 주석을 작성하지 않습니다. 변경 이유는 커밋 메시지에, 실기기에서 확인한 사실은 `docs/hardware-notes.md`에 작성합니다.
 - 로그는 `os.Logger`(subsystem `com.parkgiraffe.Pullshot`)를 사용하고, 파일 이름, 게임 이름, 경로, 일련번호는 `privacy: .private`로 기록합니다.
+- 앱 로그 파일(`FileLog`)은 사용자가 이슈에 첨부하기 때문에 파일 이름, 게임 이름, 경로, 일련번호를 기록하지 않습니다.
 
 ## 린트와 포맷 정책
 

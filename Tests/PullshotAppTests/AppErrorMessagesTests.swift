@@ -23,12 +23,23 @@ struct AppErrorMessagesTests {
     }
 
     @Test(arguments: [
-        NSError(domain: NSCocoaErrorDomain, code: NSFileWriteOutOfSpaceError),
-        NSError(domain: NSCocoaErrorDomain, code: NSFileWriteNoPermissionError),
-        POSIXError(.ENOSPC),
-    ] as [any Error])
-    func `디스크가 차거나 저장 위치에 쓰기 권한이 없으면 스위치가 아니라 Mac에 저장하지 못했다고 알린다`(error: any Error) {
-        #expect(AppErrorMessages.message(for: error)
-            == "Mac에 파일을 저장하지 못했습니다. 저장할 폴더가 있는지, 저장 공간이 충분한지, 쓰기 권한이 있는지 확인해 주세요.")
+        (
+            NSError(domain: NSCocoaErrorDomain, code: NSFileWriteOutOfSpaceError),
+            "Mac에 파일을 저장하지 못했습니다. 저장할 폴더가 있는지, 저장 공간이 충분한지, 쓰기 권한이 있는지 확인해 주세요."
+        ),
+        (
+            NSError(domain: NSCocoaErrorDomain, code: NSFileWriteNoPermissionError),
+            "Mac에 파일을 저장하지 못했습니다. 저장할 폴더가 있는지, 저장 공간이 충분한지, 쓰기 권한이 있는지 확인해 주세요."
+        ),
+        (
+            POSIXError(.ENOSPC),
+            "Mac에 파일을 저장하지 못했습니다. 저장 위치와 가져온 기록 폴더의 저장 공간이 충분한지, 쓰기 권한이 있는지 확인해 주세요."
+        ),
+    ] as [(any Error, String)])
+    func `디스크가 차거나 저장 위치에 쓰기 권한이 없으면 스위치가 아니라 Mac에 저장하지 못했다고 알린다`(
+        error: any Error,
+        message: String
+    ) {
+        #expect(AppErrorMessages.message(for: error) == message)
     }
 }

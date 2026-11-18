@@ -50,7 +50,7 @@ actor ConsoleWorker {
         self.transport = transport
         self.session = session
         serialNumber = info.serialNumber
-        log.write("연결: \(console.model.name), 펌웨어 \(info.deviceVersion)")
+        log.write("연결: \(console.model.name), 시스템 버전 \(info.deviceVersion)")
         return info
     }
 
@@ -99,7 +99,7 @@ actor ConsoleWorker {
             isCancelled: { Task.isCancelled }
         )
         log.write("가져오기(\(kind.rawValue)): 저장 \(summary.saved.count)개, 건너뜀 \(summary.skipped)개, "
-            + "실패 \(summary.failures.count)개, 가져오지 못함 \(summary.notAttempted)개")
+            + "실패 \(summary.failures.count)개, \(summary.isCancelled ? "가져오지 않음" : "가져오지 못함") \(summary.notAttempted)개")
         summary.failures.forEach { log.write("가져오지 못함: \(FileLog.describe($0.error))") }
         return summary
     }
