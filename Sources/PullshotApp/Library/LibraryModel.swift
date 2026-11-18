@@ -224,7 +224,7 @@ final class LibraryModel {
 
     private func load(_ console: AttachedConsole) async {
         do {
-            let info = try await worker.open(console, isVerbose: settings.isVerboseLogging)
+            let info = try await worker.open(console)
             try Task.checkCancellation()
             connection = .scanning(console, seen: 0)
             let scan = try await worker.scan { seen in

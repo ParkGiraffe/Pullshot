@@ -32,9 +32,12 @@ actor ConsoleWorker {
         self.log = log
     }
 
-    func open(_ console: AttachedConsole, isVerbose: Bool) throws -> DeviceInfo {
+    func open(_ console: AttachedConsole) throws -> DeviceInfo {
         close()
-        let trace: ((String) -> Void)? = isVerbose ? { [log] in log.write($0) } : nil
+        let trace = { [log] (line: String) in
+            guard UserDefaults.standard.bool(forKey: SettingsKey.isVerboseLogging.rawValue) else { return }
+            log.write(line)
+        }
         let transport = try HostTransport.open(console, trace: trace, waitingUpTo: 5, isCancelled: { Task.isCancelled })
         let session = Session(transport: transport, trace: trace)
         let info: DeviceInfo

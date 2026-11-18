@@ -26,7 +26,7 @@ struct SettingsView: View {
             }
             Toggle(isOn: $settings.isVerboseLogging) {
                 Text("자세한 로그 남기기")
-                Text("스위치와 통신하는 과정을 로그 파일에 한 줄씩 기록합니다. 문제를 알릴 때만 켜 주세요.")
+                Text("스위치와 통신하는 과정을 로그 파일에 한 줄씩 기록하며, 켜는 즉시 지금 연결에도 적용됩니다. 문제를 알릴 때만 켜 주세요.")
             }
         }
         .formStyle(.grouped)
