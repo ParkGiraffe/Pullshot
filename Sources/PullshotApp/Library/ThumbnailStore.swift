@@ -26,7 +26,7 @@ final class ThumbnailStore {
     }
 
     func image(for capture: Capture) async -> NSImage? {
-        if let image = memory.object(forKey: capture.id as NSString) {
+        if let image = cachedImage(for: capture) {
             return image
         }
         let requestedSerial = serialNumber
@@ -40,6 +40,10 @@ final class ThumbnailStore {
         guard let image, serialNumber == requestedSerial else { return nil }
         memory.setObject(image, forKey: capture.id as NSString)
         return image
+    }
+
+    func cachedImage(for capture: Capture) -> NSImage? {
+        memory.object(forKey: capture.id as NSString)
     }
 
     func enlargedThumbnailFile(for capture: Capture) async -> URL? {

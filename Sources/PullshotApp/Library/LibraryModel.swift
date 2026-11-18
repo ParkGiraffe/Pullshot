@@ -59,6 +59,7 @@ final class LibraryModel {
     @ObservationIgnored private var deviceTask: Task<Void, Never>?
     @ObservationIgnored private var transferTask: Task<Void, Never>?
     @ObservationIgnored let previewPanel = PreviewPanelController()
+    @ObservationIgnored var dragSource: CaptureDragSource?
     @ObservationIgnored var gridRows: [[Capture.ID]] = []
     @ObservationIgnored var previewCapture: Capture?
     @ObservationIgnored var previewOriginals: [Capture.ID: URL] = [:]
@@ -301,13 +302,17 @@ extension LibraryModel {
     }
 
     func startImport(_ target: ImportTarget) {
-        guard !isShuttingDown, !isTransferring else { return }
-        let items = importItems(target)
+        startTransfer(importItems(target), as: target.kind, into: settings.importFolder)
+    }
+
+    @discardableResult
+    func startTransfer(_ items: [TransferItem], as kind: TransferKind, into folder: URL) -> Task<Void, Never>? {
+        guard !isShuttingDown, !isTransferring else { return nil }
         stopPreview()
-        transferRun = TransferRun(folder: settings.importFolder)
-        transferTask = Task {
+        transferRun = TransferRun(folder: folder)
+        let task = Task {
             do {
-                let summary = try await worker.transfer(items, as: target.kind) { progress in
+                let summary = try await worker.transfer(items, as: kind) { progress in
                     Task { @MainActor in self.showTransferProgress(progress) }
                 }
                 transferRun?.summary = summary
@@ -318,6 +323,8 @@ extension LibraryModel {
             ledgerIndex = await worker.ledgerIndex
             await reopenIfSessionLost()
         }
+        transferTask = task
+        return task
     }
 
     private func showTransferProgress(_ progress: TransferProgress) {

@@ -16,6 +16,7 @@ struct CaptureGrid: View {
     let isNew: (Capture) -> Bool
     let preview: () -> Void
     let togglePreview: () -> Void
+    let drag: (Capture) -> Void
     @FocusState private var isFocused: Bool
     @State private var gridWidth: CGFloat = 0
 
@@ -121,6 +122,7 @@ struct CaptureGrid: View {
                     isSelected: selection.selected.contains(capture.id)
                 )
                 .onTapGesture { click(capture.id, in: order) }
+                .gesture(DragGesture(minimumDistance: 4).onChanged { _ in drag(capture) })
             }
         }
     }

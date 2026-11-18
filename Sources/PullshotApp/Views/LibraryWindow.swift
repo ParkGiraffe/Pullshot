@@ -103,6 +103,8 @@ struct LibraryWindow: View {
                 model.preview()
             } togglePreview: {
                 model.togglePreview()
+            } drag: { capture in
+                model.drag(capture)
             }
             .id(model.query)
         }
