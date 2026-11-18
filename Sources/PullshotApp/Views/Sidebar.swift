@@ -63,7 +63,7 @@ struct Sidebar: View {
                     gameRow(game, hasNew: game.captures.contains { newIDs.contains($0.id) })
                 }
                 if shownGames.isEmpty {
-                    Text("찾는 폴더가 없습니다")
+                    Text("일치하는 폴더가 없습니다")
                         .foregroundStyle(.secondary)
                 }
             }

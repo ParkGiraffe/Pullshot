@@ -46,7 +46,7 @@ struct LibraryWindow: View {
                         ToolbarItem {
                             Picker("보기 방식", selection: $viewMode) {
                                 Text("최신순").tag(ViewMode.newest)
-                                Text("날짜").tag(ViewMode.byDate)
+                                Text("날짜별").tag(ViewMode.byDate)
                             }
                             .pickerStyle(.segmented)
                         }
@@ -115,10 +115,10 @@ struct LibraryWindow: View {
         case .videos: "동영상이 없습니다"
         }
         let reason: Text? = switch model.emptyReason {
-        case .allTransferred: Text("새로 찍은 사진과 동영상을 모두 Mac으로 옮겼습니다.")
+        case .allTransferred: Text("새 항목을 모두 Mac으로 옮겼습니다.")
         case .noRecentTransfer: Text("최근 30일 동안 옮긴 사진과 동영상이 없습니다.")
-        case .onlyPhotosShown: Text("필터에서 사진과 동영상을 고르면 동영상을 볼 수 있습니다.")
-        case .onlyVideosShown: Text("필터에서 사진과 동영상을 고르면 사진을 볼 수 있습니다.")
+        case .onlyPhotosShown: Text("필터에서 사진과 동영상을 선택하면 동영상을 볼 수 있습니다.")
+        case .onlyVideosShown: Text("필터에서 사진과 동영상을 선택하면 사진을 볼 수 있습니다.")
         case nil: nil
         }
         return ContentUnavailableView(

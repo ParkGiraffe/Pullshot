@@ -7,12 +7,12 @@ struct FirstConnectQuestion: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("이미 받아 둔 사진과 동영상이 있나요?")
+            Text("Mac에 이미 저장한 사진과 동영상이 있나요?")
                 .font(.title3.bold())
-            Text("처음 연결한 스위치입니다. 이미 Mac에 받아 둔 사진과 동영상을 옮긴 기록에 넣으면, 새 항목에 나오지 않습니다.")
+            Text("처음 연결한 스위치입니다. Mac에 이미 저장한 사진과 동영상을 옮긴 기록에 추가하면 새 항목에 표시되지 않습니다.")
                 .fixedSize(horizontal: false, vertical: true)
             if let count = model.firstConnectRecordedCount {
-                Text("기록에 넣은 사진과 동영상 \(count)개")
+                Text("기록에 추가한 사진과 동영상 \(count)개")
                     .font(.headline)
                 HStack {
                     Spacer()
@@ -69,7 +69,7 @@ struct FirstConnectQuestion: View {
             Button {
                 model.answerFirstConnect(.leaveAllNew)
             } label: {
-                Text("모두 새 항목으로 두기")
+                Text("모두 새 항목으로 유지")
                     .frame(maxWidth: .infinity)
             }
         }

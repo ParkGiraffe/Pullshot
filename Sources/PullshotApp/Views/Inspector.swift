@@ -66,8 +66,8 @@ struct Inspector: View {
         @Bindable var settings = model.settings
         let summary = CaptureSummary(selected)
         stack(Array(selected.prefix(3)))
-        field(Text("\(selected.count)개 고름"))
-        properties("고른 항목") {
+        field(Text("\(selected.count)개 선택됨"))
+        properties("선택한 항목") {
             row("사진", Text("\(summary.photoCount)개"))
             row("동영상", Text("\(summary.videoCount)개"))
             row("크기", size(summary))

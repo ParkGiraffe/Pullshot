@@ -13,6 +13,6 @@ struct TransferTextTests {
             TransferFailure(capture: captureFixture("b.jpg"), error: SessionError.transport(.disconnected)),
         ]
         summary.notAttempted = 3
-        #expect(TransferText.summary(summary) == "저장 1개 · 건너뜀 2개 · 실패 1개 · 받지 못함 3개")
+        #expect(TransferText.summary(summary) == "저장 1개 · 건너뜀 2개 · 실패 1개 · 가져오지 못함 3개")
     }
 }

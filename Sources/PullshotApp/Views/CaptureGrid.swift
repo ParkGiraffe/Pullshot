@@ -104,7 +104,7 @@ struct CaptureGrid: View {
             }
             if !sections.undated.isEmpty {
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("날짜 모름").font(.headline)
+                    Text("날짜 없음").font(.headline)
                     grid(sections.undated, order: order)
                 }
             }

@@ -29,7 +29,7 @@ struct ConsoleSwitcher: View {
                         .padding(.vertical, 1)
                         .background(.quaternary, in: .capsule)
                         .help(
-                            "실제 본체로 시험하지 못한 기기입니다. 문제가 있으면 설정에서 자세한 로그 남기기를 켜고 다시 해 본 뒤, 로그 파일과 함께 GitHub 이슈로 알려 주세요."
+                            "실제 본체로 테스트하지 못한 기기입니다. 문제가 생기면 설정에서 자세한 로그 남기기를 켜고 다시 시도한 뒤, 로그 파일을 첨부해 GitHub 이슈로 알려 주세요."
                         )
                 }
             }
@@ -50,7 +50,7 @@ struct ConsoleSwitcher: View {
                 .buttonStyle(.plain)
                 .menuIndicator(.hidden)
                 .fixedSize()
-                .accessibilityLabel("기기 바꾸기")
+                .accessibilityLabel("기기 선택")
                 .disabled(model.isTransferring)
             }
         }
