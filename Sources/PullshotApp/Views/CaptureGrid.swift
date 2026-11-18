@@ -62,6 +62,7 @@ struct CaptureGrid: View {
                 .focusable()
                 .focusEffectDisabled()
                 .focused($isFocused)
+                .background(SelectAllShortcut { selection.selectAll(order) })
                 .onKeyPress(.leftArrow) { move(.left, in: rows) }
                 .onKeyPress(.rightArrow) { move(.right, in: rows) }
                 .onKeyPress(.upArrow) { move(.up, in: rows) }
