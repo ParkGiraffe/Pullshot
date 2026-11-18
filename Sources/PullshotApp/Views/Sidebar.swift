@@ -7,7 +7,7 @@ extension LibraryScope {
         case .all: Text("모든 항목")
         case .new: Text("새 항목")
         case .videos: Text("동영상")
-        case .recentlyTransferred: Text("최근 옮긴 항목")
+        case .recentlyTransferred: Text("최근 가져온 항목")
         case let .game(name): Text(verbatim: gameTitle(name))
         }
     }
@@ -57,7 +57,7 @@ struct Sidebar: View {
             pinnedRow("모든 항목", icon: "square.grid.2x2", scope: .all, count: model.captures.count)
             pinnedRow("새 항목", icon: "tray.and.arrow.down", scope: .new, count: newIDs.count)
             pinnedRow("동영상", icon: "video", scope: .videos, count: count(.videos))
-            pinnedRow("최근 옮긴 항목", icon: "clock", scope: .recentlyTransferred, count: count(.recentlyTransferred))
+            pinnedRow("최근 가져온 항목", icon: "clock", scope: .recentlyTransferred, count: count(.recentlyTransferred))
             Section("폴더 (\(allGames.count))") {
                 ForEach(shownGames) { game in
                     gameRow(game, hasNew: game.captures.contains { newIDs.contains($0.id) })

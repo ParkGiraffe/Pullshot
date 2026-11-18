@@ -13,7 +13,7 @@ struct PullshotApp: App {
                     LibraryWindow(model: model)
                 } else {
                     ContentUnavailableView {
-                        Label("옮긴 기록을 열지 못했습니다", systemImage: "exclamationmark.triangle")
+                        Label("가져온 기록을 열지 못했습니다", systemImage: "exclamationmark.triangle")
                     } description: {
                         let folder = appDelegate.ledgerDirectory.abbreviatedPath
                         Text("\(folder) 폴더가 있는지, 쓰기 권한이 있는지 확인해 주세요. 도움말 메뉴의 로그 파일 보기에서 자세한 내용을 확인할 수 있습니다.")
@@ -92,7 +92,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             let worker = try ConsoleWorker(ledgerDirectory: ledgerDirectory, log: log)
             return LibraryModel(worker: worker, settings: settings)
         } catch {
-            log.write("옮긴 기록을 열지 못함: \(FileLog.describe(error))")
+            log.write("가져온 기록을 열지 못함: \(FileLog.describe(error))")
             return nil
         }
     }

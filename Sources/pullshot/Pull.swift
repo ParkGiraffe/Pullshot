@@ -4,7 +4,7 @@ import PullshotKit
 
 struct Pull: ParsableCommand {
     static let configuration = CommandConfiguration(
-        abstract: "지정한 사진과 동영상을 저장 위치로 가져오고 옮긴 기록에 추가합니다. 옵션이 없으면 게임 이름 폴더에 원래 이름 그대로 저장합니다."
+        abstract: "지정한 사진과 동영상을 저장 위치로 가져오고 가져온 기록에 추가합니다. 옵션이 없으면 게임 이름 폴더에 원래 이름 그대로 저장합니다."
     )
 
     @OptionGroup var selection: SelectionOptions

@@ -4,16 +4,16 @@ import PullshotKit
 
 struct Ledger: ParsableCommand {
     static let configuration = CommandConfiguration(
-        abstract: "처음 연결 질문에 답합니다. Mac에 이미 저장한 사진과 동영상을 옮긴 기록에 추가해 새 항목에서 제외합니다."
+        abstract: "처음 연결 질문에 답합니다. Mac에 이미 저장한 사진과 동영상을 가져온 기록에 추가해 새 항목에서 제외합니다."
     )
 
     @Option(
         name: .customLong("from-folder"),
-        help: "이 폴더와 하위 폴더에서 파일 이름과 크기가 같은 사진과 동영상을 찾아 옮긴 것으로 기록합니다."
+        help: "이 폴더와 하위 폴더에서 파일 이름과 크기가 같은 사진과 동영상을 찾아 가져온 기록에 추가합니다."
     )
     var folder: Path?
 
-    @Flag(name: .customLong("mark-all"), help: "스위치에 있는 사진과 동영상을 모두 옮긴 것으로 기록합니다.")
+    @Flag(name: .customLong("mark-all"), help: "스위치에 있는 사진과 동영상을 모두 가져온 것으로 기록합니다.")
     var shouldMarkAll = false
 
     @Flag(name: .customLong("leave-new"), help: "기록하지 않고 모두 새 항목으로 유지합니다. 다시 묻지 않습니다.")

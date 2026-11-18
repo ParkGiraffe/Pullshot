@@ -312,7 +312,7 @@ extension LibraryModel {
                 }
                 transferRun?.summary = summary
             } catch {
-                worker.log.write("옮기기를 마치지 못함: \(FileLog.describe(error))")
+                worker.log.write("가져오기를 마치지 못함: \(FileLog.describe(error))")
                 transferRun?.errorMessage = AppErrorMessages.message(for: error)
             }
             ledgerIndex = await worker.ledgerIndex

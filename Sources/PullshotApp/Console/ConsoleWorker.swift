@@ -57,7 +57,7 @@ actor ConsoleWorker {
     func scan(progress: @escaping @Sendable (Int) -> Void) throws -> AlbumScan {
         let scan = try AlbumScanner(source: requireSession())
             .scan(progress: progress, isCancelled: { Task.isCancelled })
-        log.write("훑기: 캡처 \(scan.captures.count)개, 건너뜀 \(scan.skipped.count)개")
+        log.write("앨범 읽기: 사진과 동영상 \(scan.captures.count)개, 건너뜀 \(scan.skipped.count)개")
         return scan
     }
 
@@ -98,9 +98,9 @@ actor ConsoleWorker {
             },
             isCancelled: { Task.isCancelled }
         )
-        log.write("옮기기(\(kind.rawValue)): 저장 \(summary.saved.count)개, 건너뜀 \(summary.skipped)개, "
-            + "실패 \(summary.failures.count)개, 받지 못함 \(summary.notAttempted)개")
-        summary.failures.forEach { log.write("옮기지 못함: \(FileLog.describe($0.error))") }
+        log.write("가져오기(\(kind.rawValue)): 저장 \(summary.saved.count)개, 건너뜀 \(summary.skipped)개, "
+            + "실패 \(summary.failures.count)개, 가져오지 못함 \(summary.notAttempted)개")
+        summary.failures.forEach { log.write("가져오지 못함: \(FileLog.describe($0.error))") }
         return summary
     }
 

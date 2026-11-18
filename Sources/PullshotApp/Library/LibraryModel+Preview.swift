@@ -93,7 +93,7 @@ extension LibraryModel {
             refreshPreview(of: capture)
         } catch {
             guard !Task.isCancelled else { return }
-            worker.log.write("미리보기를 받지 못함: \(FileLog.describe(error))")
+            worker.log.write("미리보기 원본을 열지 못함: \(FileLog.describe(error))")
             await reopenIfSessionLost()
         }
     }

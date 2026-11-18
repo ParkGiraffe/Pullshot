@@ -5,7 +5,7 @@ struct SelectionOptions: ParsableArguments {
     @Flag(name: .customLong("all"), help: "모든 사진과 동영상을 선택합니다.")
     var isAll = false
 
-    @Flag(name: .customLong("new"), help: "옮긴 적 없는 새 항목만 선택합니다.")
+    @Flag(name: .customLong("new"), help: "가져온 기록에 없는 새 항목만 선택합니다.")
     var isNewOnly = false
 
     @Argument(help: "가져올 사진과 동영상입니다. list에 나온 파일 이름이나 \"게임/파일 이름\"으로 지정합니다.")

@@ -8,7 +8,7 @@ struct List: ParsableCommand {
     @Option(help: "이 게임의 사진과 동영상만 출력합니다. 게임 폴더 밖의 사진과 동영상은 \"\(Game.otherFolderName)\"로 지정합니다.")
     var game: String?
 
-    @Flag(name: .customLong("new"), help: "옮긴 적 없는 새 항목만 출력합니다.")
+    @Flag(name: .customLong("new"), help: "가져온 기록에 없는 새 항목만 출력합니다.")
     var isNewOnly = false
 
     @OptionGroup var connection: ConnectionOptions

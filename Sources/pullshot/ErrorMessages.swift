@@ -43,7 +43,7 @@ enum ErrorMessages {
             return nil
         }
         return path.map { "Mac에 파일을 저장하지 못했습니다: \($0). 폴더가 있는지, 저장 공간이 충분한지, 쓰기 권한이 있는지 확인해 주세요." }
-            ?? "Mac에 파일을 저장하지 못했습니다. 저장 위치와 옮긴 기록 폴더의 저장 공간이 충분한지, 쓰기 권한이 있는지 확인해 주세요."
+            ?? "Mac에 파일을 저장하지 못했습니다. 저장 위치와 가져온 기록 폴더의 저장 공간이 충분한지, 쓰기 권한이 있는지 확인해 주세요."
     }
 
     private static func message(for error: ConsoleAccessError) -> String {

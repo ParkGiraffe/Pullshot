@@ -13,7 +13,7 @@
 "기기 선택" = "Choose Console";
 "실험적 지원" = "Experimental";
 "실제 본체로 테스트하지 못한 기기입니다. 문제가 생기면 설정에서 자세한 로그 남기기를 켜고 다시 시도한 뒤, 로그 파일을 첨부해 GitHub 이슈로 알려 주세요." = "This console hasn't been tested on real hardware. If something goes wrong, turn on Detailed logging in Settings, try again, and report it as a GitHub issue with the log file attached.";
-"옮긴 기록을 열지 못했습니다" = "Couldn't open the transfer history";
+"가져온 기록을 열지 못했습니다" = "Couldn't open the import history";
 "다른 앱이 스위치를 사용하고 있습니다. 미리보기, 이미지 캡처, 사진 앱을 종료하고 다시 시도해 주세요." = "Another app is using the Switch. Quit Preview, Image Capture, and Photos, then try again.";
 "%@ 앱이 스위치를 사용하고 있습니다. 그 앱을 종료하고 다시 시도해 주세요." = "%@ is using the Switch. Quit that app and try again.";
 "스위치의 사진 전송 기능을 찾지 못했습니다. 본체에서 PC로 복사 모드가 켜져 있는지 확인해 주세요." = "Couldn't find the Switch's photo transfer interface. Make sure Copy to PC is on.";
@@ -36,7 +36,7 @@
 "모든 항목" = "All Items";
 "새 항목" = "New";
 "동영상" = "Videos";
-"최근 옮긴 항목" = "Recently Transferred";
+"최근 가져온 항목" = "Recently Imported";
 "폴더 (%lld)" = "Folders: %lld";
 "일치하는 폴더가 없습니다" = "No matching folders";
 "폴더 이름으로 찾기" = "Search folders";
@@ -46,8 +46,8 @@
 "사진 또는 동영상이 없습니다" = "No Photos or Videos";
 "사진이 없습니다" = "No Photos";
 "동영상이 없습니다" = "No Videos";
-"새 항목을 모두 Mac으로 옮겼습니다." = "All new items have been transferred to your Mac.";
-"최근 30일 동안 옮긴 사진과 동영상이 없습니다." = "No photos or videos have been transferred in the last 30 days.";
+"새 항목을 모두 Mac으로 가져왔습니다." = "All new items have been imported to your Mac.";
+"최근 30일 동안 가져온 사진과 동영상이 없습니다." = "No photos or videos have been imported in the last 30 days.";
 "필터에서 사진과 동영상을 선택하면 동영상을 볼 수 있습니다." = "Choose Photos and Videos in the filter to see videos.";
 "필터에서 사진과 동영상을 선택하면 사진을 볼 수 있습니다." = "Choose Photos and Videos in the filter to see photos.";
 "오른쪽 칸" = "Inspector";
@@ -84,12 +84,12 @@
 "닫기" = "Close";
 "연결이 끊겨 남은 사진과 동영상을 가져오지 못했습니다. 다시 연결하면 이어서 가져올 수 있습니다." = "The connection was lost before the remaining photos and videos were imported. Reconnect to continue.";
 "Mac에 이미 저장한 사진과 동영상이 있나요?" = "Already have photos and videos on your Mac?";
-"처음 연결한 스위치입니다. Mac에 이미 저장한 사진과 동영상을 옮긴 기록에 추가하면 새 항목에 표시되지 않습니다." = "This Switch hasn't been connected before. If you add the photos and videos already on your Mac to the transfer history, they won't show up as new items.";
+"처음 연결한 스위치입니다. Mac에 이미 저장한 사진과 동영상을 가져온 기록에 추가하면 새 항목에 표시되지 않습니다." = "This Switch hasn't been connected before. If you add the photos and videos already on your Mac to the import history, they won't show up as new items.";
 "폴더에서 찾기…" = "Find in Folder…";
-"스위치에 있는 사진과 동영상을 모두 옮긴 것으로 표시" = "Mark All Photos and Videos on the Switch as Transferred";
+"스위치에 있는 사진과 동영상을 모두 가져온 것으로 표시" = "Mark All Photos and Videos on the Switch as Imported";
 "모두 새 항목으로 유지" = "Keep All as New Items";
 "나중에" = "Not Now";
-"기록에 추가한 사진과 동영상 %lld개" = "Photos and videos added to history: %lld";
+"기록에 추가한 사진과 동영상 %lld개" = "Photos and videos added to import history: %lld";
 "확인" = "OK";
 "로그 파일 보기" = "Show Log File";
 "PC로 복사 모드가 아님" = "Not in Copy to PC mode";

@@ -115,8 +115,8 @@ struct LibraryWindow: View {
         case .videos: "동영상이 없습니다"
         }
         let reason: Text? = switch model.emptyReason {
-        case .allTransferred: Text("새 항목을 모두 Mac으로 옮겼습니다.")
-        case .noRecentTransfer: Text("최근 30일 동안 옮긴 사진과 동영상이 없습니다.")
+        case .allTransferred: Text("새 항목을 모두 Mac으로 가져왔습니다.")
+        case .noRecentTransfer: Text("최근 30일 동안 가져온 사진과 동영상이 없습니다.")
         case .onlyPhotosShown: Text("필터에서 사진과 동영상을 선택하면 동영상을 볼 수 있습니다.")
         case .onlyVideosShown: Text("필터에서 사진과 동영상을 선택하면 사진을 볼 수 있습니다.")
         case nil: nil

@@ -53,7 +53,7 @@ public final class TransferLedger {
             index.insert(entry)
         }
         if unreadable > 0 {
-            Log.library.error("옮긴 기록에서 읽지 못한 줄 \(unreadable, privacy: .public)개를 건너뜁니다")
+            Log.library.error("가져온 기록에서 읽지 못한 줄 \(unreadable, privacy: .public)개를 건너뜁니다")
         }
     }
 

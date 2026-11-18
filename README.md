@@ -1,6 +1,6 @@
 # Pullshot
 
-Nintendo Switch 2와 Nintendo Switch로 찍은 스크린샷과 동영상을 USB 케이블로 Mac에 옮기는 앱입니다. 게임별로 묶어서 보여 주고, 필요한 것만 선택해서 가져올 수 있습니다. Nintendo Switch 지원은 실험 단계입니다.
+Nintendo Switch 2와 Nintendo Switch로 찍은 스크린샷과 동영상을 USB 케이블로 Mac에 가져오는 앱입니다. 게임별로 묶어서 보여 주고, 필요한 것만 선택해서 가져올 수 있습니다. Nintendo Switch 지원은 실험 단계입니다.
 
 ## 진행 상황
 
@@ -40,10 +40,10 @@ Apple 공증을 받지 않은 ad-hoc 서명 앱이기 때문에, 다운로드한
 - `probe`: 기기 정보, 지원하는 PTP 명령, 저장소를 출력합니다.
 - `list [--new]`: 게임별 사진과 동영상 목록을 출력합니다. 새 항목은 줄 끝에 "새 항목"이라고 표시합니다.
 - `pull (--all | --new | <파일 이름>...) [--out <폴더>] [--numbered] [--no-game-folder] [--dry-run]`: 지정한 사진과 동영상을 저장 위치(기본값 `~/Pictures/Pullshot`)의 게임 이름 폴더에 원본 그대로 저장합니다. `--numbered`를 지정하면 찍은 순서대로 `001_20261114_211205.jpg`처럼 번호를 붙입니다.
-- `ledger (--from-folder <폴더> | --mark-all | --leave-new)`: Mac에 이미 저장한 사진과 동영상을 옮긴 기록에 추가합니다.
+- `ledger (--from-folder <폴더> | --mark-all | --leave-new)`: Mac에 이미 저장한 사진과 동영상을 가져온 기록에 추가합니다.
 - `dump --out <폴더>`: 실기기 응답을 그대로 저장합니다. 기기 일련번호가 들어 있기 때문에 공개하지 않습니다.
 
-가져오기를 하면 `~/Library/Application Support/Pullshot/`에 옮긴 기록이 저장됩니다. 새 항목은 이 기록에 없는, 즉 아직 한 번도 Mac으로 옮기지 않은 사진과 동영상입니다.
+가져오기를 하면 `~/Library/Application Support/Pullshot/`에 가져온 기록이 저장됩니다. 새 항목은 이 기록에 없는 사진과 동영상입니다.
 
 ## 개발
 
