@@ -15,7 +15,7 @@ struct LibraryModelTests {
         }
     }
 
-    @Suite("끝난 옮기기 결과")
+    @Suite("끝난 가져오기 결과")
     @MainActor
     struct FinishedTransfer {
         @Test func `필터를 바꿔 보이지 않게 된 캡처는 고른 것에서 빼고 결과도 닫는다`() async throws {

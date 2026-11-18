@@ -77,9 +77,9 @@ struct TransferTests {
         }
     }
 
-    @Suite("이미 옮긴 캡처")
+    @Suite("이미 가져온 캡처")
     struct AlreadyTransferred {
-        @Test func `이미 있던 파일을 건너뛰면 지난번 옮긴 날을 바꾸지 않는다`() throws {
+        @Test func `이미 있던 파일을 건너뛰면 지난번 가져온 날을 바꾸지 않는다`() throws {
             let setup = try Setup()
             let (a, b) = (captureFixture("a.jpg"), captureFixture("b.jpg"))
             _ = try setup.run([a])

@@ -19,7 +19,7 @@ struct CaptureQueryTests {
             .map(\.filename) == ["b.jpg"])
     }
 
-    @Test func `최근 옮긴 항목은 30일 안에 가져오거나 내보낸 캡처다`() throws {
+    @Test func `최근 가져온 항목은 30일 안에 가져오거나 내보낸 캡처다`() throws {
         let (a, b) = (captureFixture("a.jpg"), captureFixture("b.jpg"))
         try ledger.record([a], serialNumber: "S1", as: .imported, at: dateFixture("2026-10-16 23:59:59"))
         try ledger.record([b], serialNumber: "S1", as: .exported, at: dateFixture("2026-10-17 00:00:00"))
@@ -68,7 +68,7 @@ struct CaptureQueryTests {
 
     @Suite("빈 까닭")
     struct EmptyReasons {
-        @Test func `새 항목이 비면 필터가 있어도 모두 옮겼다고 한다`() throws {
+        @Test func `새 항목이 비면 필터가 있어도 모두 가져왔다고 한다`() throws {
             let ledger = try TransferLedger(directory: temporaryFolderFixture())
             let capture = captureFixture("a.mp4", kind: .video)
             try ledger.record([capture], serialNumber: "S1", as: .imported)

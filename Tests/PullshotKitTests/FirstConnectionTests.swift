@@ -47,7 +47,7 @@ struct FirstConnectionTests {
 
     @Suite("답")
     struct Answering {
-        @Test func `모두 옮긴 것으로 표시하면 지금 캡처를 모두 기록한다`() throws {
+        @Test func `모두 가져온 것으로 표시하면 지금 캡처를 모두 기록한다`() throws {
             let ledger = try TransferLedger(directory: temporaryFolderFixture())
             let captures = [captureFixture("a.jpg"), captureFixture("b.jpg")]
 
@@ -75,7 +75,7 @@ struct FirstConnectionTests {
 
     @Suite("폴더에서 찾기")
     struct FindingInFolder {
-        @Test func `폴더 어디에 있든 이름과 크기가 같은 캡처만 옮긴 것으로 기록한다`() throws {
+        @Test func `폴더 어디에 있든 이름과 크기가 같은 캡처만 가져온 것으로 기록한다`() throws {
             let root = temporaryFolderFixture()
             let nested = root.appending(path: "2025/젤다")
             try FileManager.default.createDirectory(at: nested, withIntermediateDirectories: true)

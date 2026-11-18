@@ -18,7 +18,7 @@ struct TransferLedgerTests {
 
     @Suite("색인")
     struct Index {
-        @Test func `최근 옮긴 항목은 기준 시각 뒤에 가져오거나 내보낸 캡처다`() throws {
+        @Test func `최근 가져온 항목은 기준 시각 뒤에 가져오거나 내보낸 캡처다`() throws {
             let ledger = try TransferLedger(directory: temporaryFolderFixture())
             let (old, recent, found) = (captureFixture("a.jpg"), captureFixture("b.jpg"), captureFixture("c.jpg"))
             try ledger.record([old], serialNumber: "S1", as: .imported, at: dateFixture("2026-10-16 23:59:59"))
@@ -33,7 +33,7 @@ struct TransferLedgerTests {
 
     @Suite("저장")
     struct Storage {
-        @Test func `기록한 캡처는 다시 열어도 옮긴 것으로 남는다`() throws {
+        @Test func `기록한 캡처는 다시 열어도 가져온 것으로 남는다`() throws {
             let folder = temporaryFolderFixture()
             try TransferLedger(directory: folder).record([captureFixture()], serialNumber: "S1", as: .imported)
 
@@ -56,9 +56,9 @@ struct TransferLedgerTests {
         }
     }
 
-    @Suite("옮긴 때")
+    @Suite("가져온 때")
     struct TransferDates {
-        @Test func `옮긴 때는 가져오기와 내보내기만 보고 마지막으로 옮긴 때를 남긴다`() throws {
+        @Test func `가져온 때는 가져오기와 내보내기만 보고 마지막으로 가져온 때를 남긴다`() throws {
             let ledger = try TransferLedger(directory: temporaryFolderFixture())
             let (a, c) = (captureFixture("a.jpg"), captureFixture("c.jpg"))
             try ledger.record([a], serialNumber: "S1", as: .imported, at: dateFixture("2026-11-08 10:00:00"))

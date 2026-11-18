@@ -31,7 +31,7 @@ struct ErrorMessagesTests {
             == "Mac에 파일을 저장하지 못했습니다: /Volumes/외장/Pullshot/기타. 폴더가 있는지, 저장 공간이 충분한지, 쓰기 권한이 있는지 확인해 주세요.")
     }
 
-    @Test func `옮긴 기록을 쓰지 못하면 스위치가 아니라 Mac에 저장하지 못했다고 알린다`() {
+    @Test func `가져온 기록을 쓰지 못하면 스위치가 아니라 Mac에 저장하지 못했다고 알린다`() {
         #expect(ErrorMessages.message(for: POSIXError(.ENOSPC))
             == "Mac에 파일을 저장하지 못했습니다. 저장 위치와 가져온 기록 폴더의 저장 공간이 충분한지, 쓰기 권한이 있는지 확인해 주세요.")
     }
