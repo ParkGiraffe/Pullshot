@@ -50,6 +50,7 @@ struct Inspector: View {
             }
             .buttonStyle(.borderedProminent)
             .controlSize(.large)
+            .accentTintWhenEnabled()
             .disabled(newCount == 0 || model.isDemo)
             Button {
                 model.startImport(.all)
@@ -58,6 +59,7 @@ struct Inspector: View {
                     .frame(maxWidth: .infinity)
             }
             .controlSize(.large)
+            .accentTintWhenEnabled()
             .disabled(captures.isEmpty || model.isDemo)
         }
     }
@@ -97,6 +99,7 @@ struct Inspector: View {
             }
             .buttonStyle(.borderedProminent)
             .controlSize(.large)
+            .accentTintWhenEnabled()
             .disabled(model.isDemo)
         }
     }
