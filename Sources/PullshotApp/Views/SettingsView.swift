@@ -24,6 +24,10 @@ struct SettingsView: View {
                 Text("앱 아이콘")
                 Text("앱이 실행 중일 때 Dock 아이콘만 바뀌고, Finder의 앱 아이콘은 그대로입니다.")
             }
+            Toggle(isOn: $settings.shouldCheckForUpdates) {
+                Text("업데이트 자동 확인")
+                Text("앱을 켤 때 GitHub에서 새 버전이 있는지 확인합니다. 앱 메뉴의 업데이트 확인에서 직접 확인할 수도 있습니다.")
+            }
             Toggle(isOn: $settings.isVerboseLogging) {
                 Text("자세한 로그 남기기")
                 Text("스위치와 통신하는 과정을 로그 파일에 한 줄씩 기록하며, 켜는 즉시 지금 연결에도 적용됩니다. 문제를 알릴 때만 켜 주세요.")

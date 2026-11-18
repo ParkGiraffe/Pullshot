@@ -99,3 +99,13 @@
 "PC로 복사를 다시 켜야 함" = "Turn on Copy to PC again";
 "%@ 폴더가 있는지, 읽기와 쓰기 권한이 있는지 확인해 주세요. 도움말 메뉴의 로그 파일 보기에서 자세한 내용을 확인할 수 있습니다." = "Make sure the folder %@ exists and that you have permission to read and write it. See Show Log File in the Help menu for details.";
 "기타" = "Other";
+"업데이트 확인…" = "Check for Updates…";
+"새 버전이 있습니다" = "A New Version Is Available";
+"새 버전은 Pullshot %@이고, 지금 사용 중인 버전은 %@입니다." = "Pullshot %@ is available. You're using %@.";
+"다운로드 페이지 열기" = "Open Download Page";
+"최신 버전을 사용하고 있습니다" = "You're Up to Date";
+"지금 사용 중인 버전은 %@입니다." = "Pullshot %@ is the latest version.";
+"업데이트를 확인하지 못했습니다" = "Couldn't Check for Updates";
+"인터넷 연결을 확인하고 잠시 뒤 다시 시도해 주세요." = "Check your internet connection and try again later.";
+"업데이트 자동 확인" = "Check for updates automatically";
+"앱을 켤 때 GitHub에서 새 버전이 있는지 확인합니다. 앱 메뉴의 업데이트 확인에서 직접 확인할 수도 있습니다." = "Checks GitHub for a new version when the app opens. You can also use Check for Updates in the app menu.";

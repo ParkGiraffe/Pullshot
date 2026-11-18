@@ -24,6 +24,10 @@ final class AppSettings {
         didSet { defaults.set(appIcon.rawValue, forKey: SettingsKey.appIcon.rawValue) }
     }
 
+    var shouldCheckForUpdates: Bool {
+        didSet { defaults.set(shouldCheckForUpdates, forKey: SettingsKey.shouldCheckForUpdates.rawValue) }
+    }
+
     @ObservationIgnored private let defaults: UserDefaults
 
     init(defaults: UserDefaults = .standard) {
@@ -36,5 +40,6 @@ final class AppSettings {
             .flatMap(ExportNaming.init) ?? .original
         isVerboseLogging = defaults.bool(forKey: SettingsKey.isVerboseLogging.rawValue)
         appIcon = defaults.string(forKey: SettingsKey.appIcon.rawValue).flatMap(AppIcon.init) ?? .red
+        shouldCheckForUpdates = defaults.bool(forKey: SettingsKey.shouldCheckForUpdates.rawValue)
     }
 }

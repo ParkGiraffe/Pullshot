@@ -15,6 +15,7 @@ struct AppSettingsTests {
         settings.importNaming = .numbered
         settings.isVerboseLogging = true
         settings.appIcon = .shutter
+        settings.shouldCheckForUpdates = true
 
         let reread = AppSettings(defaults: defaults)
         #expect(reread.importFolder == URL(filePath: "/tmp/스위치"))
@@ -22,5 +23,10 @@ struct AppSettingsTests {
         #expect(reread.importNaming == .numbered)
         #expect(reread.isVerboseLogging)
         #expect(reread.appIcon == .shutter)
+        #expect(reread.shouldCheckForUpdates)
+    }
+
+    @Test func `업데이트 자동 확인은 처음에 꺼져 있다`() {
+        #expect(AppSettings(defaults: defaults).shouldCheckForUpdates == false)
     }
 }

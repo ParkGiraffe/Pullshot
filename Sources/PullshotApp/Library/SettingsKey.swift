@@ -7,5 +7,6 @@ enum SettingsKey: String {
     case viewMode
     case isVerboseLogging
     case appIcon
+    case shouldCheckForUpdates
     case demoAlbum
 }

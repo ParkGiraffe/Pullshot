@@ -24,6 +24,11 @@ struct PullshotApp: App {
         }
         .defaultSize(width: 1200, height: 760)
         .commands {
+            CommandGroup(after: .appInfo) {
+                Button("업데이트 확인…") {
+                    appDelegate.updates.check(isAutomatic: false)
+                }
+            }
             CommandGroup(replacing: .help) {
                 Button("로그 파일 보기", action: showLogFile)
             }
@@ -47,12 +52,16 @@ struct PullshotApp: App {
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     let settings = AppSettings()
+    let updates = UpdateChecker()
     let ledgerDirectory = UserDefaults.standard.string(forKey: SettingsKey.ledgerFolder.rawValue)
         .map { URL(filePath: $0, directoryHint: .isDirectory) } ?? TransferLedger.defaultDirectory
     private(set) lazy var model = Self.makeModel(ledgerDirectory: ledgerDirectory, settings: settings)
 
     func applicationDidFinishLaunching(_: Notification) {
         settings.appIcon.showInDock()
+        if settings.shouldCheckForUpdates {
+            updates.check(isAutomatic: true)
+        }
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_: NSApplication) -> Bool {
