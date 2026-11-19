@@ -12,7 +12,7 @@ enum ErrorMessages {
         case CLIError.noConsole:
             "연결된 스위치가 없습니다. 본체 아래쪽 USB-C 포트에 데이터 케이블로 연결하고, 본체에서 PC로 복사 모드를 켜 주세요."
         case let CLIError.notInTransferMode(name):
-            "\(name)가 연결되어 있지만 PC로 복사 모드가 아닙니다. 본체 설정의 데이터 관리에서 PC로 복사를 켜 주세요."
+            "\(name)가 연결되어 있지만 PC로 복사 모드가 아닙니다. 본체의 설정 > 데이터 관리에서 PC로 복사를 켜 주세요."
         case let error as ConsoleAccessError:
             message(for: error)
         case SessionError.transport(.disconnected):

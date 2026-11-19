@@ -35,7 +35,7 @@ The app is available in English and Korean. It follows the system language by de
 
 Logs are saved to `~/Library/Logs/Pullshot/pullshot.log`. Choose Help > Show Log File to select the log file in Finder. Logs don't include file names, game names, paths, or serial numbers. If something goes wrong, turn on "Detailed logging" in Settings, try again, and open a GitHub issue with the log file attached.
 
-Choose "Check for Updates…" in the app menu to check GitHub for a new version. Turn on "Check for updates automatically" in Settings to check every time the app opens. It's off by default. The update check is the only thing the app uses the internet for.
+Choose Pullshot > Check for Updates… to check GitHub for a new version. Turn on "Check for updates automatically" in Settings to check every time the app opens. It's off by default. The update check is the only thing the app uses the internet for.
 
 ## CLI
 

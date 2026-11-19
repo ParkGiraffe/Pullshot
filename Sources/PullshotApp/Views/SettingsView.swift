@@ -34,7 +34,7 @@ struct SettingsView: View {
             }
             Toggle(isOn: $settings.shouldCheckForUpdates) {
                 Text("업데이트 자동 확인")
-                Text("앱을 켤 때 GitHub에서 새 버전이 있는지 확인합니다. 앱 메뉴의 업데이트 확인에서 직접 확인할 수도 있습니다.")
+                Text("앱을 켤 때 GitHub에서 새 버전이 있는지 확인합니다. Pullshot > 업데이트 확인…에서 직접 확인할 수도 있습니다.")
             }
             Toggle(isOn: $settings.isVerboseLogging) {
                 Text("자세한 로그 남기기")

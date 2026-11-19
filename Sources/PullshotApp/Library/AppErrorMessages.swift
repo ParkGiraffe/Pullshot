@@ -23,7 +23,7 @@ enum AppErrorMessages {
         case is POSIXError:
             String(localized: "Mac에 파일을 저장하지 못했습니다. 저장 위치와 가져온 기록 폴더의 저장 공간이 충분한지, 쓰기 권한이 있는지 확인해 주세요.")
         default:
-            String(localized: "스위치와 통신하지 못했습니다. 도움말 메뉴의 로그 파일 보기에서 자세한 내용을 확인할 수 있습니다.")
+            String(localized: "스위치와 통신하지 못했습니다. 도움말 > 로그 파일 보기에서 자세한 내용을 확인할 수 있습니다.")
         }
     }
 
