@@ -15,9 +15,10 @@ Thank you for your interest in Pullshot. You can write issues and pull requests 
 ```bash
 brew bundle        # Installs SwiftLint and SwiftFormat
 make setup-hooks   # Runs lint and format checks before each commit
+make build
 make test
-make check
-make app           # dist/Pullshot.app
+make check         # SwiftLint --strict, SwiftFormat --lint
+make app           # Builds dist/Pullshot.app
 ```
 
 - Follow the coding conventions in [docs/conventions.md](docs/conventions.md). Don't write comments in code.
@@ -30,3 +31,7 @@ make app           # dist/Pullshot.app
 - Create a branch from `main` and open a pull request. Fill in the Purpose, Summary of changes, Review points, and Verification sections of the template.
 - Commit titles are Korean noun phrases in the `{대상} {액션}` (target, action) form, for example `PTP 컨테이너 추가` (add PTP container). See the commits section of [docs/conventions.md](docs/conventions.md) for details.
 - `make test` and `make check` must pass, and CI runs them automatically on every pull request. If you changed code that communicates with the Switch, include the results you verified on a real console.
+
+## Releases
+
+Maintainers make a release by running the Release workflow from the Actions tab. Choose which part of the version to increase, or enter an exact version, and the workflow builds a universal DMG and creates a draft release with it attached. Publishing the draft creates the `v<version>` tag. Apps you build yourself take their version from the latest `v*` tag.

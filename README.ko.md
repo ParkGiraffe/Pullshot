@@ -53,17 +53,7 @@ Apple 공증을 받지 않은 ad-hoc 서명 앱이기 때문에, 다운로드한
 
 ## 개발
 
-```bash
-brew bundle        # SwiftLint, SwiftFormat 설치
-make setup-hooks   # 커밋 전 린트와 포맷 검사 설정
-make build
-make test
-make check         # SwiftLint --strict, SwiftFormat --lint
-```
-
-코드 작성 규칙은 [docs/conventions.ko.md](docs/conventions.ko.md), 용어는 [docs/glossary.ko.md](docs/glossary.ko.md), 이슈와 PR 작성 방법은 [CONTRIBUTING.ko.md](CONTRIBUTING.ko.md)에 정리되어 있습니다.
-
-릴리스는 Actions 탭에서 Release 워크플로를 실행해 만듭니다. 버전에서 올릴 자리를 선택하거나 버전을 직접 입력하면, 유니버설 DMG를 빌드해 첨부한 릴리스 초안이 만들어집니다. 초안을 공개하면 `v<버전>` 태그가 생깁니다. 직접 빌드한 앱의 버전은 마지막 `v*` 태그를 따릅니다.
+개발 환경, 코드 작성 규칙, 이슈와 PR 작성 방법, 릴리스 방법은 [CONTRIBUTING.ko.md](CONTRIBUTING.ko.md)에 정리되어 있습니다.
 
 ## 라이선스
 
