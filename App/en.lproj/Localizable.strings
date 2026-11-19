@@ -109,3 +109,6 @@
 "인터넷 연결을 확인하고 잠시 뒤 다시 시도해 주세요." = "Check your internet connection and try again later.";
 "업데이트 자동 확인" = "Check for updates automatically";
 "앱을 켤 때 GitHub에서 새 버전이 있는지 확인합니다. 앱 메뉴의 업데이트 확인에서 직접 확인할 수도 있습니다." = "Checks GitHub for a new version when the app opens. You can also use Check for Updates in the app menu.";
+"언어" = "Language";
+"시스템 언어" = "System Language";
+"앱을 다시 열면 적용됩니다." = "Takes effect the next time you open Pullshot.";

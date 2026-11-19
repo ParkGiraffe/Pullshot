@@ -6,6 +6,14 @@ struct SettingsView: View {
 
     var body: some View {
         Form {
+            Picker(selection: $settings.language) {
+                Text("시스템 언어").tag(AppLanguage.system)
+                Text(verbatim: "English").tag(AppLanguage.english)
+                Text(verbatim: "한국어").tag(AppLanguage.korean)
+            } label: {
+                Text("언어")
+                Text("앱을 다시 열면 적용됩니다.")
+            }
             LabeledContent("저장 위치") {
                 HStack {
                     Text(verbatim: settings.importFolder.abbreviatedPath)

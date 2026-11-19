@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
-	<string>ko</string>
+	<string>en</string>
 	<key>CFBundleExecutable</key>
 	<string>Pullshot</string>
 	<key>CFBundleIconFile</key>
@@ -12,8 +12,8 @@
 	<string>com.parkgiraffe.Pullshot</string>
 	<key>CFBundleLocalizations</key>
 	<array>
-		<string>ko</string>
 		<string>en</string>
+		<string>ko</string>
 	</array>
 	<key>CFBundleName</key>
 	<string>Pullshot</string>
@@ -27,7 +27,7 @@
 	<string>15.0</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>© 2026 ParkGiraffe
-Pullshot은 Nintendo가 만들거나 승인한 프로젝트가 아닌 개인 오픈소스 프로젝트입니다. Nintendo Switch와 Nintendo Switch 2는 Nintendo의 상표이며, 이 앱에서는 지원 기기를 표기하는 용도로만 사용합니다.</string>
+Pullshot is a personal open-source project, not made or endorsed by Nintendo. Nintendo Switch and Nintendo Switch 2 are trademarks of Nintendo and are used in this app only to indicate supported devices.</string>
 	<key>NSHighResolutionCapable</key>
 	<true/>
 	<key>NSPrincipalClass</key>

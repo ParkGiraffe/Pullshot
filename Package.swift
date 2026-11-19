@@ -3,7 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "Pullshot",
-    defaultLocalization: "ko",
+    defaultLocalization: "en",
     platforms: [
         .macOS(.v15),
     ],

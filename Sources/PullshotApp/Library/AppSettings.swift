@@ -28,6 +28,17 @@ final class AppSettings {
         didSet { defaults.set(shouldCheckForUpdates, forKey: SettingsKey.shouldCheckForUpdates.rawValue) }
     }
 
+    var language: AppLanguage {
+        didSet {
+            defaults.set(language.rawValue, forKey: SettingsKey.language.rawValue)
+            if let languages = language.preferredLanguages {
+                defaults.set(languages, forKey: SettingsKey.appleLanguages.rawValue)
+            } else {
+                defaults.removeObject(forKey: SettingsKey.appleLanguages.rawValue)
+            }
+        }
+    }
+
     @ObservationIgnored private let defaults: UserDefaults
 
     init(defaults: UserDefaults = .standard) {
@@ -41,5 +52,6 @@ final class AppSettings {
         isVerboseLogging = defaults.bool(forKey: SettingsKey.isVerboseLogging.rawValue)
         appIcon = defaults.string(forKey: SettingsKey.appIcon.rawValue).flatMap(AppIcon.init) ?? .red
         shouldCheckForUpdates = defaults.bool(forKey: SettingsKey.shouldCheckForUpdates.rawValue)
+        language = defaults.string(forKey: SettingsKey.language.rawValue).flatMap(AppLanguage.init) ?? .system
     }
 }

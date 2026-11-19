@@ -16,6 +16,7 @@ struct AppSettingsTests {
         settings.isVerboseLogging = true
         settings.appIcon = .shutter
         settings.shouldCheckForUpdates = true
+        settings.language = .korean
 
         let reread = AppSettings(defaults: defaults)
         #expect(reread.importFolder == URL(filePath: "/tmp/스위치"))
@@ -24,6 +25,8 @@ struct AppSettingsTests {
         #expect(reread.isVerboseLogging)
         #expect(reread.appIcon == .shutter)
         #expect(reread.shouldCheckForUpdates)
+        #expect(reread.language == .korean)
+        #expect(defaults.stringArray(forKey: SettingsKey.appleLanguages.rawValue) == ["ko"])
     }
 
     @Test func `업데이트 자동 확인은 처음에 꺼져 있다`() {

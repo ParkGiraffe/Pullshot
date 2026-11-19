@@ -8,5 +8,7 @@ enum SettingsKey: String {
     case isVerboseLogging
     case appIcon
     case shouldCheckForUpdates
+    case language
+    case appleLanguages = "AppleLanguages"
     case demoAlbum
 }
