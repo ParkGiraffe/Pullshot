@@ -29,4 +29,4 @@ make app           # dist/Pullshot.app
 
 - `main`에서 브랜치를 만들어 PR을 엽니다. PR 템플릿의 목적, 변경 요약, 리뷰 포인트, 검증 내용을 채워 주세요.
 - 커밋 제목은 `{대상} {액션}` 형태의 한국어 명사형입니다(예: `PTP 컨테이너 추가`). 자세한 규칙은 [docs/conventions.ko.md](docs/conventions.ko.md)의 커밋 절을 참고해 주세요.
-- `make test`와 `make check`가 통과해야 합니다. 스위치와 통신하는 코드를 변경했다면 실기기에서 확인한 결과를 작성해 주세요.
+- `make test`와 `make check`가 통과해야 하며, PR을 열면 CI가 자동으로 확인합니다. 스위치와 통신하는 코드를 변경했다면 실기기에서 확인한 결과를 작성해 주세요.

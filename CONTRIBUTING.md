@@ -29,4 +29,4 @@ make app           # dist/Pullshot.app
 
 - Create a branch from `main` and open a pull request. Fill in the Purpose, Summary of changes, Review points, and Verification sections of the template.
 - Commit titles are Korean noun phrases in the `{대상} {액션}` (target, action) form, for example `PTP 컨테이너 추가` (add PTP container). See the commits section of [docs/conventions.md](docs/conventions.md) for details.
-- `make test` and `make check` must pass. If you changed code that communicates with the Switch, include the results you verified on a real console.
+- `make test` and `make check` must pass, and CI runs them automatically on every pull request. If you changed code that communicates with the Switch, include the results you verified on a real console.
