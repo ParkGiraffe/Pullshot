@@ -4,14 +4,23 @@
 
 Nintendo Switch 2와 Nintendo Switch로 찍은 사진과 동영상을 USB 케이블로 Mac에 가져오는 앱입니다. 게임별로 묶어서 보여 주고, 필요한 것만 선택해서 가져오거나 Finder로 드래그해서 원하는 폴더에 바로 저장할 수 있습니다. Nintendo Switch 지원은 실험 단계입니다.
 
-## 진행 상황
-
-앱에서 게임별 보기와 가져오기를 사용할 수 있습니다. 아직 릴리스가 없어서 소스에서 직접 빌드해 사용합니다.
-
 ## 요구 사항
 
 - macOS 15 이상
 - 데이터 전송을 지원하는 USB-C 케이블
+
+## 설치
+
+[최신 릴리스](https://github.com/ParkGiraffe/Pullshot/releases/latest)에서 DMG를 다운로드해 열고, Pullshot.app을 Applications 폴더로 드래그합니다.
+
+Apple 공증을 받지 않은 ad-hoc 서명 앱이기 때문에, 처음 실행하면 열 수 없다는 안내가 나옵니다. 이때 시스템 설정의 개인정보 보호 및 보안 아래쪽에 나오는 "그래도 열기"를 누르면 됩니다.
+
+소스에서 직접 빌드해 사용할 수도 있습니다. `make dmg`를 실행하면 `dist/Pullshot-<버전>.dmg`도 만들어집니다.
+
+```bash
+make app                 # dist/Pullshot.app을 Apple 실리콘과 Intel 유니버설로 빌드하고 ad-hoc 서명
+open dist/Pullshot.app
+```
 
 ## 연결 방법
 
@@ -19,17 +28,6 @@ Nintendo Switch 2와 Nintendo Switch로 찍은 사진과 동영상을 USB 케이
 2. 본체 설정의 데이터 관리 메뉴에서 PC로 복사를 켭니다.
 
 ## 앱
-
-소스에서 빌드한 뒤 실행합니다.
-
-```bash
-make app                 # dist/Pullshot.app을 Apple 실리콘과 Intel 유니버설로 빌드하고 ad-hoc 서명
-open dist/Pullshot.app
-```
-
-다른 Mac에 설치하려면 `make dmg`로 `dist/Pullshot-<버전>.dmg`를 만들고, DMG를 열어 Pullshot.app을 Applications 폴더로 드래그합니다.
-
-Apple 공증을 받지 않은 ad-hoc 서명 앱이기 때문에, 다운로드한 DMG로 설치한 앱을 처음 실행하면 열 수 없다는 안내가 나옵니다. 이때 시스템 설정의 개인정보 보호 및 보안 아래쪽에 나오는 "그래도 열기"를 누르면 됩니다.
 
 스위치를 연결하고 PC로 복사를 켜면 앱이 자동으로 연결해 앨범을 읽어 옵니다. 게임별로 사진과 동영상을 보고, 새 항목이나 선택한 항목을 저장 위치(기본값 `~/Pictures/Pullshot`)로 가져올 수 있습니다.
 

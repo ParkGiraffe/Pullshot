@@ -4,14 +4,23 @@ English | [한국어](README.ko.md)
 
 Pullshot is a Mac app that imports photos and videos taken on Nintendo Switch 2 and Nintendo Switch over a USB cable. It groups them by game, lets you import only the ones you select, and lets you drag them to Finder to save them straight into any folder. Nintendo Switch support is experimental.
 
-## Status
-
-You can browse by game and import in the app. There is no release yet, so build it from source.
-
 ## Requirements
 
 - macOS 15 or later
 - A USB-C cable that supports data transfer
+
+## Install
+
+Download the DMG from the [latest release](https://github.com/ParkGiraffe/Pullshot/releases/latest), open it, and drag Pullshot.app to the Applications folder.
+
+The app is ad-hoc signed and not notarized by Apple, so the first time you open it, macOS says it can't be opened. Click "Open Anyway" near the bottom of System Settings > Privacy & Security.
+
+You can also build it from source. Running `make dmg` also creates `dist/Pullshot-<version>.dmg`.
+
+```bash
+make app                 # Builds dist/Pullshot.app as a universal app for Apple silicon and Intel, ad-hoc signed
+open dist/Pullshot.app
+```
 
 ## Connecting
 
@@ -19,17 +28,6 @@ You can browse by game and import in the app. There is no release yet, so build 
 2. On the console, turn on Copy to PC in System Settings > Data Management.
 
 ## App
-
-Build from source, then run the app.
-
-```bash
-make app                 # Builds dist/Pullshot.app as a universal app for Apple silicon and Intel, ad-hoc signed
-open dist/Pullshot.app
-```
-
-To install on another Mac, run `make dmg` to create `dist/Pullshot-<version>.dmg`, open the DMG, and drag Pullshot.app to the Applications folder.
-
-The app is ad-hoc signed and not notarized by Apple, so the first time you open a copy installed from a downloaded DMG, macOS says it can't be opened. Click "Open Anyway" near the bottom of System Settings > Privacy & Security.
 
 When you connect the Switch and turn on Copy to PC, the app connects automatically and reads the album. You can browse photos and videos by game and import new or selected items to the save location (`~/Pictures/Pullshot` by default).
 
