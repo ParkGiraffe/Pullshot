@@ -1,0 +1,13 @@
+{
+  "title": "Pullshot",
+  "icon": ".build/app-icons/icon-red-gamepad.icns",
+  "background": "App/DMG/background.tiff",
+  "icon-size": 128,
+  "text-size": 13,
+  "format": "ULFO",
+  "window": {"position": {"x": 200, "y": 480}, "size": {"width": 600, "height": 360}},
+  "contents": [
+    {"x": 150, "y": 175, "type": "file", "path": "dist/Pullshot.app"},
+    {"x": 450, "y": 175, "type": "link", "path": "/Applications"}
+  ]
+}

@@ -40,18 +40,20 @@ app: $(APP_ICON_FILES)
 	$(if $(VERSION),/usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $(VERSION)" dist/Pullshot.app/Contents/Info.plist)
 	$(if $(BUILD_NUMBER),/usr/libexec/PlistBuddy -c "Set :CFBundleVersion $(BUILD_NUMBER)" dist/Pullshot.app/Contents/Info.plist)
 	cp -R App/*.lproj dist/Pullshot.app/Contents/Resources/
-	cp $(APP_ICON_FILES) dist/Pullshot.app/Contents/Resources/
+	cp $(APP_ICON_FILES) LICENSE dist/Pullshot.app/Contents/Resources/
 	codesign --force --sign - dist/Pullshot.app
 
-dmg: app
-	rm -rf dist/dmg-staging
-	mkdir -p dist/dmg-staging
-	cp -R dist/Pullshot.app LICENSE dist/dmg-staging/
-	ln -s /Applications dist/dmg-staging/Applications
+DMGBUILD = .build/dmgbuild/bin/dmgbuild
+
+$(DMGBUILD): App/DMG/requirements.txt
+	rm -rf .build/dmgbuild
+	python3 -m venv .build/dmgbuild
+	.build/dmgbuild/bin/pip install --quiet --require-hashes --only-binary :all: -r App/DMG/requirements.txt
+
+dmg: app $(DMGBUILD)
 	version="$$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' dist/Pullshot.app/Contents/Info.plist)" && \
 	rm -f "dist/Pullshot-$$version.dmg" && \
-	hdiutil create -volname Pullshot -srcfolder dist/dmg-staging -format UDZO "dist/Pullshot-$$version.dmg"
-	rm -rf dist/dmg-staging
+	$(DMGBUILD) -s App/DMG/settings.json Pullshot "dist/Pullshot-$$version.dmg"
 
 run-app: app
 	open dist/Pullshot.app
