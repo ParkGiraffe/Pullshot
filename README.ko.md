@@ -63,6 +63,8 @@ make check         # SwiftLint --strict, SwiftFormat --lint
 
 코드 작성 규칙은 [docs/conventions.ko.md](docs/conventions.ko.md), 용어는 [docs/glossary.ko.md](docs/glossary.ko.md), 이슈와 PR 작성 방법은 [CONTRIBUTING.ko.md](CONTRIBUTING.ko.md)에 정리되어 있습니다.
 
+릴리스는 Actions 탭에서 Release 워크플로를 실행해 만듭니다. 버전에서 올릴 자리를 선택하거나 버전을 직접 입력하면, 유니버설 DMG를 빌드해 첨부한 릴리스 초안이 만들어집니다. 초안을 공개하면 `v<버전>` 태그가 생깁니다. 직접 빌드한 앱의 버전은 마지막 `v*` 태그를 따릅니다.
+
 ## 라이선스
 
 MIT 라이선스로 배포합니다. 전문은 [LICENSE](LICENSE)에 있습니다.

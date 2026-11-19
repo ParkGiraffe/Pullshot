@@ -1,0 +1,52 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Which part of the last release version to increase
+        type: choice
+        options: [patch, minor, major]
+        default: minor
+      version:
+        description: Exact version such as 0.1.0 (overrides bump when set)
+        type: string
+        required: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Build DMG and draft release
+    runs-on: macos-26
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Decide version
+        id: version
+        env:
+          BUMP: ${{ inputs.bump }}
+          REQUESTED: ${{ inputs.version }}
+        run: echo "version=$(Scripts/next-version.sh "$BUMP" "$REQUESTED")" >> "$GITHUB_OUTPUT"
+      - name: Build DMG
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: make dmg VERSION="$VERSION"
+      - name: Draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          if [ "$(gh release view "v$VERSION" --json isDraft --jq .isDraft 2>/dev/null)" = "true" ]; then
+            gh release delete "v$VERSION" --yes
+          fi
+          gh release create "v$VERSION" "dist/Pullshot-$VERSION.dmg" \
+            --draft --target "$GITHUB_SHA" --title "Pullshot $VERSION" \
+            --notes-file .github/release-notes.md --generate-notes

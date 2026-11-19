@@ -63,6 +63,8 @@ make check         # SwiftLint --strict, SwiftFormat --lint
 
 Coding conventions are in [docs/conventions.md](docs/conventions.md), terms are in [docs/glossary.md](docs/glossary.md), and how to write issues and PRs is in [CONTRIBUTING.md](CONTRIBUTING.md).
 
+To release, run the Release workflow from the Actions tab. Choose which part of the version to increase, or enter an exact version, and the workflow builds a universal DMG and creates a draft release with it attached. Publishing the draft creates the `v<version>` tag. Apps you build yourself take their version from the latest `v*` tag.
+
 ## License
 
 Released under the MIT License. See [LICENSE](LICENSE) for the full text.
