@@ -63,4 +63,4 @@ Pullshot은 Nintendo가 만들거나 승인한 프로젝트가 아닌 개인 오
 
 ## 참고한 프로젝트
 
-스위치가 응답하는 기본 PTP(카메라와 컴퓨터가 사진을 주고받는 USB 규약) 명령 10개, 스위치의 USB 제품 ID, 이전 연결이 닫지 못한 세션을 정리하는 순서는 [Tethersnap](https://github.com/Luminoid/Tethersnap)의 README와 CHANGELOG를 참고했고, Finder로 드래그해서 저장하는 기능은 Tethersnap의 같은 기능을 보고 추가했습니다. 코드는 가져오지 않고 처음부터 새로 작성했습니다.
+- [Tethersnap](https://github.com/Luminoid/Tethersnap): 스위치가 응답하는 기본 PTP(카메라와 컴퓨터가 사진을 주고받는 USB 규약) 명령 10개, 스위치의 USB 제품 ID, 이전 연결이 닫지 못한 세션을 정리하는 순서를 참고했습니다.

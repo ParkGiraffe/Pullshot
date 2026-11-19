@@ -63,4 +63,4 @@ Pullshot is a personal open-source project and is not made or endorsed by Ninten
 
 ## Acknowledgments
 
-The 10 baseline PTP operations the Switch responds to (PTP is the USB protocol cameras and computers use to exchange photos), the Switch's USB product IDs, and the steps for cleaning up a session left open by a previous connection are based on the README and CHANGELOG of [Tethersnap](https://github.com/Luminoid/Tethersnap). Saving by dragging to Finder was added after seeing the same feature in Tethersnap. No code was copied. Pullshot was written from scratch.
+- [Tethersnap](https://github.com/Luminoid/Tethersnap): Referenced for the 10 baseline PTP operations the Switch responds to (PTP is the USB protocol cameras and computers use to exchange photos), the Switch's USB product IDs, and the steps for cleaning up a session left open by a previous connection.
