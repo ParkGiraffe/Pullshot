@@ -1,135 +1,137 @@
-# 실기기 기록
+# Hardware Notes
 
-2026-11-15에 Nintendo Switch 2(펌웨어 23.5.0)를 MacBook Pro(Mac15,6, macOS 26.5)에 USB-C 데이터 케이블로 연결해 확인한 사실입니다.
-2단계(라이브러리)와 3단계(앱) 계획의 근거 자료입니다. 기기 일련번호와 사진, 동영상 원본은 이 문서와 리포에 저장하지 않습니다.
-덤프 원본은 커밋하지 않는 `LocalFixtures/switch2-23.5.0/`에 있고, `LocalFixtureTests`는 이 덤프가 있을 때만 재생합니다.
+English | [한국어](hardware-notes.ko.md)
 
-Nintendo Switch(1세대)는 기기가 없어 확인하지 못했습니다. 제품 ID 0x201D는 Tethersnap 기록을 참고한 값이며, 앱에서는 실험적 지원으로 표시합니다.
+These are facts confirmed on 2026-11-15 by connecting a Nintendo Switch 2 (firmware 23.5.0) to a MacBook Pro (Mac15,6, macOS 26.5) with a USB-C data cable.
+They are the basis for the plans for Phase 2 (library) and Phase 3 (app). The device serial number and the original photos and videos are not stored in this document or in the repo.
+The raw dumps are in `LocalFixtures/switch2-23.5.0/`, which is not committed, and `LocalFixtureTests` replays them only when this dump is present.
 
-## 기기 정보
+The original Nintendo Switch (1st generation) could not be checked because no device was available. Product ID 0x201D is a value taken from the Tethersnap notes, and the app marks it as experimental support.
 
-| 항목 | 값 |
+## Device Information
+
+| Item | Value |
 |---|---|
-| 제조사, 모델 | Nintendo, Nintendo Switch 2 |
-| PTP 버전 | 100 |
-| 지원 명령 | 0x1001 ~ 0x100A 10개뿐이며, DeleteObject(0x100B)가 없어 기기의 사진과 동영상을 삭제할 수 없습니다. |
-| 저장소 | "Album" 하나이며, 용량과 남은 공간이 모두 0xFF로 와서 알 수 없습니다. |
-| 저장소 ID | 세션마다 바뀌기 때문에(0x00060001, 0x00070001, 0x00090001) 기록의 키로 사용할 수 없습니다. |
-| 일련번호 | 여러 세션과 USB 리셋 뒤에도 같기 때문에 기기를 구분하는 키로 사용할 수 있습니다. |
+| Manufacturer, model | Nintendo, Nintendo Switch 2 |
+| PTP version | 100 |
+| Supported operations | Only the 10 operations 0x1001 to 0x100A. There is no DeleteObject (0x100B), so photos and videos on the device cannot be deleted. |
+| Storage | One, "Album". Both capacity and free space come back as 0xFF, so they are unknown. |
+| Storage ID | Changes every session (0x00060001, 0x00070001, 0x00090001), so it cannot be used as a key for the history. |
+| Serial number | Stays the same across sessions and USB resets, so it can be used as a key to tell devices apart. |
 
-## USB 상태
+## USB States
 
-| 상태 | VID:PID | 인터페이스 |
+| State | VID:PID | Interfaces |
 |---|---|---|
-| PC로 복사 모드 | 0x057E:0x2061 | 사진 전송(클래스 6, 하위 1, 프로토콜 1) |
-| 그 밖(대기) | 0x057E:0x2060 | HID만 있습니다. |
+| Copy to PC mode | 0x057E:0x2061 | Photo transfer (class 6, subclass 1, protocol 1) |
+| Otherwise (standby) | 0x057E:0x2060 | HID only. |
 
-- IOKit 검색은 제조사 ID만 지정하면 아무것도 찾지 못하기 때문에, 제품 ID 목록을 함께 지정해야 합니다.
-- USB 장치 리셋을 보내면 스위치가 PC로 복사 모드에서 나가 0x2060으로 다시 연결됩니다. 이후 사용자가 본체에서 PC로 복사를 다시 켜야 하기 때문에, 앱은 USB 리셋을 마지막 수단으로만 사용하고 리셋 뒤에는 PC로 복사를 다시 켜 달라고 안내해야 합니다.
-- 0x2060으로 연결되어 있으면 "연결은 됐지만 PC로 복사 모드가 아님"으로 판단하고 안내할 수 있습니다.
-- USB 리셋 뒤 사용자가 PC로 복사를 다시 켰을 때 같은 프로세스가 다시 연결하는 경로(사진 전송 인터페이스가 늦게 생기는 경우 5초 재시도)는 아직 실기기로 확인하지 못했습니다.
+- An IOKit search that specifies only the vendor ID finds nothing, so the list of product IDs must be specified as well.
+- Sending a USB device reset makes the Switch leave Copy to PC mode and reconnect as 0x2060. The user then has to turn Copy to PC on again on the console, so the app should use a USB reset only as a last resort and, after a reset, ask the user to turn Copy to PC on again.
+- When the device is connected as 0x2060, the app can conclude "connected but not in Copy to PC mode" and show guidance.
+- The path where the same process reconnects after the user turns Copy to PC back on following a USB reset (a 5-second retry when the photo transfer interface appears late) has not yet been verified on a real device.
 
-## 앨범 구조
+## Album Structure
 
-- 루트 바로 아래에 게임 폴더가 있고, 사진과 동영상은 그 안에 있습니다. 더 깊은 하위 폴더는 없었습니다.
-- 한글 게임 이름이 그대로 옵니다(예: "파이어 엠블렘 만자천홍", "모여봐요 동물의 숲").
-- 스위치에 실제로 "기타" 폴더가 있는데, Pullshot이 게임 폴더 밖 사진과 동영상을 묶는 이름 "기타"와 겹치기 때문에 2단계에서 둘을 구분할지 정해야 합니다.
-- 게임 폴더 12개에 파일 3,082개(사진 2,902개, 동영상 180개), 합계 약 6.9GB가 있었고, 전체를 스캔하는 데 약 16초 걸립니다.
+- Game folders sit directly under the root, and photos and videos are inside them. There were no deeper subfolders.
+- Korean game names come through as they are (for example, "파이어 엠블렘 만자천홍", "모여봐요 동물의 숲").
+- The Switch actually has a folder named "기타" ("Other"), which collides with the name "기타" that Pullshot uses to group photos and videos outside game folders, so Phase 2 has to decide whether to distinguish the two.
+- There were 12 game folders with 3,082 files (2,902 photos, 180 videos), about 6.9GB in total, and scanning everything takes about 16 seconds.
 
-## 파일 이름과 메타데이터
+## File Names and Metadata
 
-- 파일 이름은 `YYYYMMDDhhmmss` + 두 자리 순번 + `_s` 또는 `_c` + 확장자 형식입니다(예: `2026010112000000_s.jpg`).
-  - 같은 초에 찍은 파일은 순번으로 구분됩니다(`…0900_s.jpg`, `…0901_s.jpg`).
-  - 개수는 `_s.jpg` 2,460개, `_c.jpg` 442개, `_s.mp4` 165개, `_c.mp4` 15개였습니다. `_s`와 `_c`의 의미는 확인하지 못했습니다.
-- ObjectInfo의 CaptureDate 값이 채워져 오지만 시간대 표기가 없기 때문에 본체의 지역 시각으로 읽습니다.
-- 형식 코드는 사진 0x3801(EXIF JPEG), 동영상 0xB982(MP4)입니다.
-- GetThumb는 사진(약 19KB)과 동영상(약 15KB) 모두 지원합니다.
+- File names have the form `YYYYMMDDhhmmss` + a two-digit sequence number + `_s` or `_c` + extension (for example, `2026010112000000_s.jpg`).
+  - Files taken in the same second are told apart by the sequence number (`…0900_s.jpg`, `…0901_s.jpg`).
+  - The counts were 2,460 `_s.jpg`, 442 `_c.jpg`, 165 `_s.mp4`, and 15 `_c.mp4`. The meaning of `_s` and `_c` could not be determined.
+- The CaptureDate value in ObjectInfo is filled in but has no time zone notation, so it is read as the console's local time.
+- The format codes are 0x3801 for photos (EXIF JPEG) and 0xB982 for videos (MP4).
+- GetThumb is supported for both photos (about 19KB) and videos (about 15KB).
 
-## 전송
+## Transfer
 
-- 데이터 단계에서 12바이트 헤더가 먼저 따로 오고, 본문은 그다음 읽기부터 옵니다.
-- 받은 파일의 크기는 `list`에 나온 크기와 바이트 단위까지 같았습니다. 동영상(5,616,157바이트)은 8.3초, 트랙 2개로 재생되고, 사진은 1920×1080입니다.
-- 45.1MB 동영상 하나를 받는 데 약 0.3초 걸립니다. 파일 3,082개(약 6.9GB)를 모두 받는 데는 스캔을 포함해 약 87초 걸렸고 실패는 없었습니다.
-- 연결할 때마다 이전 연결이 남긴 바이트를 비우는 읽기가 한 번 시간 초과(0xE00002D6, 0.3초)로 끝나서, 연결이 그만큼 늦어집니다.
+- In the data phase, the 12-byte header arrives first on its own, and the body comes from the next read.
+- The size of each received file matched the size shown by `list` down to the byte. The video (5,616,157 bytes) plays for 8.3 seconds with 2 tracks, and the photo is 1920×1080.
+- Receiving a single 45.1MB video takes about 0.3 seconds. Receiving all 3,082 files (about 6.9GB) took about 87 seconds including the scan, with no failures.
+- On every connection, one read that drains the bytes left by the previous connection ends in a timeout (0xE00002D6, 0.3 seconds), which delays the connection by that much.
 
-## 다른 앱이 스위치를 사용 중인 경우
+## When Another App Is Using the Switch
 
-- Tethersnap 앱이 인터페이스를 사용하고 있으면 열기가 0xE00002C9로 실패합니다. IORegistry의 `UsbExclusiveOwner`가 "pid N, Tethersnap" 형식이기 때문에 사용 중인 앱 이름을 안내에 넣을 수 있습니다.
-- 미리보기나 이미지 캡처 앱을 실행하면 ptpcamerad가 스위치를 사용해 같은 0xE00002C9로 실패하고, 그 앱을 종료하면 해결됐습니다.
-- 0xE00002C5(독점 접근)는 이번 확인에서 나오지 않았습니다.
+- If the Tethersnap app is using the interface, opening fails with 0xE00002C9. The IORegistry `UsbExclusiveOwner` has the form "pid N, Tethersnap", so the name of the app in use can be included in the guidance.
+- Launching Preview or Image Capture makes ptpcamerad use the Switch, which fails with the same 0xE00002C9, and quitting that app resolved it.
+- 0xE00002C5 (exclusive access) did not appear in this check.
 
-## 세션이 남은 경우
+## When a Session Is Left Behind
 
-`kill -9`처럼 세션을 닫지 못하고 끝난 프로세스가 있으면 스위치에 세션이 남습니다.
+If a process ends without closing its session, such as with `kill -9`, the session remains on the Switch.
 
-1. 세션 없는 GetDeviceInfo는 빈 데이터 단계와 0x2004로 응답합니다.
-2. OpenSession은 0x201E(이미 열림)로 거부됩니다.
-3. 트랜잭션 ID 0으로 보낸 CloseSession도 0x2004로 거부됩니다.
-4. PTP 장치 리셋(클래스 요청)은 멈춤(0xE0005000)으로 끝납니다.
-5. 마지막 수단인 USB 장치 리셋을 보내면 해결되지만, 스위치가 PC로 복사 모드에서 나갑니다.
+1. GetDeviceInfo without a session responds with an empty data phase and 0x2004.
+2. OpenSession is rejected with 0x201E (already open).
+3. CloseSession sent with transaction ID 0 is also rejected with 0x2004.
+4. A PTP device reset (class request) ends in a stall (0xE0005000).
+5. Sending the last resort, a USB device reset, resolves it, but the Switch leaves Copy to PC mode.
 
-그래서 지금 코드는 취소와 오류 뒤에도 남은 데이터를 비우고 CloseSession을 보내 세션을 남기지 않도록 합니다.
-0x2004는 트랜잭션 ID가 틀렸다는 응답이기 때문에, 마지막 트랜잭션 ID를 디스크에 저장해 두면 강제 종료 뒤에도 USB 리셋 없이 세션을 닫을 수 있을 것으로 보이지만 아직 확인하지 않았습니다.
+So the current code drains any remaining data and sends CloseSession even after cancellation and errors, so that no session is left behind.
+0x2004 is a response saying the transaction ID is wrong, so saving the last transaction ID to disk should let the session be closed without a USB reset even after a forced termination, but this has not been verified yet.
 
-PC로 복사 모드를 껐다 다시 켠 스위치는 세션 없는 GetDeviceInfo를 거부하지 않았습니다. Tethersnap이 펌웨어 22.5.0에서 기록한 거부는 23.5.0에서 재현되지 않았지만, 코드는 거부에 대비한 경로를 유지합니다.
+A Switch whose Copy to PC mode was turned off and on again did not reject GetDeviceInfo without a session. The rejection that Tethersnap recorded on firmware 22.5.0 did not reproduce on 23.5.0, but the code keeps a path that prepares for a rejection.
 
-## 취소와 끊김
+## Cancellation and Disconnection
 
-- 시그널 핸들러로 Ctrl-C를 받으면 진행 중인 USB 읽기가 0xE00002EB로 끊겨 세션이 어긋났기 때문에, 지금은 SIGINT를 무시하고 디스패치 소스로만 감지합니다.
-- 스캔 중 취소: 객체 사이에서 멈추고 세션을 닫으며, 다음 연결은 리셋 없이 바로 열렸습니다.
-- 받는 중 취소: 45.1MB 동영상의 남은 데이터 단계를 끝까지 읽어서 버리고, 받다 만 파일을 삭제한 뒤 세션을 닫습니다. 다음 연결은 리셋 없이 바로 열렸습니다.
-- 받는 중 케이블 분리: 읽기가 0xE00002EB로 끝나고, 그 뒤 호출은 0x10000003으로 실패합니다. "스위치 연결이 끊겼습니다" 안내가 나오고, 받다 만 파일(`.pullshot-partial`)은 남지 않았습니다.
-  - `pull`은 첫 끊김에서 멈추고 "저장 1470개, 건너뜀 0개, 실패 1개"로 요약하며, 시도하지 못한 나머지 파일은 요약에 나오지 않습니다.
-  - 케이블을 다시 연결해도 스위치는 PC로 복사 모드를 유지합니다. 케이블을 뽑을 때 열려 있던 세션도 남지 않아서, 다음 연결은 세션 없는 GetDeviceInfo부터 리셋 없이 열렸습니다.
+- When Ctrl-C was received through a signal handler, the USB read in progress was cut off with 0xE00002EB and the session got out of sync, so SIGINT is now ignored and detected only through a dispatch source.
+- Cancel during a scan: it stops between objects and closes the session, and the next connection opened immediately without a reset.
+- Cancel during a download: it reads through the rest of the data phase of the 45.1MB video and discards it, deletes the partially received file, and closes the session. The next connection opened immediately without a reset.
+- Cable unplugged during a download: the read ends with 0xE00002EB, and later calls fail with 0x10000003. The "The Switch was disconnected" message appears, and no partially received file (`.pullshot-partial`) was left.
+  - `pull` stops at the first disconnection and summarizes it as "Saved 1470, Skipped 0, Failed 1", and the remaining files it could not attempt do not appear in the summary.
+  - Even after the cable is reconnected, the Switch stays in Copy to PC mode. The session that was open when the cable was pulled was not left behind either, so the next connection opened without a reset, starting from GetDeviceInfo without a session.
 
-## 2단계 확인(2026-11-15)
+## Phase 2 Verification (2026-11-15)
 
-옮긴 기록은 테스트용 폴더(`--ledger-folder`)에 따로 저장해서 확인했습니다.
+The transferred history was saved separately in a test folder (`--ledger-folder`) for verification.
 
-- 새 항목 받기: 파일이 13개인 게임에서 `pull --new`로 13개를 받았고, 두 번째 실행 결과는 `저장 0개`였습니다. 받은 파일의 만든 날짜와 수정 날짜는 찍은 시각과 초 단위까지 같습니다.
-- 번호 붙이기: `001_20220909_153710.jpg`부터 찍은 순서대로 번호가 붙었고, 빈 폴더에서는 `--dry-run` 미리보기와 실제 파일 이름 13개가 모두 같았습니다. 동영상도 같은 규칙(`004_….mp4`)을 따릅니다.
-- 폴더에서 찾기: 받은 폴더를 지정하자 13개가 기록에 추가되었고, 그 파일들은 `list --new`에서 빠졌습니다. 없는 폴더를 지정하면 스위치에 연결하기 전에 멈추고 기록 파일도 만들지 않습니다.
-- 미리보기 앱이 실행 중이면 ptpcamerad가 인터페이스를 사용해 0xE00002C9로 실패하고, 미리보기와 사진 앱을 종료하라는 안내가 나옵니다. 앱을 종료하자 바로 연결됐습니다.
-- 플레이 나누기: 60분 기준으로 파일 2,625개인 게임이 플레이 29개로 나뉘었습니다. 플레이별 보기는 필요 없다고 판단해 기능을 제거했고, 앱의 기본 보기는 최신순입니다.
-- 모든 확인이 끝난 뒤에도 다음 연결이 USB 리셋 없이 열렸습니다.
+- Receiving new items: for a game with 13 files, `pull --new` received 13, and the second run's result was `Saved: 0`. The creation and modification dates of the received files match the capture time down to the second.
+- Numbering: files were numbered in the order they were taken, starting from `001_20220909_153710.jpg`, and in an empty folder the `--dry-run` preview and the 13 actual file names were all identical. Videos follow the same rule (`004_….mp4`).
+- Finding in a folder: when the received folder was specified, 13 files were added to the history, and those files dropped out of `list --new`. Specifying a nonexistent folder stops before connecting to the Switch and does not create a history file either.
+- If the Preview app is running, ptpcamerad uses the interface and the connection fails with 0xE00002C9, and guidance appears telling the user to quit Preview and Photos. Quitting the apps connected immediately.
+- Splitting into plays: with a 60-minute threshold, a game with 2,625 files was split into 29 plays. A per-play view was judged unnecessary, so the feature was removed, and the app's default view is newest first.
+- Even after all the checks were done, the next connection opened without a USB reset.
 
-## 2단계와 3단계 후속 작업
+## Follow-up Work for Phases 2 and 3
 
-- 가져온 기록의 키는 일련번호와 파일 이름으로 정하고, 세션마다 바뀌는 저장소 ID와 객체 핸들은 사용하지 않습니다.
-- 스위치의 "기타" 폴더와 게임 폴더 밖 사진과 동영상의 이름이 겹치지 않게 정합니다.
-- 앱은 0x2060 상태를 보고 "PC로 복사를 켜 주세요"를 안내하고, USB 리셋을 했으면 그 사실과 할 일을 함께 알립니다.
-- 앱이 강제 종료돼도 다음 실행에서 USB 리셋을 하지 않도록, 마지막 트랜잭션 ID를 저장해 세션을 닫는 방법을 실기기에서 확인합니다.
-- 연결이 끊긴 뒤의 요약에 시도하지 못한 파일 수를 함께 표시합니다.
+- The key for imported history is determined by the serial number and file name; the storage ID and object handle, which change every session, are not used.
+- Make sure the Switch's "기타" folder does not collide with the name used for photos and videos outside game folders.
+- The app looks at the 0x2060 state and shows "Turn on Copy to PC", and if it performed a USB reset, it reports that fact together with what the user needs to do.
+- Verify on a real device how to close the session by saving the last transaction ID, so that the next launch does not perform a USB reset even if the app was force-quit.
+- Show the number of files that could not be attempted in the summary after a disconnection.
 
-## 3단계 임시 확인(실기기 없이, 2026-11-16)
+## Phase 3 Interim Verification (Without a Device, 2026-11-16)
 
-스위치를 연결할 수 없어서, 3단계 계획의 실기기 확인(Task 13) 중 기기 없이 볼 수 있는 항목만 Mac Studio(macOS 27.2)에서 먼저 확인했습니다.
-앱은 `make app`으로 빌드한 릴리스 빌드를 데모 앨범(`-demoAlbum YES`)과 테스트용 기록 폴더(`-ledgerFolder`, `-importFolder`)로 실행했습니다.
-이 Mac은 화면이 잠겨 있어 클릭과 키 입력이 앱에 전달되지 않았기 때문에, 게임별 보기, 선택 상태, 가져오기 진행과 결과, 처음 연결 질문은 커밋하지 않은 확인용 코드로 띄워서 화면만 확인했습니다.
+The Switch could not be connected, so only the items from the Phase 3 plan's real-device verification (Task 13) that can be checked without a device were checked first on a Mac Studio (macOS 27.2).
+The app was the release build made with `make app`, run with a demo album (`-demoAlbum YES`) and test history folders (`-ledgerFolder`, `-importFolder`).
+This Mac's screen was locked, so clicks and key input did not reach the app. The per-game view, selection state, import progress and result, and the first-connection question were therefore brought up with uncommitted verification code and only checked on screen.
 
-### 확인한 것
+### What Was Verified
 
-- 연결 안내: 스위치 없이 실행하면 "스위치를 연결해 주세요"와 두 단계 안내가 나오고, 기기 칸은 "연결된 스위치 없음"입니다.
-- 격자와 보기: 데모 사진과 동영상 60개가 최신순 격자로 표시됩니다. 날짜 보기는 월 제목 아래에 날짜별로 묶고, 날짜 제목에 찍은 시간대를 붙입니다.
-- 동영상 필터와 찾기 칸: 동영상 필터는 동영상 12개만 남기고 오른쪽 칸의 개수도 함께 바뀝니다. 게임 찾기 칸은 이름이 일치하는 게임만 남기고, 일치하는 게임이 없으면 "찾는 게임이 없습니다"를 표시합니다.
-- 크기 막대: 썸네일 크기 120에서 7열, 360에서 2열로 바뀝니다.
-- 선택: 8개를 선택하면 칸마다 강조색 테두리와 체크 표시가 붙고, 오른쪽 칸에 겹친 썸네일, "8개 고름", 사진과 동영상 수, 크기, 찍은 때가 나옵니다.
-  - 키보드 선택은 직접 눌러 볼 수 없어서 `GridSelection` 단위 테스트(클릭, ⌘, ⇧, 화살표)가 통과하는 것만 확인했습니다.
-- 가져오기와 내보내기 버튼: 데모에서는 "새 항목 N개 가져오기"와 "내보내기"가 비활성화되어 있고, "게임 전체 내보내기"는 전체 선택만 하기 때문에 활성화되어 있습니다.
-- 번호 붙이기 미리보기: 8개를 선택하고 "찍은 순서대로 번호 붙이기"를 선택하면 가장 먼저 찍은 것부터 `001_YYYYMMDD_hhmmss`로 번호가 붙고, 동영상은 `.mp4` 확장자를 그대로 사용합니다. 6개부터는 앞 세 개와 마지막 하나 사이를 생략해 표시하며, 2단계에서 확인한 CLI 이름 규칙과 같습니다.
-- 종료: 데모로 실행한 앱에 quit 이벤트를 보내자 0.16초 만에 종료됐고, 미리 만들어 둔 미리보기 원본 폴더(`Pullshot-preview`)를 삭제했습니다. 데모는 세션을 열지 않기 때문에 세션을 닫고 종료하는 경로(최대 10초 대기)는 확인하지 못했습니다.
-- CLI: 스위치 없이 `list`를 실행하면 "연결된 스위치가 없습니다. 본체 아래쪽 USB-C 포트에 데이터 케이블로 연결하고, 본체에서 PC로 복사 모드를 켜 주세요."를 출력하고 종료 코드 1로 끝나며, 테스트용 기록 폴더에는 파일을 만들지 않았습니다.
-- DMG: `make dmg`가 만든 DMG에는 `Pullshot.app`, `Applications` 바로 가기, `LICENSE`가 들어 있습니다.
-  - 앱은 x86_64와 arm64 유니버설 빌드이며 `codesign --verify --deep --strict`를 통과합니다.
-  - ad-hoc 서명이기 때문에 Gatekeeper 평가(`spctl`)에서는 거부되며, README 안내대로 처음 실행할 때 "그래도 열기"를 눌러야 합니다.
-  - DMG에서 바로 실행한 앱도 데모로 열렸고 quit 이벤트로 종료됐습니다.
+- Connection guidance: launched without a Switch, it shows "Connect your Switch" and a two-step guide, and the device field says "No Switch connected".
+- Grid and views: the 60 demo photos and videos appear in a newest-first grid. The date view groups items by date under month headings, and the time zone of the capture is attached to the date heading.
+- Video filter and search field: the video filter leaves only the 12 videos, and the count in the inspector changes with it. The game search field leaves only games whose names match, and when no game matches it shows "No matching folders".
+- Size slider: thumbnail size 120 gives 7 columns and 360 gives 2 columns.
+- Selection: when 8 items are selected, each cell gets an accent-color border and a checkmark, and the inspector shows stacked thumbnails, "Selected: 8", the number of photos and videos, the size, and the capture time.
+  - Keyboard selection could not be pressed by hand, so only the passing of the `GridSelection` unit tests (click, ⌘, ⇧, arrow keys) was confirmed.
+- Import and export buttons: in the demo, "Import N New" and "Export" are disabled, and "Export Whole Game" is enabled because it only selects everything.
+- Numbering preview: with 8 items selected, choosing "Number in order taken" numbers them as `001_YYYYMMDD_hhmmss` starting with the earliest taken, and videos keep the `.mp4` extension. From 6 items on, the display omits the range between the first three and the last one, which matches the CLI naming rule confirmed in Phase 2.
+- Quit: sending a quit event to the app run as the demo quit it in 0.16 seconds, and the preview source folder created in advance (`Pullshot-preview`) was deleted. The demo does not open a session, so the path that closes the session and quits (waiting up to 10 seconds) could not be checked.
+- CLI: running `list` without a Switch prints "No Switch connected. Connect a data cable to the USB-C port on the bottom of the console, and turn on Copy to PC mode on the console." and exits with exit code 1, and no file was created in the test history folder.
+- DMG: the DMG made by `make dmg` contains `Pullshot.app`, an `Applications` shortcut, and `LICENSE`.
+  - The app is a universal build of x86_64 and arm64 and passes `codesign --verify --deep --strict`.
+  - It is ad-hoc signed, so Gatekeeper assessment (`spctl`) rejects it, and on first launch you have to click "Open Anyway" as the README explains.
+  - The app launched directly from the DMG also opened as the demo and quit with a quit event.
 
-### 실기기 확인이 필요한 항목
+### Items That Need Real-Device Verification
 
-- Step 1: 연결한 뒤 화면이 "연결하는 중", "앨범을 읽는 중", 격자 순서로 자동으로 바뀌는지, 게임 수와 파일 수가 CLI `list` 결과와 같은지, 처음 연결 질문을 "나중에"로 닫을 수 있는지 확인합니다.
-- Step 2: 실제 썸네일이 보이는 칸부터 채워지는지, 다시 열면 디스크 캐시에서 바로 표시되는지, 스페이스 바 미리보기가 사진과 동영상 모두 원본으로 열리는지 확인합니다. 키보드 선택도 이때 직접 눌러 봅니다.
-- Step 3: 실제 가져오기 결과가 "저장 N개"인지, 다시 열었을 때 그 게임에 새 항목 점이 없는지, 받은 파일의 만든 날짜가 찍은 시각인지, 처음 연결 질문의 "폴더에서 찾기…"가 동작하는지 확인합니다.
-- Step 4: 선택해서 가져온 파일 이름이 오른쪽 칸 미리보기와 같은지, "Finder에서 보기"가 그 파일들을 선택하는지 확인합니다.
-- Step 5: 가져오는 중에 케이블을 뽑았다가 다시 연결했을 때와, 미리보기 앱을 실행한 채 다시 연결했을 때의 안내와 "다시 시도" 동작을 확인합니다.
-- Step 6: 가져오는 중에 ⌘Q로 10초 안에 종료되고, 다음 연결이 USB 리셋 안내 없이 바로 열리는지 확인합니다.
-- 본체 메뉴 이름: 영어 공식 문서의 메뉴 순서는 Data Management > Manage Screenshots and Videos > Copy to PC입니다. 지금 앱 안내 화면, 영어 문구, CLI 오류 문구는 "데이터 관리에서 PC로 복사"라고만 표기해서 중간 단계가 빠져 있으므로, 한국어 본체에서 중간 메뉴 이름을 확인한 뒤 문구를 수정합니다.
+- Step 1: After connecting, check that the screen changes automatically in the order "Connecting", "Reading the album", grid, that the number of games and files matches the CLI `list` result, and that the first-connection question can be dismissed with "Not Now".
+- Step 2: Check that cells fill in starting with those whose real thumbnails are visible, that reopening shows them immediately from the disk cache, and that the Space bar preview opens the original for both photos and videos. Press the keyboard selection by hand at this time as well.
+- Step 3: Check that the real import result is "Saved: N", that the game has no new-item dot when reopened, that the creation date of the received files is the capture time, and that "Find in Folder…" in the first-connection question works.
+- Step 4: Check that the file names of the files imported by selection match the inspector preview, and that "Show in Finder" selects those files.
+- Step 5: Check the guidance and the "Try Again" behavior when the cable is unplugged and reconnected during an import, and when reconnecting with the Preview app running.
+- Step 6: Check that ⌘Q during an import quits within 10 seconds, and that the next connection opens immediately without USB reset guidance.
+- Console menu names: the menu order in the official English documentation is Data Management > Manage Screenshots and Videos > Copy to PC. The app's guidance screen, the English strings, and the CLI error messages currently say only "Copy to PC in Data Management", which omits the middle step, so check the middle menu name on a Korean console and then fix the wording.

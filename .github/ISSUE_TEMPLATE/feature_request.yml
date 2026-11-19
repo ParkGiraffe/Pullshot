@@ -1,21 +1,25 @@
-name: 기능 제안
-description: 있으면 좋을 기능이나 바뀌었으면 하는 동작을 제안합니다.
+name: Feature request
+description: Suggest a feature you'd like or a behavior you'd like changed.
 labels: [enhancement]
 body:
+  - type: markdown
+    attributes:
+      value: |
+        You can write in English or Korean.
   - type: textarea
     id: goal
     attributes:
-      label: 하고 싶은 작업
-      description: 어떤 상황에서 무엇을 하고 싶은지 작성해 주세요.
+      label: What you want to do
+      description: Describe the situation and what you want to do.
     validations:
       required: true
   - type: textarea
     id: today
     attributes:
-      label: 현재 방법
-      description: 지금 Pullshot이나 다른 도구로 어떻게 하고 있는지, 어떤 점이 불편한지 작성해 주세요.
+      label: How you do it today
+      description: Describe how you do it now with Pullshot or other tools, and what's inconvenient.
   - type: textarea
     id: idea
     attributes:
-      label: 제안
-      description: 생각해 둔 방법이 있으면 작성해 주세요. 참고할 스크린샷이나 그림이 있으면 첨부해 주셔도 좋습니다.
+      label: Suggestion
+      description: If you have an approach in mind, describe it. Feel free to attach screenshots or sketches for reference.

@@ -1,70 +1,74 @@
 # Pullshot
 
-Nintendo Switch 2와 Nintendo Switch로 찍은 사진과 동영상을 USB 케이블로 Mac에 가져오는 앱입니다. 게임별로 묶어서 보여 주고, 필요한 것만 선택해서 가져오거나 Finder로 드래그해서 원하는 폴더에 바로 저장할 수 있습니다. Nintendo Switch 지원은 실험 단계입니다.
+English | [한국어](README.ko.md)
 
-## 진행 상황
+Pullshot is a Mac app that imports photos and videos taken on Nintendo Switch 2 and Nintendo Switch over a USB cable. It groups them by game, lets you import only the ones you select, and lets you drag them to Finder to save them straight into any folder. Nintendo Switch support is experimental.
 
-앱에서 게임별 보기와 가져오기를 사용할 수 있습니다. 아직 릴리스가 없어서 소스에서 직접 빌드해 사용합니다.
+## Status
 
-## 요구 사항
+You can browse by game and import in the app. There is no release yet, so build it from source.
 
-- macOS 15 이상
-- 데이터 전송을 지원하는 USB-C 케이블
+## Requirements
 
-## 연결 방법
+- macOS 15 or later
+- A USB-C cable that supports data transfer
 
-1. 독이 아니라 본체 아래쪽 USB-C 포트에 케이블을 연결합니다.
-2. 본체 설정의 데이터 관리 메뉴에서 PC로 복사를 켭니다.
+## Connecting
 
-## 앱
+1. Connect the cable to the USB-C port on the bottom of the console, not the dock.
+2. On the console, turn on Copy to PC in System Settings > Data Management.
 
-소스에서 빌드한 뒤 실행합니다.
+## App
+
+Build from source, then run the app.
 
 ```bash
-make app                 # dist/Pullshot.app을 Apple 실리콘과 Intel 유니버설로 빌드하고 ad-hoc 서명
+make app                 # Builds dist/Pullshot.app as a universal app for Apple silicon and Intel, ad-hoc signed
 open dist/Pullshot.app
 ```
 
-다른 Mac에 설치하려면 `make dmg`로 `dist/Pullshot-<버전>.dmg`를 만들고, DMG를 열어 Pullshot.app을 Applications 폴더로 드래그합니다.
+To install on another Mac, run `make dmg` to create `dist/Pullshot-<version>.dmg`, open the DMG, and drag Pullshot.app to the Applications folder.
 
-Apple 공증을 받지 않은 ad-hoc 서명 앱이기 때문에, 다운로드한 DMG로 설치한 앱을 처음 실행하면 열 수 없다는 안내가 나옵니다. 이때 시스템 설정의 개인정보 보호 및 보안 아래쪽에 나오는 "그래도 열기"를 누르면 됩니다.
+The app is ad-hoc signed and not notarized by Apple, so the first time you open a copy installed from a downloaded DMG, macOS says it can't be opened. Click "Open Anyway" near the bottom of System Settings > Privacy & Security.
 
-스위치를 연결하고 PC로 복사를 켜면 앱이 자동으로 연결해 앨범을 읽어 옵니다. 게임별로 사진과 동영상을 보고, 새 항목이나 선택한 항목을 저장 위치(기본값 `~/Pictures/Pullshot`)로 가져올 수 있습니다.
+When you connect the Switch and turn on Copy to PC, the app connects automatically and reads the album. You can browse photos and videos by game and import new or selected items to the save location (`~/Pictures/Pullshot` by default).
 
-로그는 `~/Library/Logs/Pullshot/pullshot.log`에 저장되며, 도움말 메뉴의 "로그 파일 보기"를 누르면 Finder에서 로그 파일을 선택해 보여 줍니다. 로그에는 파일 이름, 게임 이름, 경로, 일련번호가 기록되지 않습니다. 문제가 생기면 설정에서 "자세한 로그 남기기"를 켜고 다시 시도한 뒤, 로그 파일을 첨부해 GitHub 이슈로 알려 주시면 됩니다.
+The app is available in English and Korean. It follows the system language by default, and you can choose a language in Settings.
 
-앱 메뉴의 "업데이트 확인…"을 누르면 GitHub에서 새 버전이 있는지 확인합니다. 설정에서 "업데이트 자동 확인"을 켜면 앱을 켤 때마다 확인하며, 기본값은 꺼져 있습니다. 앱이 인터넷을 사용하는 곳은 이 업데이트 확인뿐입니다.
+Logs are saved to `~/Library/Logs/Pullshot/pullshot.log`. Choose Help > Show Log File to select the log file in Finder. Logs don't include file names, game names, paths, or serial numbers. If something goes wrong, turn on "Detailed logging" in Settings, try again, and open a GitHub issue with the log file attached.
+
+Choose "Check for Updates…" in the app menu to check GitHub for a new version. Turn on "Check for updates automatically" in Settings to check every time the app opens. It's off by default. The update check is the only thing the app uses the internet for.
 
 ## CLI
 
-개발과 디버깅에 사용하는 명령어입니다. `swift run pullshot <명령>`으로 실행합니다.
+Commands for development and debugging. Run them with `swift run pullshot <command>`. The CLI prints messages in Korean.
 
-- `probe`: 기기 정보, 지원하는 PTP 명령, 저장소를 출력합니다.
-- `list [--new]`: 게임별 사진과 동영상 목록을 출력합니다. 새 항목은 줄 끝에 "새 항목"이라고 표시합니다.
-- `pull (--all | --new | <파일 이름>...) [--out <폴더>] [--numbered] [--no-game-folder] [--dry-run]`: 지정한 사진과 동영상을 `--out` 폴더(기본값 `~/Pictures/Pullshot`)의 게임 이름 폴더에 원래 이름 그대로 저장하며, 앱의 저장 위치 설정은 따르지 않습니다. `--numbered`를 지정하면 찍은 순서대로 `001_20261114_211205.jpg`처럼 번호를 붙입니다.
-- `ledger (--from-folder <폴더> | --mark-all | --leave-new)`: 처음 연결 질문에 답합니다. 폴더에서 찾은 사진과 동영상이나 스위치의 모든 사진과 동영상을 가져온 기록에 추가하거나, 모두 새 항목으로 유지합니다.
-- `dump --out <폴더>`: 실기기 응답을 그대로 저장합니다. 저장한 폴더에는 사진 데이터와 기기 일련번호가 들어 있기 때문에 공개하지 않습니다.
+- `probe`: Prints device info, supported PTP operations, and storage.
+- `list [--new]`: Lists photos and videos by game. New items are marked "새 항목" (new item) at the end of the line.
+- `pull (--all | --new | <file name>...) [--out <folder>] [--numbered] [--no-game-folder] [--dry-run]`: Saves the given photos and videos with their original names in game folders inside the `--out` folder (`~/Pictures/Pullshot` by default). It doesn't follow the app's save location setting. With `--numbered`, files are numbered in the order they were taken, like `001_20261114_211205.jpg`.
+- `ledger (--from-folder <folder> | --mark-all | --leave-new)`: Answers the first-connection question. Adds the photos and videos found in a folder, or all photos and videos on the Switch, to the import history, or keeps them all as new items.
+- `dump --out <folder>`: Saves raw responses from the device. Don't share the saved folder, because it contains photo data and the device serial number.
 
-가져오기를 하면 `~/Library/Application Support/Pullshot/`에 가져온 기록이 저장됩니다. 새 항목은 이 기록에 없는 사진과 동영상입니다.
+Importing saves an import history to `~/Library/Application Support/Pullshot/`. New items are photos and videos that aren't in this history.
 
-## 개발
+## Development
 
 ```bash
-brew bundle        # SwiftLint, SwiftFormat 설치
-make setup-hooks   # 커밋 전 린트와 포맷 검사 설정
+brew bundle        # Installs SwiftLint and SwiftFormat
+make setup-hooks   # Runs lint and format checks before each commit
 make build
 make test
 make check         # SwiftLint --strict, SwiftFormat --lint
 ```
 
-코드 작성 규칙은 [docs/conventions.md](docs/conventions.md), 용어는 [docs/glossary.md](docs/glossary.md), 이슈와 PR 작성 방법은 [CONTRIBUTING.md](CONTRIBUTING.md)에 정리되어 있습니다.
+Coding conventions are in [docs/conventions.md](docs/conventions.md), terms are in [docs/glossary.md](docs/glossary.md), and how to write issues and PRs is in [CONTRIBUTING.md](CONTRIBUTING.md).
 
-## 라이선스
+## License
 
-MIT 라이선스로 배포합니다. 전문은 [LICENSE](LICENSE)에 있습니다.
+Released under the MIT License. See [LICENSE](LICENSE) for the full text.
 
-Pullshot은 Nintendo가 만들거나 승인한 프로젝트가 아닌 개인 오픈소스 프로젝트입니다. Nintendo Switch와 Nintendo Switch 2는 Nintendo의 상표이며, 이 문서에서는 지원 기기를 표기하는 용도로만 사용합니다.
+Pullshot is a personal open-source project and is not made or endorsed by Nintendo. Nintendo Switch and Nintendo Switch 2 are trademarks of Nintendo and are used here only to name the supported devices.
 
-## 참고한 프로젝트
+## Acknowledgments
 
-스위치가 응답하는 기본 PTP(카메라와 컴퓨터가 사진을 주고받는 USB 규약) 명령 10개, 스위치의 USB 제품 ID, 이전 연결이 닫지 못한 세션을 정리하는 순서는 [Tethersnap](https://github.com/Luminoid/Tethersnap)의 README와 CHANGELOG를 참고했고, Finder로 드래그해서 저장하는 기능은 Tethersnap의 같은 기능을 보고 추가했습니다. 코드는 가져오지 않고 처음부터 새로 작성했습니다.
+The 10 baseline PTP operations the Switch responds to (PTP is the USB protocol cameras and computers use to exchange photos), the Switch's USB product IDs, and the steps for cleaning up a session left open by a previous connection are based on the README and CHANGELOG of [Tethersnap](https://github.com/Luminoid/Tethersnap). Saving by dragging to Finder was added after seeing the same feature in Tethersnap. No code was copied. Pullshot was written from scratch.

@@ -1,18 +1,20 @@
-# 용어
+# Glossary
 
-| 용어 | 뜻 | 코드 |
+English | [한국어](glossary.ko.md)
+
+| Term | Meaning | Code |
 |---|---|---|
-| 기기 | 기기는 사진과 동영상을 보내 주는 Nintendo Switch 2 또는 Nintendo Switch입니다. | `ConsoleModel`, `AttachedConsole` |
-| PC로 복사 모드 | PC로 복사 모드는 기기가 USB로 사진과 동영상을 보내는 상태이며, 본체 설정의 데이터 관리 메뉴에서 켭니다. 꺼진 채 연결된 기기는 대기 상태라고 합니다. | `LibraryModel.Connection.notInTransferMode`, `ConsoleLocator.idle()` |
-| 전송 | 전송은 기기와 바이트를 주고받는 통로이며, 실제 USB, 테스트용 목, 기록과 재생이 있습니다. | `Transport` |
-| 세션 | 세션은 기기와 연 PTP 세션이며, 핸들과 저장소 ID는 세션 안에서만 유효합니다. | `Session` |
-| 앨범 | 앨범은 기기에 저장된 사진과 동영상 전체입니다. | `AlbumScan` |
-| 캡처 | 캡처는 기기가 찍은 사진 한 장이나 동영상 하나이며, 코드에서만 쓰는 이름입니다. 앱 화면과 문서에서는 "사진과 동영상"이나 "사진", "동영상"이라고 씁니다. | `Capture` |
-| 항목 | 항목은 화면의 목록과 칸 이름(모든 항목, 새 항목, 선택한 항목)에서 사진과 동영상을 부르는 이름입니다. | |
-| 게임 | 게임은 사진과 동영상이 든 앨범 폴더이며, 폴더 이름이 게임 이름입니다. 앱 사이드바에서는 폴더라고 씁니다. | `Game`, `Capture.gameName`, `LibraryModel.gameSearch` |
-| 기타 | 기타는 게임 폴더 밖에 있거나 스위치의 "기타" 폴더에 든 사진과 동영상의 묶음입니다. 가져온 기록의 키에는 원래 폴더 이름을 그대로 저장합니다. | `Game.isOther`, `Game.otherFolderName` |
-| 저장 위치 | 저장 위치는 앱이 가져온 사진과 동영상을 저장하는 기준 폴더이며, 기본값은 `~/Pictures/Pullshot`입니다. | `AppSettings.importFolder` |
-| 가져오기 | 가져오기는 앱의 가져오기 버튼, Finder로 드래그하기, CLI의 `pull`로 사진과 동영상을 Mac에 복사하고 가져온 기록에 추가하는 것입니다. 앱에서 새 항목과 모두 가져오기는 저장 위치의 게임 이름 폴더에 원래 이름 그대로 저장하고, 선택한 항목을 가져올 때는 폴더별로 나눠 저장할지와 번호를 붙일지 선택할 수 있습니다. Finder로 드래그하면 놓은 곳에 저장합니다. 하나만 드래그하면 파일 하나를 저장하고, 여러 개는 게임 이름 폴더를 만들어 그 안에 저장하며, 여러 게임이 섞이면 Pullshot 폴더를 만들어 저장합니다. | `Transfer`, `ImportTarget`, `CaptureDrag`, `TransferKind.imported` |
-| 내보내기 | 내보내기는 가져온 기록에서 일반 가져오기와 구분해 남기는 기록 종류이며, 앱 화면과 CLI 명령에는 쓰지 않습니다. 앱에서 선택한 항목을 가져오거나 Finder로 드래그하면 폴더별 저장과 파일 이름 설정과 상관없이 늘 내보내기로 기록하고, CLI `pull`은 `--numbered`나 `--no-game-folder`를 지정할 때만 내보내기로 기록합니다. | `TransferKind.exported`, `ExportOptions` |
-| 가져온 기록 | 가져온 기록은 가져오거나 폴더에서 찾았거나 모두 가져온 것으로 표시한 사진과 동영상을 기기 일련번호, 기록 종류와 함께 저장한 파일이며, 새 항목은 이 기록으로 구분합니다. | `TransferLedger`, `TransferKind`, `CaptureKey` |
-| 새 항목 | 새 항목은 가져온 기록에 없는 사진과 동영상입니다. | `LedgerIndex.newCaptures` |
+| Console (기기) | A console is the Nintendo Switch 2 or Nintendo Switch that sends photos and videos. | `ConsoleModel`, `AttachedConsole` |
+| Copy to PC mode (PC로 복사 모드) | Copy to PC mode is the state in which the console sends photos and videos over USB. You turn it on in the Data Management menu of the console's System Settings. A console that is connected with the mode off is called idle. | `LibraryModel.Connection.notInTransferMode`, `ConsoleLocator.idle()` |
+| Transport (전송) | A transport is the channel that exchanges bytes with the console. There are real USB, test mock, and record and replay transports. | `Transport` |
+| Session (세션) | A session is the PTP session opened with the console. Handles and storage IDs are valid only within a session. | `Session` |
+| Album (앨범) | The album is all the photos and videos stored on the console. | `AlbumScan` |
+| Capture (캡처) | A capture is one photo or one video taken on the console. It is a name used only in code. The app UI and docs say "photos and videos", "photo", or "video". | `Capture` |
+| Items (항목) | Items is the name the on-screen lists and labels (All Items, New, Selection) use for photos and videos. | |
+| Game (게임) | A game is an album folder that holds photos and videos, and the folder name is the game name. The app sidebar calls it a folder. | `Game`, `Capture.gameName`, `LibraryModel.gameSearch` |
+| Other (기타) | Other is the group of photos and videos that are outside any game folder or are in the Switch's "Other" folder. The import history key stores the original folder name as is. | `Game.isOther`, `Game.otherFolderName` |
+| Save Location (저장 위치) | The save location is the base folder where the app saves imported photos and videos. The default is `~/Pictures/Pullshot`. | `AppSettings.importFolder` |
+| Import (가져오기) | Importing copies photos and videos to the Mac and adds them to the import history, using the app's import buttons, dragging to Finder, or the CLI's `pull`. In the app, Import New and Import All save to the game-name folder in the save location with the original names. When you import the selection, you can choose whether to save in game folders and whether to number the files. Dragging to Finder saves where you drop. Dragging one item saves one file, dragging several creates a game-name folder and saves them inside it, and dragging items from several games creates a Pullshot folder and saves them there. | `Transfer`, `ImportTarget`, `CaptureDrag`, `TransferKind.imported` |
+| Export (내보내기) | Export is a record kind in the import history that is kept separate from a regular import. It is not used in the app UI or CLI commands. In the app, importing the selection or dragging to Finder is always recorded as an export, regardless of the game folder and file name settings. The CLI `pull` records an export only when you pass `--numbered` or `--no-game-folder`. | `TransferKind.exported`, `ExportOptions` |
+| Import history (가져온 기록) | The import history is a file that stores the photos and videos that were imported, found in a folder, or marked as all imported, together with the console serial number and the record kind. It is how New items are determined. | `TransferLedger`, `TransferKind`, `CaptureKey` |
+| New (새 항목) | New items are photos and videos that are not in the import history. | `LedgerIndex.newCaptures` |

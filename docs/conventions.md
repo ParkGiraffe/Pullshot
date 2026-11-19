@@ -1,44 +1,46 @@
-# 코드 작성 규칙
+# Coding Conventions
 
-Pullshot 코드를 작성하고 리뷰할 때의 기준입니다. 아래 두 가지를 Swift에 맞게 옮겼습니다.
+English | [한국어](conventions.ko.md)
 
-- 작성자가 이전 회사에서 따르던 코드 작성 원칙과 규칙: 이름, 테스트, 오류, 커밋 방식
-- Tethersnap(https://github.com/Luminoid/Tethersnap)의 SwiftLint, SwiftFormat, pre-commit 설정: 린트와 포맷 규칙
+This is the standard for writing and reviewing Pullshot code. It adapts two sources to Swift.
 
-둘이 충돌하면 앞의 것을 따르며, 줄 길이 120자, 한국어 테스트 제목, 커밋 형식이 그 예입니다.
+- The coding principles and rules the author followed at a previous company: naming, tests, errors, and commits
+- The SwiftLint, SwiftFormat, and pre-commit configuration from Tethersnap (https://github.com/Luminoid/Tethersnap): lint and format rules
 
-## 코드 작성 원칙
+When the two conflict, the first wins. The 120-character line length, Korean test titles, and the commit format are examples.
 
-1. 코드 자체가 문서이기 때문에 가독성을 최우선합니다.
-2. 작성한 코드는 모두 유지보수 부채로 남기 때문에 최소한의 코드로 구현하며, 기본값과 같은 인자는 명시하지 않습니다.
-3. 이름이 코드의 의도를 가장 먼저 드러내기 때문에 구현이 아닌 동작과 도메인이 보이도록 다듬습니다.
-4. 테스트 제목이 구현에 의존하면 구현이 바뀔 때마다 테스트까지 따라 바뀌기 때문에 도메인 언어로 서술합니다.
-5. 코드 스멜을 방치할수록 부채가 커지기 때문에 발견 즉시 리팩터링합니다.
-6. 코드 작성은 글쓰기와 같기 때문에 빈 줄은 생각이 바뀌는 곳에만 두고, 선언, 실행, 반환처럼 문법이 바뀐다는 이유로는 띄우지 않습니다.
+## Coding Principles
 
-## 이름 정책
+1. Code is its own documentation, so readability comes first.
+2. All code you write remains as maintenance debt, so implement with as little code as possible and do not spell out arguments that match the default.
+3. A name is the first thing that reveals the intent of the code, so refine it to show behavior and domain rather than implementation.
+4. If a test title depends on the implementation, the test has to change every time the implementation does, so describe tests in domain language.
+5. Code smells grow into debt the longer they are left alone, so refactor them as soon as you find them.
+6. Writing code is like writing prose, so put a blank line only where the thought changes, not just because the syntax changes, as in declaration, execution, and return.
 
-- Bool은 의미에 어울리는 접두사를 붙입니다. 상태와 속성은 `is`, 소유는 `has`, 능력은 `can`, 의도는 `should`입니다(`isOpen`, `hasThumbnail`).
-- 한 시점에 발생한 사건이나 결과는 접두사 없이 과거분사로 짓습니다(`opened`, `cancelled`).
-- 함수가 아닌 값은 명사(구)로 짓습니다.
-- 한 번만 쓰이는 값은 인라인하되, 이름이 의도를 설명하거나 줄이 지나치게 길어지거나 반복 안에서 매번 다시 계산되면 변수로 유지합니다.
-- 표준이나 기기가 정한 이름은 그대로 사용합니다(PTP의 `GetObjectHandles`, `StorageID`).
-- 용어와 코드 이름은 `docs/glossary.md`에 정의합니다.
+## Naming Policy
 
-## 제어 흐름 정책
+- Give a Bool a prefix that fits its meaning: `is` for state and attributes, `has` for possession, `can` for ability, and `should` for intent (`isOpen`, `hasThumbnail`).
+- Name an event or result that happened at one point in time with a past participle and no prefix (`opened`, `cancelled`).
+- Name values that are not functions with a noun (phrase).
+- Inline a value that is used only once, but keep it as a variable if its name explains the intent, the line becomes too long, or it would be recomputed on every iteration of a loop.
+- Use names defined by a standard or a device as they are (`GetObjectHandles` and `StorageID` from PTP).
+- Define terms and code names in `docs/glossary.md`.
 
-- 같은 열거형 값으로 분기할 때만 `switch`를 사용하고, 범위 비교, 복합 조건, 케이스 안의 추가 분기는 `if`로 작성합니다.
+## Control Flow Policy
 
-## 오류 정책
+- Use `switch` only to branch on the same enum value. Write range comparisons, compound conditions, and extra branching inside a case with `if`.
 
-- PullshotKit은 도메인 오류(`SessionError`, `ConsoleAccessError` 등)를 그대로 던지며, Kit 타입에는 사용자 문구를 두지 않습니다.
-- 오류는 CLI의 `ErrorMessages`, 앱의 `AppErrorMessages`와 문자열 표에서만 사용자 문구로 변환하고, 같은 문구가 필요하면 각자 작성합니다.
+## Error Policy
 
-## 테스트 정책
+- PullshotKit throws domain errors (`SessionError`, `ConsoleAccessError`, and so on) as they are, and Kit types carry no user-facing text.
+- Convert errors into user-facing text only in the CLI's `ErrorMessages`, the app's `AppErrorMessages`, and the string tables. If both need the same text, each writes its own.
 
-- Swift Testing을 사용하고, 검증은 `#expect`와 `#require`로 합니다.
-- 타입마다 `@Suite("<타입> 테스트")`를 두고, 그 안에 동작별 `@Suite("<동작>")`을 둡니다.
-- 테스트 제목은 한국어 도메인 언어로 작성하고, "~하면 ~한다"처럼 조건과 결과를 서술합니다.
+## Testing Policy
+
+- Use Swift Testing, and make assertions with `#expect` and `#require`.
+- Give each type a `@Suite("<type> 테스트")` (`<type> tests`), and inside it a `@Suite("<behavior>")` for each behavior.
+- Write test titles in Korean domain language, describing the condition and the result as in "when ~, then ~" (the "~하면 ~한다" form).
 
   ```swift
   @Suite("Session 테스트")
@@ -50,30 +52,30 @@ Pullshot 코드를 작성하고 리뷰할 때의 기준입니다. 아래 두 가
   }
   ```
 
-- 기댓값은 테스트 대상 코드로 만들지 않고, 손으로 계산한 값을 작성합니다.
-- 테스트 데이터는 `<대상>Fixture(...)` 픽스처로 만들고, 기본값을 두어 테스트마다 다른 값만 넘깁니다.
-- 실기기 덤프(`LocalFixtures/`)에는 기기 일련번호와 사용자의 사진, 동영상이 들어 있기 때문에 커밋하지 않습니다.
+- Do not build expected values with the code under test. Write values calculated by hand.
+- Build test data with `<target>Fixture(...)` fixtures that have default values, so each test passes only the values that differ.
+- Real-device dumps (`LocalFixtures/`) contain device serial numbers and the user's photos and videos, so do not commit them.
 
-## 주석과 로그 정책
+## Comments and Logging Policy
 
-- 코드에는 주석을 작성하지 않습니다. 변경 이유는 커밋 메시지에, 실기기에서 확인한 사실은 `docs/hardware-notes.md`에 작성합니다.
-- 로그는 `os.Logger`(subsystem `com.parkgiraffe.Pullshot`)를 사용하고, 파일 이름, 게임 이름, 경로, 일련번호는 `privacy: .private`로 기록합니다.
-- 앱 로그 파일(`FileLog`)은 사용자가 이슈에 첨부하기 때문에 파일 이름, 게임 이름, 경로, 일련번호를 기록하지 않습니다.
+- Do not write comments in code. Put the reason for a change in the commit message, and facts confirmed on real devices in `docs/hardware-notes.md`.
+- Use `os.Logger` (subsystem `com.parkgiraffe.Pullshot`) for logging, and record file names, game names, paths, and serial numbers with `privacy: .private`.
+- Users attach the app log file (`FileLog`) to issues, so do not record file names, game names, paths, or serial numbers in it.
 
-## 린트와 포맷 정책
+## Lint and Format Policy
 
-- SwiftLint `--strict`와 SwiftFormat `--lint`는 `make check`와 pre-commit 훅에서 실행되며, 처음 한 번 `make setup-hooks`로 훅을 설정합니다.
-- 한 줄은 120자를 넘지 않습니다. 컬렉션 리터럴은 마지막 원소 뒤에 쉼표를 붙이고, 함수 호출에는 붙이지 않습니다.
-- 한국어 테스트 제목을 사용하기 때문에 `identifier_name` 규칙은 끕니다.
+- SwiftLint `--strict` and SwiftFormat `--lint` run in `make check` and the pre-commit hook. Set up the hook once with `make setup-hooks`.
+- Keep each line within 120 characters. Add a trailing comma after the last element of a collection literal, but not in a function call.
+- The `identifier_name` rule is turned off because tests use Korean titles.
 
-## 패키지 추가
+## Adding Packages
 
-- PullshotKit은 외부 패키지를 사용하지 않고, CLI만 swift-argument-parser를 사용합니다.
-- 새 패키지를 추가하거나 기존 코드를 패키지로 대체할 때는 먼저 제안하고 승인을 받습니다.
+- PullshotKit uses no external packages, and only the CLI uses swift-argument-parser.
+- Before adding a new package or replacing existing code with a package, propose it first and get approval.
 
-## 커밋
+## Commits
 
-- 제목은 `{대상} {액션}` 형태의 한국어 명사형으로 끝맺습니다(`PTP 컨테이너 추가`, `Session 재연결 순서 수정`).
-- 72자를 넘지 않고 마침표로 끝맺지 않습니다. 식별자는 표기 그대로 쓰고, 여럿이면 쉼표로 구분합니다.
-- 제목으로 의미가 충분히 전달되면 본문은 생략합니다. 본문에는 어떻게 작성했는지보다 무엇을, 왜 변경했는지를 하십시오체로 짧게 적습니다.
-- Claude나 다른 도구를 공동 작성자로 적지 않습니다.
+- End the title with a Korean noun form in the shape `{대상} {액션}` (`{target} {action}`), as in `PTP 컨테이너 추가` (Add PTP container) and `Session 재연결 순서 수정` (Fix Session reconnect order).
+- Keep it within 72 characters and do not end it with a period. Write identifiers exactly as they are spelled, and separate multiple ones with commas.
+- Omit the body if the title conveys enough. In the body, briefly state what changed and why rather than how it was written, in the formal 하십시오 register.
+- Do not list Claude or any other tool as a co-author.

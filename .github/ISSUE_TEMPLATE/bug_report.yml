@@ -1,66 +1,66 @@
-name: 버그 알리기
-description: 연결, 가져오기, 화면에서 생긴 문제를 알립니다.
+name: Bug report
+description: Report a problem with connecting, importing, or the app's screens.
 labels: [bug]
 body:
   - type: markdown
     attributes:
       value: |
-        문제를 재현할 수 있다면 설정에서 "자세한 로그 남기기"를 켜고 한 번 더 시도한 뒤 알려 주세요. 로그에는 파일 이름, 게임 이름, 경로, 일련번호가 기록되지 않습니다.
+        If you can reproduce the problem, turn on "Detailed logging" in Settings and try again before reporting. Logs don't include file names, game names, paths, or serial numbers. You can write in English or Korean.
   - type: textarea
     id: what-happened
     attributes:
-      label: 문제 설명
-      description: 어떤 작업 중에 어떤 문제가 생겼는지 작성해 주세요. 화면에 나온 문구가 있으면 그대로 붙여 넣어 주세요.
+      label: What happened
+      description: Describe what you were doing and what went wrong. If the app showed a message, paste it as is.
     validations:
       required: true
   - type: textarea
     id: steps
     attributes:
-      label: 재현 순서
+      label: Steps to reproduce
       placeholder: |
-        1. 스위치를 연결하고 PC로 복사를 켭니다.
-        2. 사이드바에서 폴더 하나를 선택합니다.
+        1. Connect the Switch and turn on Copy to PC.
+        2. Select a folder in the sidebar.
         3. ...
   - type: textarea
     id: expected
     attributes:
-      label: 기대한 동작
+      label: Expected behavior
   - type: dropdown
     id: console
     attributes:
-      label: 기기
+      label: Console
       options:
         - Nintendo Switch 2
-        - Nintendo Switch (실험적 지원)
+        - Nintendo Switch (experimental)
     validations:
       required: true
   - type: input
     id: firmware
     attributes:
-      label: 본체 시스템 버전
-      description: 본체 설정의 시스템에서 확인할 수 있고, 연결되어 있으면 앱 사이드바 맨 위에도 표시됩니다.
-      placeholder: "예: 23.5.0"
+      label: Console system version
+      description: You can find it in System Settings > System on the console. While the console is connected, it's also shown at the top of the app's sidebar.
+      placeholder: "e.g. 23.5.0"
   - type: dropdown
     id: surface
     attributes:
-      label: 앱 또는 CLI
+      label: App or CLI
       options:
-        - 앱
-        - CLI(pullshot)
+        - App
+        - CLI (pullshot)
     validations:
       required: true
   - type: input
     id: version
     attributes:
-      label: Pullshot 버전
-      description: 앱은 Pullshot 메뉴의 "Pullshot에 관하여"에서 확인할 수 있습니다. 소스에서 빌드했다면 커밋 해시를 작성해 주세요.
+      label: Pullshot version
+      description: In the app, choose About Pullshot in the Pullshot menu. If you built from source, enter the commit hash.
   - type: input
     id: mac
     attributes:
-      label: Mac과 macOS 버전
-      placeholder: "예: MacBook Air M2, macOS 15.4"
+      label: Mac and macOS version
+      placeholder: "e.g. MacBook Air M2, macOS 15.4"
   - type: textarea
     id: log
     attributes:
-      label: 로그
-      description: 앱은 도움말 메뉴의 "로그 파일 보기"로 찾은 pullshot.log 파일을 첨부해 주세요. CLI는 --verbose 옵션을 붙여 다시 실행한 출력을 붙여 넣어 주세요. CLI 출력에는 파일 이름과 게임 이름이, probe 출력에는 일련번호가 들어 있기 때문에 필요하면 가려 주세요.
+      label: Log
+      description: For the app, attach the pullshot.log file you find with Help > Show Log File. For the CLI, run the command again with --verbose and paste the output. CLI output includes file names and game names, and probe output includes the serial number, so redact them if needed.

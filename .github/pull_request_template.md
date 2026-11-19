@@ -1,23 +1,23 @@
-## 목적
-<!-- 이 PR로 해결하는 문제와 결과를 1~2문장으로 적습니다. 관련 이슈가 있으면 `Closes #번호`를 붙입니다. -->
+## Purpose
+<!-- Describe the problem this PR solves and the result in one or two sentences. If there is a related issue, add `Closes #number`. You can write in English or Korean. -->
 
 
-## 변경 요약
-<!-- 리뷰어가 알아야 할 동작 변화만 적고, 항목마다 기존 동작과 바뀐 동작을 함께 적습니다. -->
-
--
-
-
-## 리뷰 포인트
-<!-- 설계 판단, 트레이드오프, 확신이 낮은 부분을 적습니다. 없으면 이 절을 지웁니다. -->
+## Summary of changes
+<!-- List only the behavior changes reviewers need to know about, with the previous and new behavior for each item. -->
 
 -
 
 
-## 검증 내용
-<!-- 직접 확인한 것만 체크하고, 무엇을 어떻게 확인했는지 한 줄을 덧붙입니다. 확인하지 못한 것은 이유와 함께 적습니다. -->
+## Review points
+<!-- Note design decisions, trade-offs, and parts you're less sure about. Delete this section if there are none. -->
+
+-
+
+
+## Verification
+<!-- Check only what you verified yourself, and add one line on what you checked and how. For anything you couldn't verify, give the reason. -->
 
 - [ ] `make test`
 - [ ] `make check`
-- [ ] 실기기 확인(기기와 본체 시스템 버전 기재)
-- [ ] 화면을 변경했다면 `make app` 후 화면 확인(바뀐 화면의 스크린샷 첨부)
+- [ ] Checked on a real console (include the console and its system version)
+- [ ] If you changed the UI, checked it after `make app` (attach screenshots of the changed screens)
