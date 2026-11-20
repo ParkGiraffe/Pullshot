@@ -5,7 +5,7 @@ English | [한국어](glossary.ko.md)
 | Term | Meaning | Code |
 |---|---|---|
 | Console (기기) | A console is the Nintendo Switch 2 or Nintendo Switch that sends photos and videos. | `ConsoleModel`, `AttachedConsole` |
-| Copy to PC mode (PC로 복사 모드) | Copy to PC mode is the state in which the console sends photos and videos over USB. You turn it on in System Settings > Data Management on the console. A console that is connected with the mode off is called idle. | `LibraryModel.Connection.notInTransferMode`, `ConsoleLocator.idle()` |
+| Copy to PC mode (PC로 복사 모드) | Copy to PC mode is the state in which the console sends photos and videos over USB. You turn it on in System Settings > Data Management > Manage Screenshots and Videos on the console. A console that is connected with the mode off is called idle. | `LibraryModel.Connection.notInTransferMode`, `ConsoleLocator.idle()` |
 | Transport (전송) | A transport is the channel that exchanges bytes with the console. There are real USB, test mock, and record and replay transports. | `Transport` |
 | Session (세션) | A session is the PTP session opened with the console. Handles and storage IDs are valid only within a session. | `Session` |
 | Album (앨범) | The album is all the photos and videos stored on the console. | `AlbumScan` |

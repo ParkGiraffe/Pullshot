@@ -1,6 +1,6 @@
 "스위치를 연결해 주세요" = "Connect your Switch";
 "독이 아니라 본체 아래쪽 USB-C 포트에 데이터 케이블을 연결합니다." = "Connect a data cable to the USB-C port on the bottom of the console, not the dock.";
-"본체의 설정 > 데이터 관리에서 PC로 복사를 켭니다." = "On the console, turn on Copy to PC in System Settings > Data Management.";
+"본체의 설정 > 데이터 관리 > 화면 사진과 동영상 관리에서 PC로 복사를 켭니다." = "On the console, turn on Copy to PC in System Settings > Data Management > Manage Screenshots and Videos.";
 "%@가 연결되어 있지만 PC로 복사 모드가 아닙니다." = "%@ is connected but not in Copy to PC mode.";
 "이전 연결이 남아 있어 스위치의 USB 연결을 재설정했고, 이때 PC로 복사가 꺼졌습니다. 본체에서 PC로 복사를 다시 켜 주세요." = "A leftover connection was cleared by resetting the Switch's USB connection, which turned off Copy to PC. Turn on Copy to PC on the console again.";
 "연결하는 중" = "Connecting";

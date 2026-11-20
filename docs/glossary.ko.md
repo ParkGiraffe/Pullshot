@@ -5,7 +5,7 @@
 | 용어 | 뜻 | 코드 |
 |---|---|---|
 | 기기 | 기기는 사진과 동영상을 보내 주는 Nintendo Switch 2 또는 Nintendo Switch입니다. | `ConsoleModel`, `AttachedConsole` |
-| PC로 복사 모드 | PC로 복사 모드는 기기가 USB로 사진과 동영상을 보내는 상태이며, 본체의 설정 > 데이터 관리에서 켭니다. 꺼진 채 연결된 기기는 대기 상태라고 합니다. | `LibraryModel.Connection.notInTransferMode`, `ConsoleLocator.idle()` |
+| PC로 복사 모드 | PC로 복사 모드는 기기가 USB로 사진과 동영상을 보내는 상태이며, 본체의 설정 > 데이터 관리 > 화면 사진과 동영상 관리에서 켭니다. 꺼진 채 연결된 기기는 대기 상태라고 합니다. | `LibraryModel.Connection.notInTransferMode`, `ConsoleLocator.idle()` |
 | 전송 | 전송은 기기와 바이트를 주고받는 통로이며, 실제 USB, 테스트용 목, 기록과 재생이 있습니다. | `Transport` |
 | 세션 | 세션은 기기와 연 PTP 세션이며, 핸들과 저장소 ID는 세션 안에서만 유효합니다. | `Session` |
 | 앨범 | 앨범은 기기에 저장된 사진과 동영상 전체입니다. | `AlbumScan` |

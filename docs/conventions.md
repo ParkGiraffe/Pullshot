@@ -78,4 +78,3 @@ When the two conflict, the first wins. The 120-character line length, Korean tes
 - End the title with a Korean noun form in the shape `{대상} {액션}` (`{target} {action}`), as in `PTP 컨테이너 추가` (Add PTP container) and `Session 재연결 순서 수정` (Fix Session reconnect order).
 - Keep it within 72 characters and do not end it with a period. Write identifiers exactly as they are spelled, and separate multiple ones with commas.
 - Omit the body if the title conveys enough. In the body, briefly state what changed and why rather than how it was written, in the formal 하십시오 register.
-- Do not list Claude or any other tool as a co-author.
