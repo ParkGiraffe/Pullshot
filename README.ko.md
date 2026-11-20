@@ -4,7 +4,7 @@
 
 Nintendo Switch 2와 Nintendo Switch로 찍은 사진과 동영상을 USB 케이블로 Mac에 가져오는 앱입니다. 게임별로 묶어서 보여 주고, 필요한 것만 선택해서 가져오거나 Finder로 드래그해서 원하는 폴더에 바로 저장할 수 있습니다. Nintendo Switch 지원은 실험 단계입니다.
 
-![연결한 Nintendo Switch 2의 Mario Kart World 폴더를 연 Pullshot 화면](docs/images/main-ko.jpg)
+![연결한 Nintendo Switch 2의 게임 폴더를 연 Pullshot 화면](docs/images/main-ko.jpg)
 
 ## 요구 사항
 

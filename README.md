@@ -4,7 +4,7 @@ English | [한국어](README.ko.md)
 
 Pullshot is a Mac app that imports photos and videos taken on Nintendo Switch 2 and Nintendo Switch over a USB cable. It groups them by game, lets you import only the ones you select, and lets you drag them to Finder to save them straight into any folder. Nintendo Switch support is experimental.
 
-![Pullshot showing a Mario Kart World folder from a connected Nintendo Switch 2](docs/images/main-en.jpg)
+![Pullshot showing a game folder from a connected Nintendo Switch 2](docs/images/main-en.jpg)
 
 ## Requirements
 
