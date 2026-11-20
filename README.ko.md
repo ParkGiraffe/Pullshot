@@ -4,6 +4,8 @@
 
 Nintendo Switch 2와 Nintendo Switch로 찍은 사진과 동영상을 USB 케이블로 Mac에 가져오는 앱입니다. 게임별로 묶어서 보여 주고, 필요한 것만 선택해서 가져오거나 Finder로 드래그해서 원하는 폴더에 바로 저장할 수 있습니다. Nintendo Switch 지원은 실험 단계입니다.
 
+![연결한 Nintendo Switch 2의 Mario Kart World 폴더를 연 Pullshot 화면](docs/images/main-ko.jpg)
+
 ## 요구 사항
 
 - macOS 15 이상
@@ -11,9 +13,23 @@ Nintendo Switch 2와 Nintendo Switch로 찍은 사진과 동영상을 USB 케이
 
 ## 설치
 
-[최신 릴리스](https://github.com/ParkGiraffe/Pullshot/releases/latest)에서 DMG를 다운로드해 열고, Pullshot.app을 Applications 폴더로 드래그합니다.
+[최신 릴리스](https://github.com/ParkGiraffe/Pullshot/releases/latest)에서 DMG를 다운로드해 열고, Pullshot을 Applications 폴더로 드래그합니다.
 
-Apple 공증을 받지 않은 ad-hoc 서명 앱이기 때문에, 처음 실행하면 열 수 없다는 안내가 나옵니다. 이때 시스템 설정 > 개인정보 보호 및 보안 아래쪽의 "그래도 열기"를 누르면 됩니다.
+<img src="docs/images/install-dmg.png" width="600" alt="앱 아이콘에서 Applications 폴더로 화살표가 그려진 Pullshot DMG 창">
+
+Apple 공증을 받지 않은 ad-hoc 서명 앱이기 때문에, 처음 실행하면 macOS가 앱을 막습니다. 아래 순서로 한 번만 허용하면 됩니다.
+
+1. "'Pullshot.app'을(를) 열지 않음" 안내 창에서 완료를 누릅니다. 휴지통으로 이동을 누르면 앱이 휴지통으로 옮겨집니다.
+
+   <img src="docs/images/install-not-opened-ko.png" width="269" alt="'Pullshot.app'을(를) 열지 않음 안내 창">
+
+2. 시스템 설정 > 개인정보 보호 및 보안을 열고 아래쪽 보안 항목까지 내려, Pullshot.app을 차단했다는 줄 옆의 그래도 열기를 누릅니다.
+
+   <img src="docs/images/install-privacy-ko.png" width="695" alt="개인정보 보호 및 보안의 그래도 열기 버튼">
+
+3. "'Pullshot.app'을(를) 열겠습니까?" 확인 창에서 그래도 열기를 누릅니다.
+
+   <img src="docs/images/install-confirm-ko.png" width="264" alt="'Pullshot.app'을(를) 열겠습니까? 확인 창">
 
 소스에서 직접 빌드해 사용할 수도 있습니다. `make dmg`를 실행하면 `dist/Pullshot-<버전>.dmg`도 만들어집니다.
 

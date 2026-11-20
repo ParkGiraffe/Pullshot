@@ -4,6 +4,8 @@ English | [한국어](README.ko.md)
 
 Pullshot is a Mac app that imports photos and videos taken on Nintendo Switch 2 and Nintendo Switch over a USB cable. It groups them by game, lets you import only the ones you select, and lets you drag them to Finder to save them straight into any folder. Nintendo Switch support is experimental.
 
+![Pullshot showing a Mario Kart World folder from a connected Nintendo Switch 2](docs/images/main-en.jpg)
+
 ## Requirements
 
 - macOS 15 or later
@@ -11,9 +13,15 @@ Pullshot is a Mac app that imports photos and videos taken on Nintendo Switch 2 
 
 ## Install
 
-Download the DMG from the [latest release](https://github.com/ParkGiraffe/Pullshot/releases/latest), open it, and drag Pullshot.app to the Applications folder.
+Download the DMG from the [latest release](https://github.com/ParkGiraffe/Pullshot/releases/latest), open it, and drag Pullshot to the Applications folder.
 
-The app is ad-hoc signed and not notarized by Apple, so the first time you open it, macOS says it can't be opened. Click "Open Anyway" near the bottom of System Settings > Privacy & Security.
+<img src="docs/images/install-dmg.png" width="600" alt="The Pullshot DMG window with an arrow from the app to the Applications folder">
+
+The app is ad-hoc signed and not notarized by Apple, so macOS blocks it the first time you open it.
+
+1. In the "Pullshot.app" Not Opened dialog, click Done. Move to Trash moves the app to the Trash.
+2. Open System Settings > Privacy & Security, scroll down to Security, and click Open Anyway next to the message that Pullshot.app was blocked.
+3. In the dialog that asks whether to open Pullshot.app, click Open Anyway.
 
 You can also build it from source. Running `make dmg` also creates `dist/Pullshot-<version>.dmg`.
 
