@@ -71,7 +71,7 @@ If a process ends without closing its session, such as with `kill -9`, the sessi
 5. Sending the last resort, a USB device reset, resolves it, but the Switch leaves Copy to PC mode.
 
 So the current code drains any remaining data and sends CloseSession even after cancellation and errors, so that no session is left behind.
-0x2004 is a response saying the transaction ID is wrong, so saving the last transaction ID to disk should let the session be closed without a USB reset even after a forced termination, but this has not been verified yet.
+0x2004 is a response saying the transaction ID is wrong, so saving the last transaction ID to disk should let the session be closed without a USB reset even after a forced termination, and this was verified on 2026-11-20. On a Switch (system version 23.5.0) left with a session by a forced termination, sending CloseSession with transaction IDs counting up from 1 closed the session with 0x2001 at 3279, the next ID the previous connection would have used, in about 2 seconds. Afterwards a sessionless GetDeviceInfo returned 0x2001 and the Switch stayed in Copy to PC mode. So the session can be closed without a USB reset even without saving the ID, by trying IDs in order. The app does not use this method yet.
 
 A Switch whose Copy to PC mode was turned off and on again did not reject GetDeviceInfo without a session. The rejection that Tethersnap recorded on firmware 22.5.0 did not reproduce on 23.5.0, but the code keeps a path that prepares for a rejection.
 
