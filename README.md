@@ -33,7 +33,7 @@ open dist/Pullshot.app
 ## Connecting
 
 1. Connect the cable to the USB-C port on the bottom of the console, not the dock.
-2. On the console, turn on Copy to PC in System Settings > Data Management.
+2. On the console, turn on Copy to PC in System Settings > Data Management > Manage Screenshots and Videos.
 
 ## App
 
